@@ -1,0 +1,10 @@
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.schema=db/schema.sql
+spring.datasource.data=db/data.sql
+
+spring.h2.console.enabled=true
+
+logging.level.root=debug

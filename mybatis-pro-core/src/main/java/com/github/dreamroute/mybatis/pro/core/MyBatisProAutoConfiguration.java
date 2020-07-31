@@ -305,7 +305,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
             mapperPackages.addAll(Arrays.asList(basePackages));
         }
 
-        logger.info("Spring-Data-MyBatis检测出Mapper路径包括: {}", mapperPackages);
+        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
 
         return mapperPackages;
     }
