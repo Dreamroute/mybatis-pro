@@ -73,7 +73,7 @@ import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @AutoConfigureBefore({MybatisAutoConfiguration.class, MapperAutoConfiguration.class}) // 通用mapper
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class})
-public class SpringDataMyBatisAutoConfiguration implements InitializingBean {
+public class MyBatisProAutoConfiguration implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
     private final MybatisProperties properties;
@@ -88,10 +88,10 @@ public class SpringDataMyBatisAutoConfiguration implements InitializingBean {
     @Autowired
     private ApplicationContext context;
 
-    public SpringDataMyBatisAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
-                                              @SuppressWarnings("rawtypes") ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
-                                              ResourceLoader resourceLoader, ObjectProvider<DatabaseIdProvider> databaseIdProvider,
-                                              ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
+    public MyBatisProAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
+                                       @SuppressWarnings("rawtypes") ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
+                                       ResourceLoader resourceLoader, ObjectProvider<DatabaseIdProvider> databaseIdProvider,
+                                       ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
         this.properties = properties;
         this.interceptors = interceptorsProvider.getIfAvailable();
         this.typeHandlers = typeHandlersProvider.getIfAvailable();
@@ -272,7 +272,7 @@ public class SpringDataMyBatisAutoConfiguration implements InitializingBean {
         Map<String, Object> springMapperScan = context.getBeansWithAnnotation(MapperScan.class);
         Map<String, Object> tkMapperScan = context.getBeansWithAnnotation(tk.mybatis.spring.annotation.MapperScan.class);
         if (springMapperScan.isEmpty() && tkMapperScan.isEmpty()) {
-            throw new SpringDataMyBatisException("需要在启动类上面设置@MapperScan注解用于标注Mapper接口的路径");
+            throw new MyBatisProException("需要在启动类上面设置@MapperScan注解用于标注Mapper接口的路径");
         }
 
         Class<?> mainCls;

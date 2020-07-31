@@ -71,7 +71,7 @@ public class MapperUtil {
                     String namespace = mapperNode.getStringAttribute("namespace");
                     return ClassUtils.forName(namespace, MapperUtil.class.getClass().getClassLoader());
                 } catch (Exception e) {
-                    throw new SpringDataMyBatisException();
+                    throw new MyBatisProException();
                 }
             }).collect(Collectors.toSet());
         }

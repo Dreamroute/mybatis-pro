@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.dreamroute.spring.data.mybatis.sdk.SpringDataMyBatisAutoConfiguration
+com.github.dreamroute.mybatis.pro.core.MyBatisProAutoConfiguration
