@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://10.82.12.238:3307/me?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useOldAliasMetadataBehavior=true&useSSL=false
+      username: meUser
+      password: mepassword
+mybatis:
+  mapper-locations: mapper/*.xml
