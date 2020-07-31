@@ -2,11 +2,10 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import java.util.List;
 
+import com.github.dream.mybatis.pro.sdk.Mapper;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 
-import tk.mybatis.mapper.common.Mapper;
-
-public interface UserMapper extends Mapper<User> {
+public interface UserMapper extends Mapper<User, Long> {
 
     User findByNameAndPassword(String name, String password);
 

@@ -65,7 +65,7 @@ import org.springframework.util.StringUtils;
 import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
 
 /**
- * w.dehai
+ * @author w.dehai
  */
 @Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
