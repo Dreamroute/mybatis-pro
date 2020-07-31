@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * w.dehai
+ */
 @SpringBootTest
 public class UserMapperTest {
-    
 
     @Autowired
     private UserMapper userMapper;
@@ -19,19 +22,19 @@ public class UserMapperTest {
     @Test
     public void findByNameAndPasswordTest() {
         User user = userMapper.findByNameAndPassword("w.dehai", "123");
-        System.err.println(user);
+        Assertions.assertEquals(1L, user.getId());
     }
 
     @Test
     void findByNameTest() {
         List<User> users = userMapper.findByName("w.dehai");
-        System.err.println(users);
+        Assertions.assertEquals(1, users.size());
     }
 
     @Test
     void findByNameAndPasswordLikeTest() {
         List<User> users = userMapper.findByNameAndPasswordLike("w.dehai", "23");
-        System.err.println(users);
+        Assertions.assertEquals(1, users.size());
     }
 
     @Test
@@ -40,6 +43,7 @@ public class UserMapperTest {
         if (users != null) {
             users.stream().map(User::getId).forEach(System.err::println);
         }
+        Assertions.assertEquals(1, users.size());
     }
 
     @Test
@@ -60,7 +64,6 @@ public class UserMapperTest {
     @Test
     public void findByIdNotIn() {
         List<Long> list = new ArrayList<>();
-        list.add(1L);
         list.add(2L);
         List<User> users = userMapper.findByIdNotIn(list);
         System.err.println(users);

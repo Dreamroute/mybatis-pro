@@ -1,10 +1,10 @@
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS smart_user;
 
-CREATE TABLE user
+CREATE TABLE `smart_user`
 (
-  id BIGINT(20) NOT NULL COMMENT '主键ID',
-  name VARCHAR(30) NULL DEFAULT NULL COMMENT '姓名',
-  age INT(11) NULL DEFAULT NULL COMMENT '年龄',
-  email VARCHAR(50) NULL DEFAULT NULL COMMENT '邮箱',
-  PRIMARY KEY (id)
-);
+    `id`       bigint(20) NOT NULL AUTO_INCREMENT,
+    `name`     varchar(32) DEFAULT NULL,
+    `password` varchar(32) DEFAULT NULL,
+    `version`  bigint(20)  DEFAULT NULL,
+    PRIMARY KEY (`id`)
+)

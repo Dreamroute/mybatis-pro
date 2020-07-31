@@ -150,19 +150,19 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         Set<String> mapperPackages = getMapperPackages();
         //--------------------------
 
-        // -- fast-mapper begin.
+        // -- mybatis-pro begin.
         Resource[] resources = this.properties.resolveMapperLocations();
-        logger.info("织入fast-mapper开始 ......");
+        logger.info("织入mybatis-pro开始 ......");
         StopWatch watch = new StopWatch();
         watch.start();
         if (!ObjectUtils.isEmpty(resources) || !CollectionUtils.isEmpty(mapperPackages)) {
             Resource[] rs = MapperUtil.parseResource(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
-        logger.info("织入fast-mapper结束 ......");
+        logger.info("织入mybatis-pro结束 ......");
         watch.stop();
-        logger.info("织入fast-mapper耗时: {}", watch.getTotalTimeSeconds());
-        // -- fast-mapper end.
+        logger.info("织入mybatis-pro耗时: {}", watch.getTotalTimeSeconds());
+        // -- mybatis-pro end.
 
         Set<String> factoryPropertyNames = Stream
                 .of(new BeanWrapperImpl(SqlSessionFactoryBean.class).getPropertyDescriptors()).map(PropertyDescriptor::getName)
