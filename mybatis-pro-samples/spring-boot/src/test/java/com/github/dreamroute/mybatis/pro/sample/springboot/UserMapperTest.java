@@ -1,20 +1,15 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
+import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
-import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
-
-import tk.mybatis.mapper.entity.Example;
-import tk.mybatis.spring.annotation.MapperScan;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
-@MapperScan("com.github.dreamroute.spring.data.mybatis.mapper")
 public class UserMapperTest {
     
 
@@ -69,15 +64,6 @@ public class UserMapperTest {
         list.add(2L);
         List<User> users = userMapper.findByIdNotIn(list);
         System.err.println(users);
-    }
-
-    @Test
-    void mm() {
-        Example e = new Example(User.class);
-        e.createCriteria()
-                .andLike("name", "w.dehai");
-        List<User> userList = userMapper.selectByExample(e);
-        System.err.println(userList);
     }
 
 }

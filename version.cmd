@@ -1,1 +1,1 @@
-versions:set -DnewVersion=
+mvn versions:set -DnewVersion=

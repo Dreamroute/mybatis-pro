@@ -79,14 +79,13 @@ public class MapperUtil {
     }
 
     private static Resource createResource(Class<?> mapper) {
-        String name = mapper.getName();
+        String mapperFullName = mapper.getName();
         String xml =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+                "<?xml version='1.0' encoding='UTF-8' ?>\n" +
                 "<!DOCTYPE mapper\n" +
-                "        PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\"\n" +
-                "        \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\n" +
-                "<mapper namespace=\"" + name + "\">\n" +
-                "</mapper>";
+                "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
+                "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
+                "<mapper namespace='" + mapperFullName + "'></mapper>";
         return new ByteArrayResource(xml.getBytes(StandardCharsets.UTF_8));
     }
 
