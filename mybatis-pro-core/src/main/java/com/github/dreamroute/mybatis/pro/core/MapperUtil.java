@@ -5,6 +5,7 @@ import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
+import org.apache.ibatis.reflection.Reflector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -12,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,6 +21,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import javax.persistence.Table;
+import javax.swing.text.html.Option;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,8 +37,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
@@ -64,18 +69,20 @@ public class MapperUtil {
 
     private static Set<Class<?>> getExistMappers(Resource[] resources) {
         if (!ObjectUtils.isEmpty(resources)) {
-            return Arrays.stream(resources).map(resource -> {
-                try {
-                    XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
-                    XNode mapperNode = xPathParser.evalNode("mapper");
-                    String namespace = mapperNode.getStringAttribute("namespace");
-                    return ClassUtils.forName(namespace, MapperUtil.class.getClass().getClassLoader());
-                } catch (Exception e) {
-                    throw new MyBatisProException();
-                }
-            }).collect(Collectors.toSet());
+            return Arrays.stream(resources).map(MapperUtil::getMapperByResource).collect(Collectors.toSet());
         }
         return new HashSet<>();
+    }
+
+    private static Class<?> getMapperByResource(Resource resource) {
+        try {
+            XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
+            XNode mapperNode = xPathParser.evalNode("mapper");
+            String namespace = mapperNode.getStringAttribute("namespace");
+            return ClassUtils.forName(namespace, MapperUtil.class.getClass().getClassLoader());
+        } catch (Exception e) {
+            throw new MyBatisProException();
+        }
     }
 
     private static Resource createResource(Class<?> mapper) {
@@ -175,18 +182,32 @@ public class MapperUtil {
         Set<Class<?>> existXmlMapper = getExistMappers(resources);
         mappers.removeAll(existXmlMapper);
 
-        Set<Resource> result = new HashSet<>();
+        Set<Resource> allResources = new HashSet<>();
         Set<Resource> extraResource = null;
         if (!CollectionUtils.isEmpty(mappers)) {
             extraResource = mappers.stream().map(MapperUtil::createResource).collect(Collectors.toSet());
-            result.addAll(extraResource);
+            allResources.addAll(extraResource);
         }
         if (!ObjectUtils.isEmpty(resources)) {
-            result.addAll(Arrays.asList(resources));
+            allResources.addAll(Arrays.asList(resources));
         }
 
-        Set<Resource> allResources = parseResource(result);
-        return allResources.toArray(new Resource[allResources.size()]);
+        // 处理findBy方法
+        Set<Resource> all = parseResource(allResources);
+
+        // 处理通用crud
+        Set<Resource> result = processAllResources(all);
+
+        return all.toArray(new Resource[result.size()]);
+    }
+
+    private static Set<Resource> processAllResources(Set<Resource> all) {
+        if (!CollectionUtils.isEmpty(all)) {
+            all.forEach(resource -> {
+                Class<?> mapper = MapperUtil.getMapperByResource(resource);
+            });
+        }
+        return null;
     }
 
     private static Document createDoc(Resource resource) throws ParserConfigurationException, SAXException, IOException {

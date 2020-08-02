@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * @author w.dehai
  */
-public interface SelectMapper<T, I> {
+public interface SelectMapper<T, ID> {
     
-    T selectById(I id);
+    T selectById(ID id);
     
-    List<T> selectByIds(List<I> ids);
+    List<T> selectByIds(List<ID> ids);
 
 }

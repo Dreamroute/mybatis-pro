@@ -3,6 +3,7 @@ package com.github.dreamroute.mybatis.pro.core;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +66,16 @@ public class ClassUtil {
             }
         }
         return result;
+    }
+
+    public static List<Class<?>> getAllParentInterface(Class<?> cls) {
+        List<Class<?>> all = new ArrayList<>();
+        Class<?> superclass = cls.getSuperclass();
+        Class<?> current = superclass;
+        while (current != null) {
+            
+        }
+        return all;
     }
 
 }
