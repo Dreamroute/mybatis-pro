@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.consts;
 
 /**
  * 方法命名的所有关键字，与JPA保持同步，去掉了JPA中个别有歧义以及雷同的用法的关键字

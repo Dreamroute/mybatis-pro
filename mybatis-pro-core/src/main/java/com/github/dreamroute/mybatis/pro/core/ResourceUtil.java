@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
@@ -20,12 +21,6 @@ import org.w3c.dom.Text;
 import javax.persistence.Table;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -95,8 +90,8 @@ public class ResourceUtil {
     public static Class<?> getMapperByResource(Resource resource) {
         try {
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
-            XNode mapperNode = xPathParser.evalNode(XmlLabel.MAPPER);
-            String namespace = mapperNode.getStringAttribute(XmlLabel.NAMESPACE);
+            XNode mapperNode = xPathParser.evalNode(MapperLabel.MAPPER.getCode());
+            String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
             return ClassUtils.forName(namespace, ResourceUtil.class.getClass().getClassLoader());
         } catch (Exception e) {
             throw new MyBatisProException();
@@ -120,8 +115,8 @@ public class ResourceUtil {
             for (Resource resource : resources) {
                 try {
                     XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
-                    XNode mapperNode = xPathParser.evalNode(XmlLabel.MAPPER);
-                    String namespace = mapperNode.getStringAttribute(XmlLabel.NAMESPACE);
+                    XNode mapperNode = xPathParser.evalNode(MapperLabel.MAPPER.getCode());
+                    String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
                     Class<?> mapperCls = ClassUtils.forName(namespace, ResourceUtil.class.getClass().getClassLoader());
 
                     // 获取接口的findBy开头的方法
@@ -130,7 +125,7 @@ public class ResourceUtil {
                         // 获取mapper.xml的<select>标签的方法，并且与所有findBy方法对比，移除交集，也就是id与接口的findBy名称相同，那么xml文件的优先级更高
                         List<XNode> selectNodes = xPathParser.evalNodes("mapper/select");
                         if (selectNodes != null && !selectNodes.isEmpty()) {
-                            List<String> selectNames = selectNodes.stream().map(node -> node.getStringAttribute(XmlLabel.ID)).collect(Collectors.toList());
+                            List<String> selectNames = selectNodes.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
                             names.removeAll(selectNames);
                         }
 
@@ -141,7 +136,7 @@ public class ResourceUtil {
                             Document doc = createDoc(resource);
                             for (String name : names) {
                                 // 1.<select>
-                                Element selectElement = doc.createElement(XmlLabel.SELECT);
+                                Element selectElement = doc.createElement(MapperLabel.SELECT.getCode());
 
                                 // 2.<select>sql</select>
                                 String tableName = getTableName(name2Type.get(name));
@@ -150,12 +145,12 @@ public class ResourceUtil {
                                 selectElement.appendChild(sqlText);
 
                                 // 3.<select id="xxx">sql</select>
-                                Attr id = doc.createAttribute(XmlLabel.ID);
+                                Attr id = doc.createAttribute(MapperLabel.ID.getCode());
                                 id.setValue(name);
                                 selectElement.setAttributeNode(id);
 
                                 // 3.<select id="xxx" resultType="xxx">sql</select>
-                                Attr resultType = doc.createAttribute(XmlLabel.RESULT_TYPE);
+                                Attr resultType = doc.createAttribute(MapperLabel.RESULT_TYPE.getCode());
                                 resultType.setValue(name2Type.get(name));
                                 selectElement.setAttributeNode(resultType);
 
@@ -165,24 +160,10 @@ public class ResourceUtil {
                                  *     <select id="xxx" resultType="xxx">sql</select>
                                  * </mapper>
                                  */
-                                doc.getElementsByTagName(XmlLabel.MAPPER).item(0).appendChild(selectElement);
+                                doc.getElementsByTagName(MapperLabel.MAPPER.getCode()).item(0).appendChild(selectElement);
                             }
 
-                            TransformerFactory tf = TransformerFactory.newInstance();
-                            Transformer t = tf.newTransformer();
-                            t.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, doc.getDoctype().getPublicId());
-                            t.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doc.getDoctype().getSystemId());
-                            t.setOutputProperty("encoding", "UTF-8");
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                            t.transform(new DOMSource(doc), new StreamResult(bos));
-
-                            String xml = bos.toString("UTF-8");
-                            // 必须要将尖括号进行替换，否则要报错
-                            String replace = xml.replace("&gt;", ">").replace("&lt;", "<");
-                            result.add(new ByteArrayResource(replace.getBytes(StandardCharsets.UTF_8)));
-                            log.debug("fast-mapper织入后的mapper文件");
-                            log.debug("{}", bos.toString());
-                            bos.close();
+                            result.add(DocumentUtil.createResourceFromDocument(doc));
                         }
                     }
 

@@ -1,24 +1,13 @@
 package com.github.dreamroute.mybatis.pro.core;
 
 import com.github.dream.mybatis.pro.sdk.Mapper;
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.ByteArrayResource;
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 /**
@@ -59,38 +48,9 @@ public class MapperUtil {
     }
 
     private Resource processSelectMapper(Document doc) {
-        Element select = doc.createElement(XmlLabel.SELECT);
-
-        Text sql = doc.createTextNode("select * from " + tableName + " where " + idName + " = #{id}");
-        select.appendChild(sql);
-
-        Attr id = doc.createAttribute(XmlLabel.ID);
-        id.setValue("selectById");
-        select.setAttributeNode(id);
-
-        Attr resultType = doc.createAttribute(XmlLabel.RESULT_TYPE);
-        resultType.setValue(entityCls);
-        select.setAttributeNode(resultType);
-
-        doc.getElementsByTagName(XmlLabel.MAPPER).item(0).appendChild(select);
-
-        try {
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer t = tf.newTransformer();
-            t.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, doc.getDoctype().getPublicId());
-            t.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doc.getDoctype().getSystemId());
-            t.setOutputProperty("encoding", "UTF-8");
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            t.transform(new DOMSource(doc), new StreamResult(bos));
-
-            String xml = bos.toString("UTF-8");
-            // 必须要将尖括号进行替换，否则要报错
-            String replace = xml.replace("&gt;", ">").replace("&lt;", "<");
-            return new ByteArrayResource(replace.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-
-        }
-        return null;
+        String sql = "select * from " + tableName + " where " + idName + " = #{id}";
+        DocumentUtil.createSelectMethod(doc, MapperLabel.SELECT.getCode(), "selectById", entityCls, sql);
+        return DocumentUtil.createResourceFromDocument(doc);
     }
 
 }
