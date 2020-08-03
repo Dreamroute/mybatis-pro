@@ -1,16 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import java.beans.PropertyDescriptor;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.sql.DataSource;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -61,8 +51,19 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
-
 import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
+
+import javax.sql.DataSource;
+import java.beans.PropertyDescriptor;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author w.dehai
@@ -146,17 +147,15 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
             factory.setTypeHandlers(this.typeHandlers);
         }
 
-        //--------------------------
-        Set<String> mapperPackages = getMapperPackages();
-        //--------------------------
+        Resource[] resources = this.properties.resolveMapperLocations();
 
         // -- mybatis-pro begin.
-        Resource[] resources = this.properties.resolveMapperLocations();
         logger.info("织入mybatis-pro开始 ......");
         StopWatch watch = new StopWatch();
         watch.start();
+        Set<String> mapperPackages = getMapperPackages();
         if (!ObjectUtils.isEmpty(resources) || !CollectionUtils.isEmpty(mapperPackages)) {
-            Resource[] rs = MapperUtil.parseResource(resources, mapperPackages);
+            Resource[] rs = ResourceUtil.parseResource(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
         logger.info("织入mybatis-pro结束 ......");

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author w.dehai
  */
-public class MapperUtilTest {
+public class ResourceUtilTest {
 
     @Test
     public void parseResourceTest() {

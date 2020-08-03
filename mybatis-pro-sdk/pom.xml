@@ -7,11 +7,4 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>mybatis-pro-sdk</artifactId>
-    <dependencies>
-        <dependency>
-            <groupId>com.github.dreamroute</groupId>
-            <artifactId>mybatis-pro-core</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
 </project>
