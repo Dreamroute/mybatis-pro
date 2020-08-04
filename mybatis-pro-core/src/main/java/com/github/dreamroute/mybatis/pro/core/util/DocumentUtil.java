@@ -1,6 +1,8 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Attr;
@@ -8,6 +10,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -42,8 +46,29 @@ public class DocumentUtil {
         }
     }
 
-    public static void createSelectMethod(Document document, String tagName, String id, String resultType, String sql) {
-        Element select = document.createElement(tagName);
+    /**
+     * 将Resource转换成Document
+     */
+    public static Document createDocumentFromResource(Resource resource) {
+        try {
+            // 改写resource，加入findBy方法的<select>标签
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setValidating(false);
+            documentBuilderFactory.setNamespaceAware(false);
+            DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+            // 此处需要设置EntityResolver，以便从classpath寻找dtd文件进行解析，否则会从网路下载，很慢并且可能会connect timeout
+            builder.setEntityResolver(new XMLMapperEntityResolver());
+            return builder.parse(resource.getInputStream());
+        } catch (Exception e) {
+            throw new MyBatisProException("创建Document失败");
+        }
+    }
+
+    /**
+     * 给Document填充sql节点
+     */
+    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql) {
+        Element select = document.createElement(tagName.getCode());
 
         Text sqlNode = document.createTextNode(sql);
         select.appendChild(sqlNode);
@@ -57,6 +82,7 @@ public class DocumentUtil {
         select.setAttributeNode(resultTypeAttr);
 
         document.getElementsByTagName(MapperLabel.MAPPER.getCode()).item(0).appendChild(select);
+        return document;
     }
 
 }

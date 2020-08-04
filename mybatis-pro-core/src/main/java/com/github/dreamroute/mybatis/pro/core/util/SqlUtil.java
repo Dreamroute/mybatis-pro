@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.util;
 
 import com.github.dreamroute.mybatis.pro.core.consts.KeyWord;
 
@@ -8,6 +8,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author w.dehai
+ */
 public class SqlUtil {
 
     private SqlUtil() {}

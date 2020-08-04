@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
+import com.github.dreamroute.mybatis.pro.core.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
 class SqlUtilTest {

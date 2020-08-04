@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import org.apache.commons.io.IOUtils;
+import com.github.dreamroute.mybatis.pro.core.util.ResourceUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -55,8 +55,6 @@ import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -155,7 +153,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         watch.start();
         Set<String> mapperPackages = getMapperPackages();
         if (!ObjectUtils.isEmpty(resources) || !CollectionUtils.isEmpty(mapperPackages)) {
-            Resource[] rs = ResourceUtil.parseResource(resources, mapperPackages);
+            Resource[] rs = ResourceUtil.processFindByMethods(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
         logger.info("织入mybatis-pro结束 ......");

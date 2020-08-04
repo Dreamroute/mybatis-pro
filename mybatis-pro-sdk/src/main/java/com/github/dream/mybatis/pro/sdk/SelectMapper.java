@@ -11,4 +11,6 @@ public interface SelectMapper<T, ID> {
     
     List<T> selectByIds(List<ID> ids);
 
+    List<T> selectAll();
+
 }

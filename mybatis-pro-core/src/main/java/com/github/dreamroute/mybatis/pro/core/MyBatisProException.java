@@ -1,7 +1,7 @@
 package com.github.dreamroute.mybatis.pro.core;
 
 /**
- * w.dehai
+ * @author w.dehai
  */
 public class MyBatisProException extends RuntimeException {
     /**

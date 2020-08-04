@@ -1,31 +1,61 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import org.apache.ibatis.io.ResolverUtil;
+import org.apache.ibatis.io.ResolverUtil.IsA;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 查询接口的方法的返回值类型（包括普通类型和泛型类型），由于只需要容器初始化的时候执行，所以不需要缓存
- *
  * @author w.dehai
  */
 public class ClassUtil {
 
     private ClassUtil() {}
+
+    /**
+     * 根据包名获取包内的所有类
+     *
+     * @param packages 包名
+     * @return 返回包内所有类
+     */
+    public static Set<Class<?>> getClassesFromPackages(Set<String> packages) {
+        return Optional.ofNullable(packages).orElse(new HashSet<String>())
+                .stream().map(pkgName -> {
+                    ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+                    resolverUtil.find(new IsA(Object.class), pkgName);
+                    return resolverUtil.getClasses();
+                }).flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * 根据报名获取包内的所有接口
+     * @param packages 包名
+     * @return 返回包内所有接口
+     */
+    public static Set<Class<?>> getInterfacesFromPackage(Set<String> packages) {
+        return Optional.ofNullable(getClassesFromPackages(packages)).orElse(new HashSet<Class<?>>())
+                .stream().filter(Class::isInterface)
+                .collect(Collectors.toSet());
+    }
 
     /**
      * 获取方法返回值类型
@@ -60,20 +90,14 @@ public class ClassUtil {
     }
 
     /**
-     * 获取Mapper方法名与返回值对应的map
+     * 获取Mapper方法名与返回值对应的map, Map<method-name, return-type>
      *
      * @param interfaceCls 接口
      * @return 返回映射关系
      */
     public static Map<String, String> getName2Type(Class<?> interfaceCls) {
         Method[] ms = interfaceCls.getMethods();
-        Map<String, String> result = new HashMap<>();
-        if (ms != null && ms.length > 0) {
-            for (Method method : ms) {
-                result.put(method.getName(), getReturnType(method));
-            }
-        }
-        return result;
+        return Arrays.stream(ms).collect(Collectors.toMap(Method::getName, ClassUtil::getReturnType));
     }
 
     /**
@@ -94,14 +118,15 @@ public class ClassUtil {
     }
 
     /**
-     * 获取实体所有属性
+     * 获取实体所有属性, serialVersionUID和@javax.persistence.Transient除外
      */
     public static Set<Field> getAllFields(Class<?> cls) {
         Set<Field> result = new HashSet<>();
         recursiveField(cls, result);
 
-        // 过滤掉serialVersionUID和@javax.persistence.Transient属性
-        return result.stream().filter(field -> !(Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class))).collect(Collectors.toSet());
+        return result.stream()
+                .filter(field -> !(Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class)))
+                .collect(Collectors.toSet());
     }
 
     private static void recursiveField(Class<?> cls, Set<Field> result) {
@@ -127,6 +152,22 @@ public class ClassUtil {
         Column colAnno = idField.getAnnotation(Column.class);
 
         return (colAnno != null && colAnno.name() != null) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+    }
+
+    /**
+     * 根据实体获取表名
+     *
+     * @param entityStr 实体
+     * @return 返回表名
+     */
+    public static String getTableNameFromEntity(String entityStr) {
+        try {
+            Class<?> entityCls = ClassUtils.forName(entityStr, null);
+            Table anno = entityCls.getAnnotation(Table.class);
+            return anno.name();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("获取表名失败，entity需要本@Table注解标注", e);
+        }
     }
 
 }
