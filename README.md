@@ -1,8 +1,13 @@
-# mybatis-pro
-##### 1、开发此框架的初衷
-    彻底告别单表SQL语句
+## mybatis-pro
 
-##### 2、使用方式
+## Links
+- [中文文档](https://www.mdeditor.com/)
+- [English Document](https://www.mdeditor.com/)
+
+## 开发此框架的初衷
+- 彻底告别单表SQL语句
+
+## 使用方式
 - SpringBoot
 ```
     <dependency>
@@ -16,8 +21,8 @@
     
 ```
 
-##### 3、功能展示
-###### 1、简单查询
+## 功能展示
+### 简单查询
 ```$xslt
 public interface User {
 
@@ -28,7 +33,7 @@ public interface User {
 ```$xslt
 select * from user where name = #{name} and password = #{password}
 ```
-###### 2、其他
+### 其他
 ```$xslt
 
 ```
