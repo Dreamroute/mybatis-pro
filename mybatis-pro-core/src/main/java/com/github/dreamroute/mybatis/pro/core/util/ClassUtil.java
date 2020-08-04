@@ -1,15 +1,15 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
 import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.annotations.Column;
+import com.github.dreamroute.mybatis.pro.core.annotations.Id;
+import com.github.dreamroute.mybatis.pro.core.annotations.Table;
+import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -163,8 +163,8 @@ public class ClassUtil {
     public static String getTableNameFromEntity(String entityStr) {
         try {
             Class<?> entityCls = ClassUtils.forName(entityStr, null);
-            Table anno = entityCls.getAnnotation(Table.class);
-            return anno.name();
+            Table table = entityCls.getAnnotation(Table.class);
+            return table.name();
         } catch (Exception e) {
             throw new IllegalArgumentException("获取表名失败，entity需要本@Table注解标注", e);
         }
