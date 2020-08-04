@@ -21,11 +21,10 @@
 ```$xslt
 public interface User {
 
-    // 用户登录
+    // 无需在xml文件中编写sql，也无需使用注解@Select("xxx")的sql
     User findByNameAndPassword(String name, String password);
 }
 ```
-说明：对于上述UserMapper，无需在xml文件中编写sql，也无需使用注解@Select("xxx")的sql，框架会自动生成：<br>
 ```$xslt
 select * from user where name = #{name} and password = #{password}
 ```
