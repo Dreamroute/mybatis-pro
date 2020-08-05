@@ -39,7 +39,7 @@ public class MapperUtil {
     // -- biz
     private String selectPrefix;
     private String insertPrefix;
-    private String updatePrefix;
+    private String updateByIdPrefix;
     private String deletePrefix;
 
     private String insert;
@@ -51,6 +51,9 @@ public class MapperUtil {
     private String deleteByIds;
 
     private Map<String, String> methodName2Sql = new HashMap<>();
+
+    private String commonWhereIdIs = null;
+    private String commonWhereIdIn = null;
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
@@ -79,11 +82,14 @@ public class MapperUtil {
     private void processBiz() {
         selectPrefix = "select * from " + tableName;
         insertPrefix = "INSERT INTO " + tableName.toLowerCase();
-        updatePrefix = "update " + tableName;
-        deletePrefix = "delete from" + tableName;
+        updateByIdPrefix = "update " + tableName;
+        deletePrefix = "delete from " + tableName;
 
-        String selectById = selectPrefix + " where " + idColumn + " = #{id}";
-        String selectByIds = selectPrefix + " where id in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>";
+        commonWhereIdIs = " where " + idColumn + " = #{" + idName + "}";
+        commonWhereIdIn = " where " + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
+
+        String selectById = selectPrefix + commonWhereIdIs;
+        String selectByIds = selectPrefix + commonWhereIdIn;
         String selectAll = selectPrefix;
         methodName2Sql.put("selectById", selectById);
         methodName2Sql.put("selectByIds", selectByIds);
@@ -98,15 +104,15 @@ public class MapperUtil {
         methodName2Sql.put("insertList", insertList);
 //        methodName2Sql.put("insertListBySelect", insertListBySelect);
 //
-//        String update = "";
+        String updateById = createUpdateById();
 //        String updateBySelect = "";
-//        methodName2Sql.put("update", update);
+        methodName2Sql.put("updateById", updateById);
 //        methodName2Sql.put("updateBySelect", updateBySelect);
 //
-//        String deleteById = "";
-//        String deleteByIds = "";
-//        methodName2Sql.put("deleteById", deleteById);
-//        methodName2Sql.put("deleteByIds", deleteByIds);
+        String deleteById = deletePrefix + commonWhereIdIs;
+        String deleteByIds = deletePrefix + commonWhereIdIn;
+        methodName2Sql.put("deleteById", deleteById);
+        methodName2Sql.put("deleteByIds", deleteByIds);
 
     }
 
@@ -137,23 +143,24 @@ public class MapperUtil {
     }
 
     private String createInsert() {
-        return insertPrefix + " " + sqlFragment.names.toUpperCase() + " VALUE " + sqlFragment.values;
+        return insertPrefix + " " + sqlFragment.insertColumns.toUpperCase() + " VALUE " + sqlFragment.insertValues;
     }
 
     private String createInsertList() {
         return
-                insertPrefix + " " + sqlFragment.names.toUpperCase() + " VALUES " + "" +
+                insertPrefix + " " + sqlFragment.insertColumns.toUpperCase() + " VALUES " + "" +
                         "<foreach collection='list' item='item' index='index' separator=','>" +
-                        sqlFragment.values.replace("#{", "#{item.") +
+                        sqlFragment.insertColumns.replace("#{", "#{item.") +
                         "</foreach>";
     }
 
-    private String createUpdate() {
-        return null;
+    private String createUpdateById() {
+        return updateByIdPrefix + " set " + this.sqlFragment.updateByIdNamesAndValues + commonWhereIdIs;
     }
 
     private SqlFragment createSqlFragment() {
         List<String> columns = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         ReflectionUtils.doWithFields(entityCls, field -> {
             Id idAn = field.getAnnotation(Id.class);
             if (idAn != null) {
@@ -167,8 +174,10 @@ public class MapperUtil {
                 } else {
                     type = com.github.dreamroute.mybatis.pro.core.annotations.Type.IDENTITY;
                 }
-                if (id != null)
+                if (id != null) {
                     columns.add(id);
+                    values.add(field.getName());
+                }
             } else {
                 String column = SqlUtil.toLine(field.getName());
                 Column colAn = field.getAnnotation(Column.class);
@@ -176,18 +185,34 @@ public class MapperUtil {
                     column = colAn.name();
                 }
                 columns.add(column);
+                values.add(field.getName());
             }
         }, field -> !ClassUtil.specialProp(field));
-        String names = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
-        String values = columns.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
+        String insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
+        String insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
+        String updateByIdNamesAndValues = createUpdateByIdNamesAndValues(columns, values);
+
         SqlFragment fragment = new SqlFragment();
-        fragment.names = names;
-        fragment.values = values;
+        fragment.insertColumns = insertColumns;
+        fragment.insertValues = insertValues;
+        fragment.updateByIdNamesAndValues = updateByIdNamesAndValues;
         return fragment;
     }
 
     private static class SqlFragment {
-        String names;
-        String values;
+        String insertColumns;
+        String insertValues;
+        String updateByIdNamesAndValues;
+    }
+
+    private String createUpdateByIdNamesAndValues(List<String> columns, List<String> values) {
+        StringBuilder result = new StringBuilder();
+        for (int i=0; i<columns.size(); i++) {
+            result.append("`").append(columns.get(i)).append("` = #{").append(values.get(i)).append("}");
+            if (i != columns.size() - 1) {
+                result.append(",");
+            }
+        }
+        return result.toString();
     }
 }

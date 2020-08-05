@@ -64,7 +64,24 @@ public class SdkTest {
 
         int result = userMapper.insertList(users);
         System.err.println(result);
+    }
 
+    @Test
+    void updateByIdTest() {
+        User user = userMapper.selectById(2L);
+        user.setPhoneNo("13060067253");
+        int result = userMapper.updateById(user);
+        System.err.println(result);
+    }
+
+    @Test
+    void deleteByIdTest() {
+        userMapper.deleteById(107L);
+    }
+
+    @Test
+    void deleteByIdsTest() {
+        userMapper.deleteByIds(Arrays.asList(105L, 106L));
     }
 
 }
