@@ -118,15 +118,22 @@ public class ClassUtil {
     }
 
     /**
-     * 获取实体所有属性, serialVersionUID和@javax.persistence.Transient除外
+     * 获取实体所有属性, 除外
      */
     public static Set<Field> getAllFields(Class<?> cls) {
         Set<Field> result = new HashSet<>();
         recursiveField(cls, result);
 
         return result.stream()
-                .filter(field -> !(Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class)))
+                .filter(field -> !specialProp(field))
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 判断是否是serialVersionUID或者@javax.persistence.Transient
+     */
+    public static boolean specialProp(Field field) {
+        return Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class);
     }
 
     private static void recursiveField(Class<?> cls, Set<Field> result) {
@@ -140,18 +147,29 @@ public class ClassUtil {
     }
 
     /**
-     * 获取id字段
+     * 获取id字段(有@Column注解那么就是注解的name值)
+     */
+    public static String getIdColumn(Class<?> cls) {
+        Field idField = getIdField(cls);
+        Column colAnno = idField.getAnnotation(Column.class);
+        return (colAnno != null && colAnno.name() != null) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+    }
+
+    /**
+     * 获取id属性的属性名
      */
     public static String getIdName(Class<?> cls) {
+        Field idField = getIdField(cls);
+        return idField.getName();
+    }
+
+    private static Field getIdField(Class<?> cls) {
         Set<Field> idFields = getAllFields(cls).stream().filter(field -> field.isAnnotationPresent(Id.class)).collect(Collectors.toSet());
         if (idFields != null && idFields.size() != 1) {
             throw new MyBatisProException("实体" + cls.getName() + "缺少@Id注解标注的主键字段");
         }
 
-        Field idField = idFields.iterator().next();
-        Column colAnno = idField.getAnnotation(Column.class);
-
-        return (colAnno != null && colAnno.name() != null) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+        return idFields.iterator().next();
     }
 
     /**

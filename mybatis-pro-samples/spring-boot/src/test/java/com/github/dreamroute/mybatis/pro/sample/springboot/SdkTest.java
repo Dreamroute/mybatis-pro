@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +32,39 @@ public class SdkTest {
     void selectByIdsTest() {
         List<User> users = userMapper.selectByIds(Arrays.asList(1L, 100L, 101L));
         System.err.println(users);
+    }
+
+    @Test
+    public void insertTest() {
+        User user = new User();
+        user.setName("test");
+        user.setPassword("test");
+        user.setVersion(1L);
+        user.setGender(1);
+
+        userMapper.insert(user);
+    }
+
+    @Test
+    public void insertListTest() {
+        List<User> users = new ArrayList<>();
+        User user1 = new User();
+        user1.setName("test");
+        user1.setPassword("test");
+        user1.setVersion(1L);
+        user1.setGender(1);
+        users.add(user1);
+
+        User user2 = new User();
+        user2.setName("test");
+        user2.setPassword("test");
+        user2.setVersion(1L);
+        user2.setGender(1);
+        users.add(user2);
+
+        int result = userMapper.insertList(users);
+        System.err.println(result);
+
     }
 
 }

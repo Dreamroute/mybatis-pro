@@ -1,10 +1,12 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
 import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,22 +68,41 @@ public class DocumentUtil {
 
     /**
      * 给Document填充sql节点
+     *
+     * @param document mapper文档
+     * @param tagName 标签
+     * @param id id
+     * @param resultType 返回类型
+     * @param sql sql语句
+     * @param type 主键是否自增
      */
-    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql) {
-        Element select = document.createElement(tagName.getCode());
+    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql, Type type, String idName) {
+        Element statement = document.createElement(tagName.getCode());
 
         Text sqlNode = document.createTextNode(sql);
-        select.appendChild(sqlNode);
+        statement.appendChild(sqlNode);
 
         Attr idAttr = document.createAttribute(MapperLabel.ID.getCode());
         idAttr.setValue(id);
-        select.setAttributeNode(idAttr);
+        statement.setAttributeNode(idAttr);
 
-        Attr resultTypeAttr = document.createAttribute(MapperLabel.RESULT_TYPE.getCode());
-        resultTypeAttr.setValue(resultType);
-        select.setAttributeNode(resultTypeAttr);
+        if (!StringUtils.isEmpty(resultType)) {
+            Attr resultTypeAttr = document.createAttribute(MapperLabel.RESULT_TYPE.getCode());
+            resultTypeAttr.setValue(resultType);
+            statement.setAttributeNode(resultTypeAttr);
+        }
 
-        document.getElementsByTagName(MapperLabel.MAPPER.getCode()).item(0).appendChild(select);
+        if (tagName == MapperLabel.INSERT && type == Type.IDENTITY) {
+            Attr useGeneratedKeysAttr = document.createAttribute(MapperLabel.USE_GENERATED_KEYS.getCode());
+            useGeneratedKeysAttr.setValue("true");
+            statement.setAttributeNode(useGeneratedKeysAttr);
+
+            Attr keyPropertyAttr = document.createAttribute(MapperLabel.KEY_PROPERTY.getCode());
+            keyPropertyAttr.setValue(idName);
+            statement.setAttributeNode(keyPropertyAttr);
+        }
+
+        document.getElementsByTagName(MapperLabel.MAPPER.getCode()).item(0).appendChild(statement);
         return document;
     }
 

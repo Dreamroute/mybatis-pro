@@ -15,7 +15,9 @@ public enum  MapperLabel {
     MAPPER("mapper"),
     NAMESPACE("namespace"),
     ID("id"),
-    RESULT_TYPE("resultType");
+    RESULT_TYPE("resultType"),
+    USE_GENERATED_KEYS("useGeneratedKeys"),
+    KEY_PROPERTY("keyProperty");
 
     private String code;
 
