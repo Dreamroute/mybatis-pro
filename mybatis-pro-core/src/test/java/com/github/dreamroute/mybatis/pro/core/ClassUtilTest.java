@@ -34,7 +34,7 @@ class ClassUtilTest {
 
     @Test
     public void getName2TypeTest() {
-        Map<String, String> name2Type = ClassUtil.getName2Type(DemoMapper.class);
+        Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(DemoMapper.class);
         System.err.println(name2Type);
     }
 

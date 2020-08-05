@@ -69,4 +69,10 @@ public class UserMapperTest {
         System.err.println(users);
     }
 
+    @Test
+    void findByNameCountTest() {
+        int count = userMapper.findByNameCount("123");
+        System.err.println(count);
+    }
+
 }

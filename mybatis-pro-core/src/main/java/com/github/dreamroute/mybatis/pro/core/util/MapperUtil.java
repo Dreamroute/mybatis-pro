@@ -10,8 +10,6 @@ import org.springframework.util.ReflectionUtils;
 import org.w3c.dom.Document;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,6 @@ public class MapperUtil {
     private Set<Class<?>> parentInters;
     private Class<?> entityCls;
     private String entityClsStr;
-    private String idCls;
     private String tableName;
     private String idColumn;
     private String idName;
@@ -60,11 +57,7 @@ public class MapperUtil {
         Class<?> mapper = ResourceUtil.getMapperByResource(resource);
         this.parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
-            Type[] genericInterfaces = mapper.getGenericInterfaces();
-            ParameterizedType pt = (ParameterizedType) genericInterfaces[0];
-            Type[] args = pt.getActualTypeArguments();
-            this.entityClsStr = args[0].getTypeName();
-            this.idCls = args[1].getTypeName();
+            this.entityClsStr = ClassUtil.getMapperGeneric(mapper);
             this.tableName = ClassUtil.getTableNameFromEntity(entityClsStr);
             try {
                 this.entityCls = ClassUtils.forName(entityClsStr, getClass().getClassLoader());
