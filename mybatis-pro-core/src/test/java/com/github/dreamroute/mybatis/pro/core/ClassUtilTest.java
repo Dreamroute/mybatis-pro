@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -9,11 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
+import javax.persistence.Transient;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.Transient;
+import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
 
 /**
  * @author w.dehai
@@ -72,7 +74,14 @@ class M {
     @Transient
     private String name;
 }
-class User extends M {
+class User extends M implements Serializable {
     private static final long serialVersionUID = -1383742108573524072L;
     private Long id;
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
 }

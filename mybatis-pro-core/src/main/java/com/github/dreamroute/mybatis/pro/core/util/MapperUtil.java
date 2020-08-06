@@ -39,14 +39,6 @@ public class MapperUtil {
     private String updateByIdPrefix;
     private String deletePrefix;
 
-    private String insert;
-    private String insertBySelect;
-
-    private String updateById;
-
-    private String deleteById;
-    private String deleteByIds;
-
     private Map<String, String> methodName2Sql = new HashMap<>();
 
     private String commonWhereIdIs = null;
@@ -90,18 +82,11 @@ public class MapperUtil {
 
         String insert = createInsert();
         String insertList = createInsertList();
-//        String insertBySelect = insertPrefix + "() values ()";
-//        String insertListBySelect = "";
         methodName2Sql.put("insert", insert);
-//        methodName2Sql.put("insertBySelect", insertBySelect);
         methodName2Sql.put("insertList", insertList);
-//        methodName2Sql.put("insertListBySelect", insertListBySelect);
 //
         String updateById = createUpdateById();
-//        String updateBySelect = "";
         methodName2Sql.put("updateById", updateById);
-//        methodName2Sql.put("updateBySelect", updateBySelect);
-//
         String deleteById = deletePrefix + commonWhereIdIs;
         String deleteByIds = deletePrefix + commonWhereIdIn;
         methodName2Sql.put("deleteById", deleteById);

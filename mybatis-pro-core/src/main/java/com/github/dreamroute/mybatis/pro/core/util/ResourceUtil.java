@@ -1,18 +1,5 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
-import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.w3c.dom.Document;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,14 +9,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
+import org.w3c.dom.Document;
+
+import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
  *
  * @author w.dehai
  */
 public class ResourceUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(ResourceUtil.class);
 
     private ResourceUtil() {}
 

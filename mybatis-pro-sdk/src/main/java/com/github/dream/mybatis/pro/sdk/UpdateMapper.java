@@ -1,7 +1,5 @@
 package com.github.dream.mybatis.pro.sdk;
 
-import java.util.List;
-
 /**
  * @author w.dehai
  */
