@@ -25,7 +25,7 @@
 
 - 单表条件查询
 ```$xslt
-public interface User {
+public interface UserMapper {
 
     // 这是一个根据用户名、密码查询单个用户的查询，方法名只需要以findBy打头
     User findByNameAndPassword(String name, String password);
