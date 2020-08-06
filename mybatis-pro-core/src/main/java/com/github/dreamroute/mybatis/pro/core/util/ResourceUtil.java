@@ -2,7 +2,6 @@ package com.github.dreamroute.mybatis.pro.core.util;
 
 import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
@@ -14,7 +13,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -86,6 +84,7 @@ public class ResourceUtil {
     public static Set<Resource> processFindByMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
             Class<?> mapperCls = getMapperByResource(resource);
+            String entityCls = ClassUtil.getMapperGeneric(mapperCls);
             List<String> findByMethodNames = ClassUtil.getFindByMethods(mapperCls);
             try {
                 // 获取mapper.xml的<select>标签的方法，并且与所有findBy方法对比，移除交集，也就是id与接口的findBy名称相同，那么xml文件的优先级更高
@@ -98,10 +97,19 @@ public class ResourceUtil {
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
             if (!CollectionUtils.isEmpty(findByMethodNames)) {
-                Map<String, String> name2Type = ClassUtil.getName2Type(mapperCls);
+                String tableName = ClassUtil.getTableNameFromEntity(entityCls);
+                Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
                 findByMethodNames.forEach(findByMethodName -> {
-                    String sql = "select * from " + ClassUtil.getTableNameFromEntity(name2Type.get(findByMethodName)) + " where " + createCondition(findByMethodName);
-                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, findByMethodName, name2Type.get(findByMethodName), sql);
+                    String sql;
+                    String methodName = findByMethodName;
+                    if (findByMethodName.toUpperCase().endsWith("COUNT")) {
+                        sql = "select count(*) c from ";
+                        methodName = methodName.substring(0, methodName.length() - 5);
+                    } else {
+                        sql = "select * from ";
+                    }
+                    sql +=  tableName + " where " + createCondition(methodName);
+                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, findByMethodName, name2Type.get(findByMethodName), sql, null, null);
                 });
             }
             return DocumentUtil.createResourceFromDocument(doc);

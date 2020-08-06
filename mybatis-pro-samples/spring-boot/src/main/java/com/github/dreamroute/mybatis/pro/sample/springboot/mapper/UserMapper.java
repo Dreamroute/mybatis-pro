@@ -21,4 +21,6 @@ public interface UserMapper extends Mapper<User, Long> {
 
     List<User> findByIdNotIn(List<Long> list);
 
+    int findByNameCount(String name);
+
 }

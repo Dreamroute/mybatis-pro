@@ -22,7 +22,7 @@ public class UserMapperTest {
     @Test
     public void findByNameAndPasswordTest() {
         User user = userMapper.findByNameAndPassword("w.dehai", "123");
-        Assertions.assertEquals(1L, user.getUserId());
+        Assertions.assertEquals(1L, user.getId());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class UserMapperTest {
     void findByVersionOrderByIdTest() {
         List<User> users = userMapper.findByVersionOrderByIdDesc(1L);
         if (users != null) {
-            users.stream().map(User::getUserId).forEach(System.err::println);
+            users.stream().map(User::getId).forEach(System.err::println);
         }
         Assertions.assertEquals(1, users.size());
     }
@@ -67,6 +67,12 @@ public class UserMapperTest {
         list.add(2L);
         List<User> users = userMapper.findByIdNotIn(list);
         System.err.println(users);
+    }
+
+    @Test
+    void findByNameCountTest() {
+        int count = userMapper.findByNameCount("123");
+        System.err.println(count);
     }
 
 }

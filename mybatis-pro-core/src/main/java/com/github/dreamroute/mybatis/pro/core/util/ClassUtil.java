@@ -95,7 +95,7 @@ public class ClassUtil {
      * @param interfaceCls 接口
      * @return 返回映射关系
      */
-    public static Map<String, String> getName2Type(Class<?> interfaceCls) {
+    public static Map<String, String> getMethodName2ReturnType(Class<?> interfaceCls) {
         Method[] ms = interfaceCls.getMethods();
         return Arrays.stream(ms).collect(Collectors.toMap(Method::getName, ClassUtil::getReturnType));
     }
@@ -186,6 +186,16 @@ public class ClassUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException("获取表名失败，entity需要本@Table注解标注", e);
         }
+    }
+
+    /**
+     * 获取接口Mapper<T, ID>的泛型真实类型
+     */
+    public static String getMapperGeneric(Class<?> mapperCls) {
+        Type[] genericInterfaces = mapperCls.getGenericInterfaces();
+        ParameterizedType pt = (ParameterizedType) genericInterfaces[0];
+        Type[] args = pt.getActualTypeArguments();
+        return args[0].getTypeName();
     }
 
 }
