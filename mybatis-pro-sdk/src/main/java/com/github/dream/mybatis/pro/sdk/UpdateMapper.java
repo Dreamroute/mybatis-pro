@@ -7,6 +7,6 @@ public interface UpdateMapper<T> {
 
     int updateById(T entity);
 
-    int updateByIdKeep(T entity);
+    int updateByIdExcludeNull(T entity);
 
 }

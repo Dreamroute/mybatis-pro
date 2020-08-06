@@ -46,10 +46,10 @@ public class MapperUtil {
 
     String insertColumns;
     String insertValues;
-    String insertKeepColumns;
-    String insertKeepValues;
+    String insertExcludeNullColumns;
+    String insertExcludeNullValues;
     String updateByIdColumns;
-    String updateByIdKeepColumns;
+    String updateByIdExcludeNullColumns;
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
@@ -89,15 +89,15 @@ public class MapperUtil {
 
         String insert = insertPrefix + " (" + this.insertColumns + "( VALUE (" + this.insertValues + ")";
         String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
-        String insertKeep = insertPrefix + " (" + this.insertKeepColumns + ") VALUE (" + this.insertKeepValues + ")";
+        String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") VALUE (" + this.insertExcludeNullValues + ")";
         methodName2Sql.put("insert", insert);
         methodName2Sql.put("insertList", insertList);
-        methodName2Sql.put("insertKeep", insertKeep);
+        methodName2Sql.put("insertExcludeNull", insertExcludeNull);
 
         String updateById = updateByIdPrefix + " set " + this.updateByIdColumns + commonWhereIdIs;
-        String updateByIdKeep = updateByIdPrefix + " set " + this.updateByIdKeepColumns + " where " + this.idColumn + " = #{" + this.idName + "}";
+        String updateByIdExcludeNull = updateByIdPrefix + " set " + this.updateByIdExcludeNullColumns + " where " + this.idColumn + " = #{" + this.idName + "}";
         methodName2Sql.put("updateById", updateById);
-        methodName2Sql.put("updateByIdKeep", updateByIdKeep);
+        methodName2Sql.put("updateByIdExcludeNull", updateByIdExcludeNull);
 
         String deleteById = deletePrefix + commonWhereIdIs;
         String deleteByIds = deletePrefix + commonWhereIdIn;
@@ -160,9 +160,9 @@ public class MapperUtil {
 
         this.insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
         this.insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
-        this.createInsertKeepColumnsAndValues(columns, values);
+        this.createInsertExcludeNullColumnsAndValues(columns, values);
         this.createUpdateByIdColumns(columns, values);
-        this.createUpdateByIdKeepColumns(columns, values);
+        this.createUpdateByIdExcludeNullColumns(columns, values);
     }
 
     private static class IdType {
@@ -173,16 +173,16 @@ public class MapperUtil {
         String name;
     }
 
-    private void createInsertKeepColumnsAndValues(List<String> columns, List<String> values) {
-        StringBuilder insertKeepColumns = new StringBuilder();
-        StringBuilder insertKeepValues = new StringBuilder();
+    private void createInsertExcludeNullColumnsAndValues(List<String> columns, List<String> values) {
+        StringBuilder insertExcludeNullColumns = new StringBuilder();
+        StringBuilder insertExcludeNullValues = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertKeepColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
-            insertKeepValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+            insertExcludeNullColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
+            insertExcludeNullValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
         }
 
-        this.insertKeepColumns = trimStart + insertKeepColumns.toString() + trimEnd;
-        this.insertKeepValues = trimStart + insertKeepValues.toString() + trimEnd;
+        this.insertExcludeNullColumns = trimStart + insertExcludeNullColumns.toString() + trimEnd;
+        this.insertExcludeNullValues = trimStart + insertExcludeNullValues.toString() + trimEnd;
     }
 
     private void createUpdateByIdColumns(List<String> columns, List<String> values) {
@@ -196,12 +196,12 @@ public class MapperUtil {
         this.updateByIdColumns = result.toString();
     }
 
-    private void createUpdateByIdKeepColumns(List<String> columns, List<String> values) {
+    private void createUpdateByIdExcludeNullColumns(List<String> columns, List<String> values) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
             result.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "` = #{" + values.get(i) + "},</if>");
         }
-        this.updateByIdKeepColumns = trimStart + result.toString() + trimEnd;
+        this.updateByIdExcludeNullColumns = trimStart + result.toString() + trimEnd;
     }
 }
 

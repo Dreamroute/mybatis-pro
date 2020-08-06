@@ -72,14 +72,14 @@ public class SdkTest {
     }
 
     @Test
-    void insertKeepTest() {
+    void insertExcludeNullTest() {
         User user = new User();
         user.setName("name");
         user.setPassword("pwd");
         user.setGender(1);
         user.setPhoneNo("13060067253");
 
-        int result = userMapper.insertKeep(user);
+        int result = userMapper.insertExcludeNull(user);
         System.err.println(result);
     }
 
@@ -92,10 +92,11 @@ public class SdkTest {
     }
 
     @Test
-    void updateByIdKeepTest() {
-        User user = userMapper.selectById(3L);
+    void updateByIdExcludeNullTest() {
+        User user = userMapper.selectById(1L);
+        user.setName("bai");
         user.setPhoneNo(null);
-        int result = userMapper.updateByIdKeep(user);
+        int result = userMapper.updateByIdExcludeNull(user);
         System.err.println(result);
     }
 
