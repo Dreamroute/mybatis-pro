@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,19 +20,19 @@ public class SdkTest {
     @Test
     void selectByIdTest() {
         User user = userMapper.selectById(1L);
-        System.err.println(user);
+        Assertions.assertEquals("w.dehai", user.getName());
     }
 
     @Test
     void selectAllTest() {
         List<User> users = userMapper.selectAll();
-        System.err.println(users);
+        Assertions.assertEquals(2, users.size());
     }
 
     @Test
     void selectByIdsTest() {
-        List<User> users = userMapper.selectByIds(Arrays.asList(1L, 100L, 101L));
-        System.err.println(users);
+        List<User> users = userMapper.selectByIds(Arrays.asList(1L, 2L));
+        Assertions.assertEquals(2, users.size());
     }
 
     @Test
@@ -41,8 +42,10 @@ public class SdkTest {
         user.setPassword("test");
         user.setVersion(1L);
         user.setGender(1);
+        user.setPhoneNo("13060067253");
 
-        userMapper.insert(user);
+        int result = userMapper.insert(user);
+        System.err.println(result);
     }
 
     @Test
@@ -53,6 +56,7 @@ public class SdkTest {
         user1.setPassword("test");
         user1.setVersion(1L);
         user1.setGender(1);
+        user1.setPhoneNo("139");
         users.add(user1);
 
         User user2 = new User();
@@ -60,6 +64,7 @@ public class SdkTest {
         user2.setPassword("test");
         user2.setVersion(1L);
         user2.setGender(1);
+        user2.setPhoneNo("135");
         users.add(user2);
 
         int result = userMapper.insertList(users);
@@ -76,12 +81,12 @@ public class SdkTest {
 
     @Test
     void deleteByIdTest() {
-        userMapper.deleteById(107L);
+        userMapper.deleteById(1L);
     }
 
     @Test
     void deleteByIdsTest() {
-        userMapper.deleteByIds(Arrays.asList(105L, 106L));
+        userMapper.deleteByIds(Arrays.asList(2L, 4L));
     }
 
 }

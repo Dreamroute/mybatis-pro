@@ -17,7 +17,7 @@ import javax.sql.DataSource;
  *
  */
 @Configuration
-public class SqlPrinterConfig {
+public class CommonConfig {
 
     @Value("${sql-show:true}")
     private String show;

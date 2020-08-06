@@ -143,7 +143,7 @@ public class MapperUtil {
         return
                 insertPrefix + " " + sqlFragment.insertColumns.toUpperCase() + " VALUES " + "" +
                         "<foreach collection='list' item='item' index='index' separator=','>" +
-                        sqlFragment.insertColumns.replace("#{", "#{item.") +
+                        sqlFragment.insertValues.replace("#{", "#{item.") +
                         "</foreach>";
     }
 
