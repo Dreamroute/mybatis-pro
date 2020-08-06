@@ -72,6 +72,18 @@ public class SdkTest {
     }
 
     @Test
+    void insertKeepTest() {
+        User user = new User();
+        user.setName("name");
+        user.setPassword("pwd");
+        user.setGender(1);
+        user.setPhoneNo("13060067253");
+
+        int result = userMapper.insertKeep(user);
+        System.err.println(result);
+    }
+
+    @Test
     void updateByIdTest() {
         User user = userMapper.selectById(2L);
         user.setPhoneNo("13060067253");

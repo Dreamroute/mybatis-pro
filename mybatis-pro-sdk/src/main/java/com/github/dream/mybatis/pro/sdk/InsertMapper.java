@@ -9,6 +9,8 @@ public interface InsertMapper<T> {
 
     int insert(T entity);
 
+    int insertKeep(T entity);
+
     int insertList(List<T> entityList);
 
 }

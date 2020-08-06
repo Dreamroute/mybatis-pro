@@ -31,7 +31,6 @@ public class MapperUtil {
     private String tableName;
     private String idColumn;
     private String idName;
-    private SqlFragment sqlFragment;
     private com.github.dreamroute.mybatis.pro.core.annotations.Type type;
 
     // -- biz
@@ -41,6 +40,12 @@ public class MapperUtil {
     private Map<String, String> methodName2Sql = new HashMap<>();
 
     private String commonWhereIdIs = null;
+
+    String insertColumns;
+    String insertValues;
+    String insertKeepColumns;
+    String insertKeepValues;
+    String updateByIdColumns;
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
@@ -53,7 +58,7 @@ public class MapperUtil {
                 this.entityCls = ClassUtils.forName(entityClsStr, getClass().getClassLoader());
                 this.idColumn = ClassUtil.getIdColumn(entityCls);
                 this.idName = ClassUtil.getIdName(entityCls);
-                this.sqlFragment = createSqlFragment();
+                this.createSqlFragment();
             } catch (ClassNotFoundException e) {
                 // ignore
             }
@@ -78,10 +83,12 @@ public class MapperUtil {
         methodName2Sql.put("selectByIds", selectByIds);
         methodName2Sql.put("selectAll", selectPrefix);
 
-        String insert = createInsert();
-        String insertList = createInsertList();
+        String insert = insertPrefix + " (" + this.insertColumns + "( VALUE (" + this.insertValues + ")";
+        String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
+        String insertKeep = insertPrefix + " (" + this.insertKeepColumns + ") VALUE (" + this.insertKeepValues + ")";
         methodName2Sql.put("insert", insert);
         methodName2Sql.put("insertList", insertList);
+        methodName2Sql.put("insertKeep", insertKeep);
 //
         String updateById = createUpdateById();
         methodName2Sql.put("updateById", updateById);
@@ -89,7 +96,6 @@ public class MapperUtil {
         String deleteByIds = deletePrefix + commonWhereIdIn;
         methodName2Sql.put("deleteById", deleteById);
         methodName2Sql.put("deleteByIds", deleteByIds);
-
     }
 
     /**
@@ -118,23 +124,11 @@ public class MapperUtil {
         return DocumentUtil.createResourceFromDocument(this.document);
     }
 
-    private String createInsert() {
-        return insertPrefix + " " + sqlFragment.insertColumns.toUpperCase() + " VALUE " + sqlFragment.insertValues;
-    }
-
-    private String createInsertList() {
-        return
-                insertPrefix + " " + sqlFragment.insertColumns.toUpperCase() + " VALUES " + "" +
-                        "<foreach collection='list' item='item' index='index' separator=','>" +
-                        sqlFragment.insertValues.replace("#{", "#{item.") +
-                        "</foreach>";
-    }
-
     private String createUpdateById() {
-        return updateByIdPrefix + " set " + this.sqlFragment.updateByIdNamesAndValues + commonWhereIdIs;
+        return updateByIdPrefix + " set " + this.updateByIdColumns + commonWhereIdIs;
     }
 
-    private SqlFragment createSqlFragment() {
+    private void createSqlFragment() {
         List<String> columns = new ArrayList<>();
         List<String> values = new ArrayList<>();
         Map<String, String> values2Columns = new HashMap<>();
@@ -156,26 +150,15 @@ public class MapperUtil {
         if (idType.type == Type.IDENTITY) {
             values2Columns.remove(pk.name);
         }
-        values2Columns.forEach((column, value) -> {
+        values2Columns.forEach((fieldName, column) -> {
             columns.add(column);
-            values.add(value);
+            values.add(fieldName);
         });
 
-        String insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
-        String insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
-        String updateByIdNamesAndValues = createUpdateByIdNamesAndValues(columns, values);
-
-        SqlFragment fragment = new SqlFragment();
-        fragment.insertColumns = insertColumns;
-        fragment.insertValues = insertValues;
-        fragment.updateByIdNamesAndValues = updateByIdNamesAndValues;
-        return fragment;
-    }
-
-    private static class SqlFragment {
-        String insertColumns;
-        String insertValues;
-        String updateByIdNamesAndValues;
+        this.insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
+        this.insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
+        this.createInsertKeepColumnsAndValues(columns, values);
+        this.createUpdateByIdColumns(columns, values);
     }
 
     private static class IdType {
@@ -186,7 +169,7 @@ public class MapperUtil {
         String name;
     }
 
-    private String createUpdateByIdNamesAndValues(List<String> columns, List<String> values) {
+    private void createUpdateByIdColumns(List<String> columns, List<String> values) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
             result.append("`").append(columns.get(i)).append("` = #{").append(values.get(i)).append("}");
@@ -194,6 +177,19 @@ public class MapperUtil {
                 result.append(",");
             }
         }
-        return result.toString();
+        this.updateByIdColumns = result.toString();
+    }
+
+    private void createInsertKeepColumnsAndValues(List<String> columns, List<String> values) {
+        StringBuilder insertKeepColumns = new StringBuilder();
+        StringBuilder insertKeepValues = new StringBuilder();
+        for (int i=0; i<columns.size(); i++) {
+            insertKeepColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
+            insertKeepValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+        }
+        String trimStart = "<trim suffixOverrides=','>";
+        String trimEnd = "</trim>";
+        this.insertKeepColumns = trimStart + insertKeepColumns.toString() + trimEnd;
+        this.insertKeepValues = trimStart + insertKeepValues.toString() + trimEnd;
     }
 }
