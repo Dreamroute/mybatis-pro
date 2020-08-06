@@ -66,6 +66,9 @@ public class DocumentUtil {
         }
     }
 
+    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql) {
+        return fillSqlNode(document, tagName, id, resultType, sql, null, null);
+    }
     /**
      * 给Document填充sql节点
      *

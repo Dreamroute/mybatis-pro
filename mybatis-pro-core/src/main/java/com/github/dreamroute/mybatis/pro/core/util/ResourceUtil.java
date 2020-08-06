@@ -101,7 +101,7 @@ public class ResourceUtil {
                 Map<String, String> name2Type = ClassUtil.getName2Type(mapperCls);
                 findByMethodNames.forEach(findByMethodName -> {
                     String sql = "select * from " + ClassUtil.getTableNameFromEntity(name2Type.get(findByMethodName)) + " where " + createCondition(findByMethodName);
-                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, findByMethodName, name2Type.get(findByMethodName), sql, null, null);
+                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, findByMethodName, name2Type.get(findByMethodName), sql);
                 });
             }
             return DocumentUtil.createResourceFromDocument(doc);
