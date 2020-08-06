@@ -92,6 +92,14 @@ public class SdkTest {
     }
 
     @Test
+    void updateByIdKeepTest() {
+        User user = userMapper.selectById(3L);
+        user.setPhoneNo(null);
+        int result = userMapper.updateByIdKeep(user);
+        System.err.println(result);
+    }
+
+    @Test
     void deleteByIdTest() {
         userMapper.deleteById(1L);
     }

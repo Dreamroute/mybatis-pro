@@ -41,11 +41,15 @@ public class MapperUtil {
 
     private String commonWhereIdIs = null;
 
+    final String trimStart = "<trim suffixOverrides=','>";
+    final String trimEnd = "</trim>";
+
     String insertColumns;
     String insertValues;
     String insertKeepColumns;
     String insertKeepValues;
     String updateByIdColumns;
+    String updateByIdKeepColumns;
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
@@ -89,9 +93,12 @@ public class MapperUtil {
         methodName2Sql.put("insert", insert);
         methodName2Sql.put("insertList", insertList);
         methodName2Sql.put("insertKeep", insertKeep);
-//
-        String updateById = createUpdateById();
+
+        String updateById = updateByIdPrefix + " set " + this.updateByIdColumns + commonWhereIdIs;
+        String updateByIdKeep = updateByIdPrefix + " set " + this.updateByIdKeepColumns + " where " + this.idColumn + " = #{" + this.idName + "}";
         methodName2Sql.put("updateById", updateById);
+        methodName2Sql.put("updateByIdKeep", updateByIdKeep);
+
         String deleteById = deletePrefix + commonWhereIdIs;
         String deleteByIds = deletePrefix + commonWhereIdIn;
         methodName2Sql.put("deleteById", deleteById);
@@ -122,10 +129,6 @@ public class MapperUtil {
                     DocumentUtil.fillSqlNode(this.document, ml, methodName, returnType, methodName2Sql.get(methodName), type, idName);
                 });
         return DocumentUtil.createResourceFromDocument(this.document);
-    }
-
-    private String createUpdateById() {
-        return updateByIdPrefix + " set " + this.updateByIdColumns + commonWhereIdIs;
     }
 
     private void createSqlFragment() {
@@ -159,6 +162,7 @@ public class MapperUtil {
         this.insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
         this.createInsertKeepColumnsAndValues(columns, values);
         this.createUpdateByIdColumns(columns, values);
+        this.createUpdateByIdKeepColumns(columns, values);
     }
 
     private static class IdType {
@@ -167,6 +171,18 @@ public class MapperUtil {
 
     private static class PrimaryKey {
         String name;
+    }
+
+    private void createInsertKeepColumnsAndValues(List<String> columns, List<String> values) {
+        StringBuilder insertKeepColumns = new StringBuilder();
+        StringBuilder insertKeepValues = new StringBuilder();
+        for (int i=0; i<columns.size(); i++) {
+            insertKeepColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
+            insertKeepValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+        }
+
+        this.insertKeepColumns = trimStart + insertKeepColumns.toString() + trimEnd;
+        this.insertKeepValues = trimStart + insertKeepValues.toString() + trimEnd;
     }
 
     private void createUpdateByIdColumns(List<String> columns, List<String> values) {
@@ -180,16 +196,12 @@ public class MapperUtil {
         this.updateByIdColumns = result.toString();
     }
 
-    private void createInsertKeepColumnsAndValues(List<String> columns, List<String> values) {
-        StringBuilder insertKeepColumns = new StringBuilder();
-        StringBuilder insertKeepValues = new StringBuilder();
+    private void createUpdateByIdKeepColumns(List<String> columns, List<String> values) {
+        StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertKeepColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
-            insertKeepValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+            result.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "` = #{" + values.get(i) + "},</if>");
         }
-        String trimStart = "<trim suffixOverrides=','>";
-        String trimEnd = "</trim>";
-        this.insertKeepColumns = trimStart + insertKeepColumns.toString() + trimEnd;
-        this.insertKeepValues = trimStart + insertKeepValues.toString() + trimEnd;
+        this.updateByIdKeepColumns = trimStart + result.toString() + trimEnd;
     }
 }
+
