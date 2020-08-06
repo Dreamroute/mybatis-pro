@@ -3,6 +3,7 @@ package com.github.dreamroute.mybatis.pro.core.util;
 import com.github.dream.mybatis.pro.sdk.Mapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
+import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,8 +25,7 @@ import java.util.stream.Stream;
  */
 public class MapperUtil {
 
-    private Document document;
-    private Set<Class<?>> parentInters;
+    private final Document document;
     private Class<?> entityCls;
     private String entityClsStr;
     private String tableName;
@@ -34,20 +35,17 @@ public class MapperUtil {
     private com.github.dreamroute.mybatis.pro.core.annotations.Type type;
 
     // -- biz
-    private String selectPrefix;
     private String insertPrefix;
     private String updateByIdPrefix;
-    private String deletePrefix;
 
     private Map<String, String> methodName2Sql = new HashMap<>();
 
     private String commonWhereIdIs = null;
-    private String commonWhereIdIn = null;
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
         Class<?> mapper = ResourceUtil.getMapperByResource(resource);
-        this.parentInters = ClassUtil.getAllParentInterface(mapper);
+        Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
             this.entityClsStr = ClassUtil.getMapperGeneric(mapper);
             this.tableName = ClassUtil.getTableNameFromEntity(entityClsStr);
@@ -65,20 +63,20 @@ public class MapperUtil {
     }
 
     private void processBiz() {
-        selectPrefix = "select * from " + tableName;
+        String selectPrefix = "select * from " + tableName;
+        String deletePrefix = "delete from " + tableName;
+
         insertPrefix = "INSERT INTO " + tableName.toLowerCase();
         updateByIdPrefix = "update " + tableName;
-        deletePrefix = "delete from " + tableName;
 
         commonWhereIdIs = " where " + idColumn + " = #{" + idName + "}";
-        commonWhereIdIn = " where " + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
+        String commonWhereIdIn = " where " + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
 
         String selectById = selectPrefix + commonWhereIdIs;
         String selectByIds = selectPrefix + commonWhereIdIn;
-        String selectAll = selectPrefix;
         methodName2Sql.put("selectById", selectById);
         methodName2Sql.put("selectByIds", selectByIds);
-        methodName2Sql.put("selectAll", selectAll);
+        methodName2Sql.put("selectAll", selectPrefix);
 
         String insert = createInsert();
         String insertList = createInsertList();
@@ -115,9 +113,9 @@ public class MapperUtil {
                         ml = MapperLabel.DELETE;
                     }
 
-                    DocumentUtil.fillSqlNode(document, ml, methodName, returnType, methodName2Sql.get(methodName), type, idName);
+                    DocumentUtil.fillSqlNode(this.document, ml, methodName, returnType, methodName2Sql.get(methodName), type, idName);
                 });
-        return DocumentUtil.createResourceFromDocument(document);
+        return DocumentUtil.createResourceFromDocument(this.document);
     }
 
     private String createInsert() {
@@ -139,33 +137,30 @@ public class MapperUtil {
     private SqlFragment createSqlFragment() {
         List<String> columns = new ArrayList<>();
         List<String> values = new ArrayList<>();
+        Map<String, String> values2Columns = new HashMap<>();
+        IdType idType = new IdType();
+        PrimaryKey pk = new PrimaryKey();
+
         ReflectionUtils.doWithFields(entityCls, field -> {
+            Column colAn = field.getAnnotation(Column.class);
+            String column = Optional.ofNullable(colAn).map(Column::name).orElse(SqlUtil.toLine(field.getName()));
+            values2Columns.put(field.getName(), column);
+
             Id idAn = field.getAnnotation(Id.class);
             if (idAn != null) {
-                String id = null;
-                if (idAn.type() == com.github.dreamroute.mybatis.pro.core.annotations.Type.AUTO) {
-                    id = SqlUtil.toLine(field.getName());
-                    Column colAn = field.getAnnotation(Column.class);
-                    if (colAn != null) {
-                        id = colAn.name();
-                    }
-                } else {
-                    type = com.github.dreamroute.mybatis.pro.core.annotations.Type.IDENTITY;
-                }
-                if (id != null) {
-                    columns.add(id);
-                    values.add(field.getName());
-                }
-            } else {
-                String column = SqlUtil.toLine(field.getName());
-                Column colAn = field.getAnnotation(Column.class);
-                if (colAn != null) {
-                    column = colAn.name();
-                }
-                columns.add(column);
-                values.add(field.getName());
+                idType.type = idAn.type();
+                pk.name = field.getName();
             }
-        }, field -> !ClassUtil.specialProp(field));
+        }, ClassUtil::isBeanProp);
+
+        if (idType.type == Type.IDENTITY) {
+            values2Columns.remove(pk.name);
+        }
+        values2Columns.forEach((column, value) -> {
+            columns.add(column);
+            values.add(value);
+        });
+
         String insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
         String insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
         String updateByIdNamesAndValues = createUpdateByIdNamesAndValues(columns, values);
@@ -181,6 +176,14 @@ public class MapperUtil {
         String insertColumns;
         String insertValues;
         String updateByIdNamesAndValues;
+    }
+
+    private static class IdType {
+        Type type;
+    }
+
+    private static class PrimaryKey {
+        String name;
     }
 
     private String createUpdateByIdNamesAndValues(List<String> columns, List<String> values) {

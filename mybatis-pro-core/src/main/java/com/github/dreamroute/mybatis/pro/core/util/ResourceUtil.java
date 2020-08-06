@@ -1,14 +1,7 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
@@ -18,8 +11,14 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 
-import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
@@ -47,9 +46,8 @@ public class ResourceUtil {
         // 处理通用crud
         Set<Resource> result = processMyBatisProMethods(all);
 
-        return result.toArray(new Resource[result.size()]);
+        return result.toArray(new Resource[0]);
     }
-
     private static Set<Class<?>> getExistMappers(Resource[] resources) {
         return Arrays.stream(Optional.ofNullable(resources).orElse(new Resource[0]))
                 .map(ResourceUtil::getMapperByResource)
@@ -61,7 +59,7 @@ public class ResourceUtil {
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
             XNode mapperNode = xPathParser.evalNode(MapperLabel.MAPPER.getCode());
             String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
-            return ClassUtils.forName(namespace, ResourceUtil.class.getClass().getClassLoader());
+            return ClassUtils.forName(namespace, ResourceUtil.class.getClassLoader());
         } catch (Exception e) {
             throw new MyBatisProException();
         }
@@ -127,7 +125,7 @@ public class ResourceUtil {
      * 处理通用crud方法
      */
     private static Set<Resource> processMyBatisProMethods(Set<Resource> all) {
-        return Optional.ofNullable(all).orElse(new HashSet<Resource>())
+        return Optional.ofNullable(all).orElse(new HashSet<>())
                 .stream()
                 .map(resource -> new MapperUtil(resource).parse())
                 .collect(Collectors.toSet());

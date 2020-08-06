@@ -9,6 +9,7 @@ import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -37,7 +38,7 @@ public class ClassUtil {
      * @return 返回包内所有类
      */
     public static Set<Class<?>> getClassesFromPackages(Set<String> packages) {
-        return Optional.ofNullable(packages).orElse(new HashSet<String>())
+        return Optional.ofNullable(packages).orElse(new HashSet<>())
                 .stream().map(pkgName -> {
                     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
                     resolverUtil.find(new IsA(Object.class), pkgName);
@@ -52,7 +53,7 @@ public class ClassUtil {
      * @return 返回包内所有接口
      */
     public static Set<Class<?>> getInterfacesFromPackage(Set<String> packages) {
-        return Optional.ofNullable(getClassesFromPackages(packages)).orElse(new HashSet<Class<?>>())
+        return Optional.ofNullable(getClassesFromPackages(packages)).orElse(new HashSet<>())
                 .stream().filter(Class::isInterface)
                 .collect(Collectors.toSet());
     }
@@ -74,8 +75,7 @@ public class ClassUtil {
         Type genericReturnType = method.getGenericReturnType();
         ParameterizedType pt = (ParameterizedType) genericReturnType;
         Type actualTypeArgument = pt.getActualTypeArguments()[0];
-        String typeName = actualTypeArgument.getTypeName();
-        return typeName;
+        return actualTypeArgument.getTypeName();
     }
 
     /**
@@ -118,22 +118,22 @@ public class ClassUtil {
     }
 
     /**
-     * 获取实体所有属性, 除外
+     * 获取实体所有属性
      */
     public static Set<Field> getAllFields(Class<?> cls) {
         Set<Field> result = new HashSet<>();
         recursiveField(cls, result);
 
         return result.stream()
-                .filter(field -> !specialProp(field))
+                .filter(ClassUtil::isBeanProp)
                 .collect(Collectors.toSet());
     }
 
     /**
-     * 判断是否是serialVersionUID或者@javax.persistence.Transient
+     * 判断是否是普通属性，（serialVersionUID或者@javax.persistence.Transient）除外
      */
-    public static boolean specialProp(Field field) {
-        return Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class);
+    public static boolean isBeanProp(Field field) {
+        return !Objects.equals(field.getName(), "serialVersionUID") && !field.isAnnotationPresent(Transient.class);
     }
 
     private static void recursiveField(Class<?> cls, Set<Field> result) {
@@ -152,7 +152,7 @@ public class ClassUtil {
     public static String getIdColumn(Class<?> cls) {
         Field idField = getIdField(cls);
         Column colAnno = idField.getAnnotation(Column.class);
-        return (colAnno != null && colAnno.name() != null) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+        return (colAnno != null && !StringUtils.isEmpty(colAnno.name())) ? colAnno.name() : SqlUtil.toLine(idField.getName());
     }
 
     /**
@@ -165,7 +165,7 @@ public class ClassUtil {
 
     private static Field getIdField(Class<?> cls) {
         Set<Field> idFields = getAllFields(cls).stream().filter(field -> field.isAnnotationPresent(Id.class)).collect(Collectors.toSet());
-        if (idFields != null && idFields.size() != 1) {
+        if (idFields.size() != 1) {
             throw new MyBatisProException("实体" + cls.getName() + "缺少@Id注解标注的主键字段");
         }
 

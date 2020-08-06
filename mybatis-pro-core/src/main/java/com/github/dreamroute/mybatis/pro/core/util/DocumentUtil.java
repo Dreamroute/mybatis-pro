@@ -27,6 +27,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class DocumentUtil {
 
+    private DocumentUtil() {}
+
     /**
      * 将Document转换成Resource
      */
@@ -66,9 +68,6 @@ public class DocumentUtil {
         }
     }
 
-    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql) {
-        return fillSqlNode(document, tagName, id, resultType, sql, null, null);
-    }
     /**
      * 给Document填充sql节点
      *
@@ -79,7 +78,7 @@ public class DocumentUtil {
      * @param sql sql语句
      * @param type 主键是否自增
      */
-    public static Document fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql, Type type, String idName) {
+    public static void fillSqlNode(Document document, MapperLabel tagName, String id, String resultType, String sql, Type type, String idName) {
         Element statement = document.createElement(tagName.getCode());
 
         Text sqlNode = document.createTextNode(sql);
@@ -106,7 +105,6 @@ public class DocumentUtil {
         }
 
         document.getElementsByTagName(MapperLabel.MAPPER.getCode()).item(0).appendChild(statement);
-        return document;
     }
 
 }

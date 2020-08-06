@@ -13,5 +13,5 @@ public enum Type {
     /**
      * 自定义
      */
-    AUTO;
+    AUTO
 }

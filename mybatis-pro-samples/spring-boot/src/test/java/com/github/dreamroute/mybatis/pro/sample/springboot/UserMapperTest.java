@@ -3,7 +3,9 @@ package com.github.dreamroute.mybatis.pro.sample.springboot;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * w.dehai
  */
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserMapperTest {
 
     @Autowired
@@ -21,7 +24,7 @@ public class UserMapperTest {
 
     @Test
     public void findByNameAndPasswordTest() {
-        User user = userMapper.findByNameAndPassword("w.dehai", "123");
+        User user = userMapper.findByNameAndPassword("w.dehai", "1234");
         Assertions.assertEquals(1L, user.getId());
     }
 

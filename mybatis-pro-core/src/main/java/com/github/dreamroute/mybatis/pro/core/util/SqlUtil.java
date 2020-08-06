@@ -27,8 +27,7 @@ public class SqlUtil {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         methodName = methodName.replace("OrderBy", OB);
         List<String> result = nameToken(methodName.substring(6));
-        String sql = fragment(result);
-        return sql;
+        return fragment(result);
     }
 
     private static String fragment(List<String> tokens) {
@@ -173,9 +172,9 @@ public class SqlUtil {
         int orIndex = name.indexOf(OR);
         if (andIndex == -1 && orIndex == -1) {
             return "";
-        } else if (andIndex == -1 && orIndex != -1) {
+        } else if (andIndex == -1) {
             return OR;
-        } else if (andIndex != -1 && orIndex == -1) {
+        } else if (orIndex == -1) {
             return AND;
         } else {
             return andIndex < orIndex ? AND : OR;

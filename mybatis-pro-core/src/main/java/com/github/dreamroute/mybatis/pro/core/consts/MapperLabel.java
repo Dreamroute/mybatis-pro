@@ -19,7 +19,7 @@ public enum  MapperLabel {
     USE_GENERATED_KEYS("useGeneratedKeys"),
     KEY_PROPERTY("keyProperty");
 
-    private String code;
+    private final String code;
 
     MapperLabel(String code) {
         this.code = code;
