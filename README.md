@@ -5,6 +5,7 @@
 
 ## 开发此框架的初衷
 - 彻底告别单表SQL语句
+- 毫无无底线的优雅查询
 
 ## 使用方式
 - SpringBoot
@@ -21,18 +22,18 @@
 ```
 
 ## 功能展示
-### 简单查询
+
+- 单表条件查询
 ```$xslt
 public interface User {
 
-    // 无需在xml文件中编写sql，也无需使用注解@Select("xxx")的sql
+    // 这是一个根据用户名、密码查询单个用户的查询，方法名只需要以findBy打头
     User findByNameAndPassword(String name, String password);
+
 }
 ```
-```$xslt
-select * from user where name = #{name} and password = #{password}
-```
-### 其他
-```$xslt
+你无需在xml文件中编写sql，也无需使用注解@Select("xxx")的sql，框架自动根据方法名：
 
-```
+**findByNameAndPassword**切割成`findBy`,`NameAndPassword`，组成如下sql：
+
+`select * from user where name = #{name} and password = #{password}`
