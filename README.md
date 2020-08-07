@@ -1,6 +1,6 @@
 ## mybatis-pro
 
-<p align="center">
+<p align="left">
   <a href="https://github.com/Dreamroute/mybatis-pro">
    <img src="https://github.com/Dreamroute/mybatis-pro/blob/master/mybatis.jpg">
   </a>
