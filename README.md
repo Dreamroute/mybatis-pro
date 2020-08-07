@@ -2,7 +2,7 @@
 
 <p align="left">
   <a href="https://github.com/Dreamroute/mybatis-pro">
-   <img src="https://github.com/Dreamroute/mybatis-pro/blob/master/mybatis.jpg">
+   <img src="https://github.com/Dreamroute/mybatis-pro/blob/master/mybatis.png">
   </a>
 </p>
 
