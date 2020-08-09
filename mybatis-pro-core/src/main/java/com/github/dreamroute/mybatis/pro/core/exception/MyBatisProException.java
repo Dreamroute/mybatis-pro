@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.exception;
 
 /**
  * @author w.dehai

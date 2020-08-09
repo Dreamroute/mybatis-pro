@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
@@ -25,23 +25,23 @@ import java.util.stream.Collectors;
  *
  * @author w.dehai
  */
-public class ResourceUtil {
+public class MyBatisProUtil {
 
-    private ResourceUtil() {}
+    private MyBatisProUtil() {}
 
-    public static Resource[] processFindByMethods(Resource[] resources, Set<String> mapperPackages) {
+    public static Resource[] processMyBatisPro(Resource[] resources, Set<String> mapperPackages) {
 
         Set<Class<?>> mappers = ClassUtil.getInterfacesFromPackage(mapperPackages);
         Set<Class<?>> existXmlMapper = getExistMappers(resources);
         mappers.removeAll(existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
-        Set<Resource> extraResource = mappers.stream().map(ResourceUtil::createResource).collect(Collectors.toSet());
+        Set<Resource> extraResource = mappers.stream().map(MyBatisProUtil::createResource).collect(Collectors.toSet());
         allResources.addAll(extraResource);
         allResources.addAll(Arrays.asList(resources));
 
-        // 处理findBy方法
-        Set<Resource> all = processFindByMethods(allResources);
+        // 处理findBy, deleteBy, updateBy, countBy, existBy方法
+        Set<Resource> all = processSpecialMethods(allResources);
 
         // 处理通用crud
         Set<Resource> result = processMyBatisProMethods(all);
@@ -50,7 +50,7 @@ public class ResourceUtil {
     }
     private static Set<Class<?>> getExistMappers(Resource[] resources) {
         return Arrays.stream(Optional.ofNullable(resources).orElse(new Resource[0]))
-                .map(ResourceUtil::getMapperByResource)
+                .map(MyBatisProUtil::getMapperByResource)
                 .collect(Collectors.toSet());
     }
 
@@ -59,7 +59,7 @@ public class ResourceUtil {
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
             XNode mapperNode = xPathParser.evalNode(MapperLabel.MAPPER.getCode());
             String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
-            return ClassUtils.forName(namespace, ResourceUtil.class.getClassLoader());
+            return ClassUtils.forName(namespace, MyBatisProUtil.class.getClassLoader());
         } catch (Exception e) {
             throw new MyBatisProException();
         }
@@ -76,10 +76,9 @@ public class ResourceUtil {
         return new ByteArrayResource(xml.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static Set<Resource> processFindByMethods(Set<Resource> resources) {
+    public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
             Class<?> mapperCls = getMapperByResource(resource);
-            String entityCls = ClassUtil.getMapperGeneric(mapperCls);
             List<String> findByMethodNames = ClassUtil.getFindByMethods(mapperCls);
             try {
                 // 获取mapper.xml的<select>标签的方法，并且与所有findBy方法对比，移除交集，也就是id与接口的findBy名称相同，那么xml文件的优先级更高
@@ -92,6 +91,7 @@ public class ResourceUtil {
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
             if (!CollectionUtils.isEmpty(findByMethodNames)) {
+                String entityCls = ClassUtil.getMapperGeneric(mapperCls);
                 String tableName = ClassUtil.getTableNameFromEntity(entityCls);
                 Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
                 findByMethodNames.forEach(findByMethodName -> {

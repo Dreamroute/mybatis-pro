@@ -1,10 +1,11 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dream.mybatis.pro.sdk.Mapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.springframework.util.ClassUtils;
@@ -32,16 +33,16 @@ public class ClassUtil {
     private ClassUtil() {}
 
     /**
-     * 根据包名获取包内的所有类
+     * 根据包名获取包内的所有Mapper接口（实现了com.github.dream.mybatis.pro.sdk.Mapepr的接口）
      *
      * @param packages 包名
-     * @return 返回包内所有类
+     * @return 返回包内所有适合的接口
      */
     public static Set<Class<?>> getClassesFromPackages(Set<String> packages) {
         return Optional.ofNullable(packages).orElse(new HashSet<>())
                 .stream().map(pkgName -> {
                     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
-                    resolverUtil.find(new IsA(Object.class), pkgName);
+                    resolverUtil.find(new IsA(Mapper.class), pkgName);
                     return resolverUtil.getClasses();
                 }).flatMap(Set::stream)
                 .collect(Collectors.toSet());
@@ -49,6 +50,7 @@ public class ClassUtil {
 
     /**
      * 根据报名获取包内的所有接口
+     *
      * @param packages 包名
      * @return 返回包内所有接口
      */

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author w.dehai
  */
-public class ResourceUtilTest {
+public class MyBatisProUtilTest {
 
     @Test
     public void parseResourceTest() {

@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;

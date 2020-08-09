@@ -1,11 +1,13 @@
 package com.github.dreamroute.mybatis.pro.core;
 
+import com.github.dream.mybatis.pro.sdk.Mapper;
+
 import java.util.List;
 
 /**
  * @author w.dehai
  */
-public interface DemoMapper {
+public interface DemoMapper extends Mapper<Demo, Long> {
 
     Demo findByNameAndPassword(String name, String password);
 

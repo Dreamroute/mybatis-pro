@@ -1,6 +1,7 @@
-package com.github.dreamroute.mybatis.pro.core;
+package com.github.dreamroute.mybatis.pro.core.autoconfiguration;
 
-import com.github.dreamroute.mybatis.pro.core.util.ResourceUtil;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -153,7 +154,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         watch.start();
         Set<String> mapperPackages = getMapperPackages();
         if (!ObjectUtils.isEmpty(resources) || !CollectionUtils.isEmpty(mapperPackages)) {
-            Resource[] rs = ResourceUtil.processFindByMethods(resources, mapperPackages);
+            Resource[] rs = MyBatisProUtil.processMyBatisPro(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
         logger.info("织入mybatis-pro结束 ......");
@@ -206,7 +207,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     /**
      * This will just scan the same base package as Spring Boot does. If you want more power, you can explicitly use
-     * {@link org.mybatis.spring.annotation.MapperScan} but this will get typed mappers working correctly, out-of-the-box,
+     * {@link MapperScan} but this will get typed mappers working correctly, out-of-the-box,
      * similar to using Spring Data JPA repositories.
      */
     public static class AutoConfiguredMapperScannerRegistrar implements BeanFactoryAware, ImportBeanDefinitionRegistrar {

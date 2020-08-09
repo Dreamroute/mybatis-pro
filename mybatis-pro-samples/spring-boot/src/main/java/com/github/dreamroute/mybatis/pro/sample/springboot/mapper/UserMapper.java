@@ -23,4 +23,6 @@ public interface UserMapper extends Mapper<User, Long> {
 
     int findByNameCount(String name);
 
+    boolean findByNameAndPhoneNoCount(String name, String phoneNo);
+
 }

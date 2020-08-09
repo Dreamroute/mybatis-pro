@@ -53,7 +53,7 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
-        Class<?> mapper = ResourceUtil.getMapperByResource(resource);
+        Class<?> mapper = MyBatisProUtil.getMapperByResource(resource);
         Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
             this.entityClsStr = ClassUtil.getMapperGeneric(mapper);

@@ -78,4 +78,10 @@ public class UserMapperTest {
         System.err.println(count);
     }
 
+    @Test
+    void findByNameAndPhoneNoTest() {
+        boolean count = userMapper.findByNameAndPhoneNoCount("bai", "13060067253");
+        System.err.println(count);
+    }
+
 }
