@@ -21,8 +21,8 @@ public interface UserMapper extends Mapper<User, Long> {
 
     List<User> findByIdNotIn(List<Long> list);
 
-    int findByNameCount(String name);
+    int countByName(String name);
 
-    boolean findByNameAndPhoneNoCount(String name, String phoneNo);
+    boolean countByNameAndPhoneNo(String name, String phoneNo);
 
 }

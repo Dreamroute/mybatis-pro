@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.rmi.Naming;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -86,9 +87,12 @@ public class ClassUtil {
      * @param interfaceCls Mapper接口
      * @return findBy开头的方法的方法名字
      */
-    public static List<String> getFindByMethods(Class<?> interfaceCls) {
+    public static List<String> getSpecialMethods(Class<?> interfaceCls) {
         Method[] methods = interfaceCls.getMethods();
-        return Arrays.stream(methods).map(Method::getName).filter(name -> name.startsWith("findBy")).collect(Collectors.toList());
+        return Arrays.stream(methods)
+                .map(Method::getName)
+                .filter(name -> name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("delete") || name.startsWith("count") || name.startsWith("exist")   )
+                .collect(Collectors.toList());
     }
 
     /**

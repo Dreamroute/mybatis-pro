@@ -57,7 +57,7 @@ class ClassUtilTest {
 
     @Test
     public void getSpecialMethodsTest() {
-        List<String> names = ClassUtil.getFindByMethods(DemoMapper.class);
+        List<String> names = ClassUtil.getSpecialMethods(DemoMapper.class);
         String result = names.stream().collect(Collectors.joining(",", "[", "]"));
         Assertions.assertEquals("[findByName,findByNameAndPassword]", result);
     }

@@ -74,13 +74,13 @@ public class UserMapperTest {
 
     @Test
     void findByNameCountTest() {
-        int count = userMapper.findByNameCount("123");
+        int count = userMapper.countByName("123");
         System.err.println(count);
     }
 
     @Test
     void findByNameAndPhoneNoTest() {
-        boolean count = userMapper.findByNameAndPhoneNoCount("bai", "13060067253");
+        boolean count = userMapper.countByNameAndPhoneNo("bai", "13060067253");
         System.err.println(count);
     }
 

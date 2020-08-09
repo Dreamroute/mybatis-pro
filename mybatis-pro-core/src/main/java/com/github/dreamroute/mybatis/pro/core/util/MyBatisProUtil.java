@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dream.mybatis.pro.sdk.Mapper;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
@@ -12,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -79,32 +81,50 @@ public class MyBatisProUtil {
     public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
             Class<?> mapperCls = getMapperByResource(resource);
-            List<String> findByMethodNames = ClassUtil.getFindByMethods(mapperCls);
+            List<String> specialMethods = ClassUtil.getSpecialMethods(mapperCls);
             try {
-                // 获取mapper.xml的<select>标签的方法，并且与所有findBy方法对比，移除交集，也就是id与接口的findBy名称相同，那么xml文件的优先级更高
-                List<XNode> selectNodes = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver()).evalNodes("mapper/select");
-                List<String> selectNames = selectNodes.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
-                findByMethodNames.removeAll(selectNames);
+                // 获取mapper.xml的<select>标签的方法，移除交集，也就是用户自定义方法优先级高
+                XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
+                List<XNode> selectMethods = xPathParser.evalNodes("mapper/select");
+                List<XNode> updateMethods = xPathParser.evalNodes("mapper/update");
+                List<XNode> deleteMethods = xPathParser.evalNodes("mapper/delete");
+                List<XNode> methods = new ArrayList<>();
+                methods.addAll(selectMethods);
+                methods.addAll(deleteMethods);
+                methods.addAll(deleteMethods);
+
+                List<String> methodNames = methods.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
+                specialMethods.removeAll(methodNames);
             } catch (Exception e) {
                 throw new MyBatisProException("解析" + mapperCls.getName() + "失败!");
             }
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
-            if (!CollectionUtils.isEmpty(findByMethodNames)) {
+            if (!CollectionUtils.isEmpty(specialMethods)) {
                 String entityCls = ClassUtil.getMapperGeneric(mapperCls);
                 String tableName = ClassUtil.getTableNameFromEntity(entityCls);
                 Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
-                findByMethodNames.forEach(findByMethodName -> {
-                    String sql;
-                    String methodName = findByMethodName;
-                    if (findByMethodName.toUpperCase().endsWith("COUNT")) {
-                        sql = "select count(*) c from ";
-                        methodName = methodName.substring(0, methodName.length() - 5);
-                    } else {
-                        sql = "select * from ";
+                specialMethods.forEach(specialMethodName -> {
+                    String methodName = null;
+                    String sql = null;
+                    if (specialMethodName.startsWith("findBy")) {
+                        methodName = specialMethodName.substring(6);
+                        sql = "select * from " + tableName;
+                    } else if (specialMethodName.startsWith("delete")) {
+                        methodName = specialMethodName.substring(6);
+                        sql = "delete from " + tableName;
+                    } else if (specialMethodName.startsWith("update")) {
+                        methodName = specialMethodName.substring(6);
+                        sql = "update " + tableName + "set ";
+                    } else if (specialMethodName.startsWith("count")) {
+                        methodName = specialMethodName.substring(5);
+                        sql = "select count(*) c from " + tableName;
+                    } else if (specialMethodName.startsWith("exist")) {
+                        methodName = specialMethodName.substring(5);
+                        sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from " + tableName;
                     }
-                    sql +=  tableName + " where " + createCondition(methodName);
-                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, findByMethodName, name2Type.get(findByMethodName), sql, null, null);
+                    sql +=  " where " + createCondition(methodName);
+                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, specialMethodName, name2Type.get(specialMethodName), sql, null, null);
                 });
             }
             return DocumentUtil.createResourceFromDocument(doc);

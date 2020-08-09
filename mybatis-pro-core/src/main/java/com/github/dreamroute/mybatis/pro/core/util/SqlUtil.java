@@ -26,7 +26,7 @@ public class SqlUtil {
     public static String createSql(String methodName) {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         methodName = methodName.replace("OrderBy", OB);
-        List<String> result = nameToken(methodName.substring(6));
+        List<String> result = nameToken(methodName);
         return fragment(result);
     }
 
