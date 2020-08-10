@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper">
-    <select id="selectById" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
+    <select id="selectUserById" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
         select * from smart_user where id = #{id}
     </select>
 </mapper>

@@ -9,6 +9,7 @@ import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -16,14 +17,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.rmi.Naming;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -88,10 +90,10 @@ public class ClassUtil {
      * @return findBy开头的方法的方法名字
      */
     public static List<String> getSpecialMethods(Class<?> interfaceCls) {
-        Method[] methods = interfaceCls.getMethods();
+        Method[] methods = interfaceCls.getDeclaredMethods();
         return Arrays.stream(methods)
                 .map(Method::getName)
-                .filter(name -> name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("delete") || name.startsWith("count") || name.startsWith("exist")   )
+                .filter(name -> name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy")   )
                 .collect(Collectors.toList());
     }
 
@@ -103,6 +105,11 @@ public class ClassUtil {
      */
     public static Map<String, String> getMethodName2ReturnType(Class<?> interfaceCls) {
         Method[] ms = interfaceCls.getMethods();
+        Map<String, Long> methodCount = Arrays.stream(ms).map(Method::getName).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        if (!CollectionUtils.isEmpty(duplicateMethods)) {
+            throw new MyBatisProException(interfaceCls.getName() + "的方法: " + duplicateMethods.keySet() + "不允许与" + Mapper.class.getName() + "内置方法重名");
+        }
         return Arrays.stream(ms).collect(Collectors.toMap(Method::getName, ClassUtil::getReturnType));
     }
 

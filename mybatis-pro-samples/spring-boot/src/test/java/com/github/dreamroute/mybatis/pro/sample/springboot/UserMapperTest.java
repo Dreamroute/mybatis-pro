@@ -24,7 +24,7 @@ public class UserMapperTest {
 
     @Test
     public void findByNameAndPasswordTest() {
-        User user = userMapper.findByNameAndPassword("w.dehai", "1234");
+        User user = userMapper.findByNameAndPassword("mm", "pwd");
         Assertions.assertEquals(1L, user.getId());
     }
 
@@ -80,7 +80,7 @@ public class UserMapperTest {
 
     @Test
     void findByNameAndPhoneNoTest() {
-        boolean count = userMapper.countByNameAndPhoneNo("bai", "13060067253");
+        boolean count = userMapper.countByNameAndPhoneNo("mm", "13060067253");
         System.err.println(count);
     }
 

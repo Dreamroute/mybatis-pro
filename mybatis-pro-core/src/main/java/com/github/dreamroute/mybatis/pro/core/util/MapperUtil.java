@@ -28,6 +28,7 @@ public class MapperUtil {
     private final Document document;
     private Class<?> entityCls;
     private String entityClsStr;
+    private Class<?> mapper;
     private String tableName;
     private String idColumn;
     private String idName;
@@ -53,7 +54,7 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
-        Class<?> mapper = MyBatisProUtil.getMapperByResource(resource);
+        this.mapper = MyBatisProUtil.getMapperByResource(resource);
         Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
             this.entityClsStr = ClassUtil.getMapperGeneric(mapper);
@@ -135,7 +136,7 @@ public class MapperUtil {
         List<String> columns = new ArrayList<>();
         List<String> values = new ArrayList<>();
         Map<String, String> values2Columns = new HashMap<>();
-        IdType idType = new IdType();
+        IdType pkType = new IdType();
         PrimaryKey pk = new PrimaryKey();
 
         ReflectionUtils.doWithFields(entityCls, field -> {
@@ -145,12 +146,12 @@ public class MapperUtil {
 
             Id idAn = field.getAnnotation(Id.class);
             if (idAn != null) {
-                idType.type = idAn.type();
+                pkType.type = idAn.type();
                 pk.name = field.getName();
             }
         }, ClassUtil::isBeanProp);
 
-        if (idType.type == Type.IDENTITY) {
+        if (pkType.type == Type.IDENTITY) {
             values2Columns.remove(pk.name);
         }
         values2Columns.forEach((fieldName, column) -> {
