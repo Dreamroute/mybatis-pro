@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.config;
 
 import java.util.Properties;
 
+import com.github.dreamroute.mybatis.pro.core.page.PageInterceptor;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,6 +39,11 @@ public class CommonConfig {
     @ConfigurationProperties("spring.datasource.hikari")
     public DataSource dataSource() {
         return new HikariDataSource();
+    }
+
+    @Bean
+    public PageInterceptor pageInterceptor() {
+        return new PageInterceptor();
     }
 
 }
