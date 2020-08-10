@@ -12,9 +12,9 @@
 - [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
 ## 开发此框架的初衷
-- 彻底告别单表SQL语句
-- 毫无无底线的优雅查询
-- 钢铁直男的终极选择
+- 让单表查询更加优雅
+- 基本告别单表SQL语句
+- 拥有JPA的单表表查询优势
 
 ## 框架的功能
 - 包含单表增删改查方法
