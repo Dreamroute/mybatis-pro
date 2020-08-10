@@ -1,6 +1,7 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dream.mybatis.pro.sdk.Mapper;
+import com.github.dreamroute.mybatis.pro.core.page.PageParam;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 
 import java.util.List;
@@ -60,4 +61,7 @@ public interface UserMapper extends Mapper<User, Long> {
     List<User> findByNameOrderByVersion(String name);
 
     List<User> findByNameOrderByVersionDesc(String name);
+
+    List<User> findByVersion(Long version, PageParam pageParam);
+
 }

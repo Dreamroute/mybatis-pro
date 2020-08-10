@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot;
 
+import com.github.dreamroute.mybatis.pro.core.page.PageParam;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import org.junit.jupiter.api.Assertions;
@@ -82,6 +83,16 @@ public class UserMapperTest {
     void findByNameAndPhoneNoTest() {
         boolean count = userMapper.countByNameAndPhoneNo("mm", "13060067253");
         System.err.println(count);
+    }
+
+    @Test
+    void pageTest() {
+        PageParam page = new PageParam();
+        page.setDefaultPageSize(3);
+        page.setDefaultPage(1);
+        page.setDefaultUseFlag(true);
+        List<User> users = userMapper.findByVersion(1L, page);
+        System.err.println(users);
     }
 
 }
