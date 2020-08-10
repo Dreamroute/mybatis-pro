@@ -76,7 +76,7 @@ public class MapperUtil {
         String selectPrefix = "select * from " + tableName;
         String deletePrefix = "delete from " + tableName;
 
-        insertPrefix = "INSERT INTO " + tableName.toLowerCase();
+        insertPrefix = "insert into " + tableName;
         updateByIdPrefix = "update " + tableName;
 
         commonWhereIdIs = " where " + idColumn + " = #{" + idName + "}";
@@ -88,7 +88,7 @@ public class MapperUtil {
         methodName2Sql.put("selectByIds", selectByIds);
         methodName2Sql.put("selectAll", selectPrefix);
 
-        String insert = insertPrefix + " (" + this.insertColumns + "( VALUE (" + this.insertValues + ")";
+        String insert = insertPrefix + this.insertColumns + " VALUE " + this.insertValues;
         String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
         String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") VALUE (" + this.insertExcludeNullValues + ")";
         methodName2Sql.put("insert", insert);
@@ -178,7 +178,7 @@ public class MapperUtil {
         StringBuilder insertExcludeNullColumns = new StringBuilder();
         StringBuilder insertExcludeNullValues = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertExcludeNullColumns.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
+            insertExcludeNullColumns.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "`,</if>");
             insertExcludeNullValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
         }
 

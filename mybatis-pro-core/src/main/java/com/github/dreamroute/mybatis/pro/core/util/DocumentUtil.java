@@ -1,8 +1,8 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -54,7 +54,9 @@ public class DocumentUtil {
      * 将Resource转换成Document
      */
     public static Document createDocumentFromResource(Resource resource) {
+        String result = null;
         try {
+
             // 改写resource，加入findBy方法的<select>标签
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setValidating(false);
@@ -64,7 +66,7 @@ public class DocumentUtil {
             builder.setEntityResolver(new XMLMapperEntityResolver());
             return builder.parse(resource.getInputStream());
         } catch (Exception e) {
-            throw new MyBatisProException("创建Document失败");
+            throw new MyBatisProException("创建Document失败", e);
         }
     }
 

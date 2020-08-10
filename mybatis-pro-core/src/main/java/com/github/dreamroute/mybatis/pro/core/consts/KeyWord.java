@@ -19,14 +19,14 @@ public class KeyWord {
     public static final String BETWEEN = "Between";
 
     // … where x.age < ?1
-    public static final String LESS_THAN = "LessThan";
+    public static final String LESS_THAN = "LT";
     // … where x.age <= ?1
-    public static final String LESS_THAN_EQUAL = "LessThanEqual";
+    public static final String LESS_THAN_EQUAL = "LTE";
 
     // … where x.age > ?1
-    public static final String GREATER_THAN = "GreaterThan";
+    public static final String GREATER_THAN = "GT";
     // … where x.age >= ?1
-    public static final String GREATER_THAN_EQUAL = "GreaterThanEqual";
+    public static final String GREATER_THAN_EQUAL = "GTE";
 
     // … where x.startDate > ?1
     public static final String AFTER = "After";
@@ -39,19 +39,25 @@ public class KeyWord {
     //… where x.age not null
     public static final String IS_NOT_NULL = "IsNotNull";
 
+    //… where x.age is null or x.age = ''
+    public static final String IS_BLANK = "IsBlank";
+
+    //… where x.age is null or x.age = ''
+    public static final String IS_NOT_BLANK= "IsNotBlank";
+
     // … where x.firstname like ?1
     public static final String LIKE = "Like";
     // … where x.firstname not like ?1
     public static final String NOT_LIKE = "NotLike";
 
     // … where x.firstname like ?1%
-    public static final String STARTING_WITH = "StartingWith";
+    public static final String STARTING_WITH = "StartWith";
 
     // … where x.firstname like %?1
-    public static final String ENDING_WITH = "EndingWith";
+    public static final String ENDING_WITH = "EndWith";
 
     // … where x.firstname like ?1
-    public static final String CONTAINING = "Containing";
+    public static final String CONTAINING = "Contain";
 
     //… where x.lastname <> ?1
     public static final String NOT = "Not";

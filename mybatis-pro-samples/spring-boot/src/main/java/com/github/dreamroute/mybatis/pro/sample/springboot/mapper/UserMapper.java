@@ -25,4 +25,39 @@ public interface UserMapper extends Mapper<User, Long> {
 
     boolean countByNameAndPhoneNo(String name, String phoneNo);
 
+    int deleteByNameOrPassword(String name, String password);
+
+    List<User> findByVersionLT(Long version);
+
+    List<User> findByVersionLTE(Long version);
+
+    List<User> findByVersionGT(Long version);
+
+    List<User> findByVersionGTE(Long version);
+
+    List<User> findByNameIsNull();
+
+    List<User> findByNameIsNotNull();
+
+    List<User> findByNameIsBlank();
+
+    List<User> findByNameIsNotBlank();
+
+    List<User> findByNameLike(String name);
+
+    List<User> findByNameNotLike(String name);
+
+    List<User> findByNameStartWith(String name);
+
+    List<User> findByNameEndWith(String name);
+
+    List<User> findByNameNot(String name);
+
+    List<User> findByNameIn(List<String> name);
+
+    List<User> findByNameNotIn(List<String> names);
+
+    List<User> findByNameOrderByVersion(String name);
+
+    List<User> findByNameOrderByVersionDesc(String name);
 }

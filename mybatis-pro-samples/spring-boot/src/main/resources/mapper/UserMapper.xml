@@ -6,4 +6,5 @@
     <select id="selectUserById" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
         select * from smart_user where id = #{id}
     </select>
+
 </mapper>

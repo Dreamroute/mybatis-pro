@@ -19,4 +19,8 @@ public class MyBatisProException extends RuntimeException {
         super(message, cause);
     }
 
+    public MyBatisProException(Throwable cause) {
+        super(cause);
+    }
+
 }

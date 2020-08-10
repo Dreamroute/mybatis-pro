@@ -120,6 +120,7 @@
                         </goals>
                         <configuration>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <encoding>UTF-8</encoding>
                         </configuration>
                     </execution>
                 </executions>

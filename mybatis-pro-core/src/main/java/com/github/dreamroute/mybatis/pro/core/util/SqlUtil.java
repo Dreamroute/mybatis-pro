@@ -15,8 +15,8 @@ public class SqlUtil {
 
     private SqlUtil() {}
 
-    private static final String AND = "And";
-    private static final String OR = "Or";
+    private static final String AND = KeyWord.AND;
+    private static final String OR = KeyWord.OR;
 
     private static final String ANDING = " and ";
     private static final String ORING = " or ";
@@ -25,7 +25,7 @@ public class SqlUtil {
 
     public static String createSql(String methodName) {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
-        methodName = methodName.replace("OrderBy", OB);
+        methodName = methodName.replace(KeyWord.ORDER_BY, OB);
         List<String> result = nameToken(methodName);
         return fragment(result);
     }
@@ -54,19 +54,19 @@ public class SqlUtil {
             } else if (statement.endsWith(KeyWord.LESS_THAN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LESS_THAN));
                 String column = toLine(variableName);
-                builder.append(column).append(" < #{").append(variableName).append("}").append(key);
+                builder.append(column).append(" <![CDATA[<]]> #{").append(variableName).append("}").append(key);
             } else if (statement.endsWith(KeyWord.LESS_THAN_EQUAL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LESS_THAN_EQUAL));
                 String column = toLine(variableName);
-                builder.append(column).append(" <= #{").append(variableName).append("}").append(key);
+                builder.append(column).append(" <![CDATA[<=]]> #{").append(variableName).append("}").append(key);
             } else if (statement.endsWith(KeyWord.GREATER_THAN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.GREATER_THAN));
                 String column = toLine(variableName);
-                builder.append(column).append(" > #{").append(variableName).append("}").append(key);
+                builder.append(column).append(" <![CDATA[>]]> #{").append(variableName).append("}").append(key);
             } else if (statement.endsWith(KeyWord.GREATER_THAN_EQUAL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.GREATER_THAN_EQUAL));
                 String column = toLine(variableName);
-                builder.append(column).append(" >= #{").append(variableName).append("}").append(key);
+                builder.append(column).append(" <![CDATA[>=]]> #{").append(variableName).append("}").append(key);
             } else if (statement.endsWith(KeyWord.IS_NULL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NULL));
                 String column = toLine(variableName);
@@ -75,6 +75,14 @@ public class SqlUtil {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NOT_NULL));
                 String column = toLine(variableName);
                 builder.append(column).append(" is not null").append(key);
+            } else if (statement.endsWith(KeyWord.IS_BLANK)) {
+                String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_BLANK));
+                String column = toLine(variableName);
+                builder.append(column).append(" is null or ").append(column).append(" = ''").append(key);
+            } else if (statement.endsWith(KeyWord.IS_NOT_BLANK)) {
+                String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NOT_BLANK));
+                String column = toLine(variableName);
+                builder.append(column).append(" is not null and ").append(column).append(" != ''").append(key);
             } else if (statement.endsWith(KeyWord.LIKE) && !statement.endsWith(KeyWord.NOT_LIKE)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LIKE));
                 String column = toLine(variableName);
@@ -94,7 +102,7 @@ public class SqlUtil {
             } else if (statement.endsWith(KeyWord.NOT)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT));
                 String column = toLine(variableName);
-                builder.append(column).append(" <> ").append("#{").append(variableName).append("}").append(key);
+                builder.append(column).append(" <![CDATA[<>]]> ").append("#{").append(variableName).append("}").append(key);
             } else if (statement.endsWith(KeyWord.IN) && !statement.endsWith(KeyWord.NOT_IN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IN));
                 String column = toLine(variableName);
@@ -103,14 +111,6 @@ public class SqlUtil {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT_IN));
                 String column = toLine(variableName);
                 builder.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>").append(key);
-            } else if (statement.endsWith(KeyWord.TRUE)) {
-                String variableName = firstLower(removeKeyWord(statement, KeyWord.TRUE));
-                String column = toLine(variableName);
-                builder.append(column).append(" = true").append(key);
-            } else if (statement.endsWith(KeyWord.FALSE)) {
-                String variableName = firstLower(removeKeyWord(statement, KeyWord.FALSE));
-                String column = toLine(variableName);
-                builder.append(column).append(" = false").append(key);
             } else {
 
                 // 这里处理两类：1.处理不带后缀的条件，2.处理最后一个条件（可能包含OrderBy和DESC）

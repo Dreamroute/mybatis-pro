@@ -64,7 +64,7 @@ public class MyBatisProUtil {
             String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
             return ClassUtils.forName(namespace, MyBatisProUtil.class.getClassLoader());
         } catch (Exception e) {
-            throw new MyBatisProException();
+            throw new MyBatisProException(e);
         }
     }
 
@@ -128,12 +128,14 @@ public class MyBatisProUtil {
                 specialMethods.forEach(specialMethodName -> {
                     String methodName = null;
                     String sql = null;
+                    MapperLabel ml = MapperLabel.SELECT;
                     if (specialMethodName.startsWith("findBy")) {
                         methodName = specialMethodName.substring(6);
                         sql = "select * from " + tableName;
                     } else if (specialMethodName.startsWith("deleteBy")) {
                         methodName = specialMethodName.substring(8);
                         sql = "delete from " + tableName;
+                        ml = MapperLabel.DELETE;
                     } else if (specialMethodName.startsWith("countBy")) {
                         methodName = specialMethodName.substring(7);
                         sql = "select count(*) c from " + tableName;
@@ -142,7 +144,10 @@ public class MyBatisProUtil {
                         sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from " + tableName;
                     }
                     sql += " where " + createCondition(methodName);
-                    DocumentUtil.fillSqlNode(doc, MapperLabel.SELECT, specialMethodName, name2Type.get(specialMethodName), sql, null, null);
+
+                    //  对于delete需要特殊处理，delete不需要设置resultType
+                    String resultType = ml == MapperLabel.DELETE ? null : name2Type.get(specialMethodName);
+                    DocumentUtil.fillSqlNode(doc, ml, specialMethodName, resultType, sql, null, null);
                 });
             }
             return DocumentUtil.createResourceFromDocument(doc);
