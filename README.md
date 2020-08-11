@@ -57,3 +57,7 @@ public interface UserMapper {
 **findByNameAndPassword**切割成`findBy`,`NameAndPassword`，组成如下sql：
 
 `select * from user where name = #{name} and password = #{password}`
+
+## 全部文档
+
+[中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
