@@ -58,7 +58,7 @@ public interface UserMapper {
 `select * from user where name = #{name} and password = #{password}`
 
 ## 对比（mybatis-plus、通用mapper）
-> **需求：查询version在2~4之间，并且根据id方向排序**
+> **需求：查询version在2~4之间，并且根据id反向排序**
 
 - mybatis-pro：
 ```
