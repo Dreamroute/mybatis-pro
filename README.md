@@ -3,6 +3,7 @@
 <p align="left">
     <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
 </p>
+[![wu2SX.png](https://cdn.img.wenhairu.com/images/2020/08/11/wu2SX.png)](https://img.wenhairu.com/image/wu2SX)
 
 ## 文档
 
