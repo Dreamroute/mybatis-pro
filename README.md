@@ -56,6 +56,41 @@ public interface UserMapper {
 
 `select * from user where name = #{name} and password = #{password}`
 
+## 对比（mybatis-plus、通用mapper）
+> ** 需求：查询version在2~4之间，并且根据id方向排序 **
+
+- mybatis-pro：
+```
+@Test
+void proTest() {
+    List<User> users = selectByVersionBetweenOrderById(2L, 4L);
+    System.err.println(users);
+}
+```
+- mybatis-plus：
+```
+@Test
+void plusTest() {
+    LambdaQueryWrapper<User> qw = new LambdaQueryWrapper<>();
+    LambdaQueryWrapper<User> query = qw.between(User::getVersion, 2L, 4L);
+    query.orderByDesc(User::getId);
+    List<User> users = userMapper.selectList(query);
+    System.err.println(users);
+}
+```
+
+- 通用mapper
+```
+@Test
+void mapperTest() {
+    Example e = new Example(User.class);
+    e.orderBy("id").desc();
+    Criteria criteria = e.createCriteria().andBetween("version", 2L, 4L);
+    List<User> users = userMapper.selectByExample(e);
+    System.err.println(users);
+}
+```
+
 ## 全部文档
 
 - [中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
