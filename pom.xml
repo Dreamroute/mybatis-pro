@@ -166,6 +166,6 @@
         <module>mybatis-pro-sdk</module>
         <module>mybatis-pro-auto-configuration</module>
         <module>mybatis-pro-boot-starter</module>
-        <module>mybatis-pro-samples</module>
+        <!--<module>mybatis-pro-samples</module>-->
     </modules>
 </project>
