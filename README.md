@@ -4,6 +4,11 @@
     <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
 </p>
 
+## 地址
+- [GitHub](https://github.com/Dreamroute/mybatis-pro)
+- [Gitee](https://gitee.com/Dreamroute/mybatis-pro)
+
+
 ## 文档
 
 - [中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
