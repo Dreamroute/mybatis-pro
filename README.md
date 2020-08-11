@@ -4,6 +4,8 @@
     <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
 </p>
 
+<div class="github-widget" data-repo="<GitHub Dreamroute>/<https://github.com/Dreamroute/mybatis-pro>.js"></div>
+
 ## 地址
 - [GitHub](https://github.com/Dreamroute/mybatis-pro)
 - [Gitee](https://gitee.com/Dreamroute/mybatis-pro)
