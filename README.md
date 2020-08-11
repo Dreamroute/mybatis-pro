@@ -1,9 +1,7 @@
 ## mybatis-pro
 
 <p align="left">
-  <a href="https://github.com/Dreamroute/mybatis-pro">
-   <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
-  </a>
+    <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
 </p>
 
 ## 文档
