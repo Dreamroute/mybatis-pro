@@ -1,5 +1,13 @@
 package com.github.dreamroute.mybatis.pro.core.page;
 
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -12,14 +20,6 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
-
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by chenboge on 2017/5/14.
@@ -143,7 +143,7 @@ public class PageInterceptor implements Interceptor {
 
 //        首先处理传递进来的是map对象和通过注解方式传值的情况，从中提取出PageParam,循环获取map中的键值对，取出PageParam对象
         if (paramerObject instanceof Map) {
-            Map<String, Object> params = (Map<String, Object>) paramerObject;
+            @SuppressWarnings("unchecked") Map<String, Object> params = (Map<String, Object>) paramerObject;
             for (Map.Entry<String, Object> entry : params.entrySet()) {
                 if (entry.getValue() instanceof PageParam) {
                     return (PageParam) entry.getValue();

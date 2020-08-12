@@ -1,16 +1,5 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
-import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.w3c.dom.Document;
-
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,6 +10,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
+import org.w3c.dom.Document;
+
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
@@ -106,7 +107,6 @@ public class MyBatisProUtil {
         methods.addAll(updateMethods);
         methods.addAll(deleteMethods);
         List<String> methodNames = methods.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
-        Method[] mapperMethods = mapperCls.getMethods();
         List<String> mapperMethodNames = Arrays.stream(mapperCls.getMethods()).map(Method::getName).collect(Collectors.toList());
         mapperMethodNames.retainAll(methodNames);
         if (!CollectionUtils.isEmpty(mapperMethodNames)) {

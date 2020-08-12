@@ -1,8 +1,16 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Type;
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -12,15 +20,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
+import com.github.dreamroute.mybatis.pro.core.annotations.Type;
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 
 /**
  * @author w.dehai
@@ -54,7 +56,6 @@ public class DocumentUtil {
      * 将Resource转换成Document
      */
     public static Document createDocumentFromResource(Resource resource) {
-        String result = null;
         try {
 
             // 改写resource，加入findBy方法的<select>标签
