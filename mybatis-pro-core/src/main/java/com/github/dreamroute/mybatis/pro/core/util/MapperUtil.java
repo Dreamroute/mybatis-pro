@@ -88,9 +88,9 @@ public class MapperUtil {
         methodName2Sql.put("selectByIds", selectByIds);
         methodName2Sql.put("selectAll", selectPrefix);
 
-        String insert = insertPrefix + this.insertColumns + " VALUE " + this.insertValues;
+        String insert = insertPrefix + this.insertColumns + " VALUES " + this.insertValues;
         String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
-        String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") VALUE (" + this.insertExcludeNullValues + ")";
+        String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") VALUES (" + this.insertExcludeNullValues + ")";
         methodName2Sql.put("insert", insert);
         methodName2Sql.put("insertList", insertList);
         methodName2Sql.put("insertExcludeNull", insertExcludeNull);
