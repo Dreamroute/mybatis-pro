@@ -1,17 +1,11 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.config;
 
-import java.util.Properties;
-
-import com.github.dreamroute.mybatis.pro.core.page.PageInterceptor;
-import com.zaxxer.hikari.HikariDataSource;
+import com.github.dreamroute.sqlprinter.interceptor.SqlPrinter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.github.dreamroute.sqlprinter.interceptor.SqlPrinter;
-
-import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author w.dehai
@@ -35,15 +29,14 @@ public class CommonConfig {
         return printer;
     }
 
-    @Bean
-    @ConfigurationProperties("spring.datasource.hikari")
-    public DataSource dataSource() {
-        return new HikariDataSource();
-    }
+//    @Bean
+//    public DataSource dataSource() {
+//        return new HikariDataSource();
+//    }
 
-    @Bean
-    public PageInterceptor pageInterceptor() {
-        return new PageInterceptor();
-    }
+//    @Bean
+//    public PageInterceptor pageInterceptor() {
+//        return new PageInterceptor();
+//    }
 
 }

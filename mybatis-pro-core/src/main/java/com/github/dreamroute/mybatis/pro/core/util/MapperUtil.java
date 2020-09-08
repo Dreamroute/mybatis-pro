@@ -63,6 +63,7 @@ public class MapperUtil {
                 this.entityCls = ClassUtils.forName(entityClsStr, getClass().getClassLoader());
                 this.idColumn = ClassUtil.getIdColumn(entityCls);
                 this.idName = ClassUtil.getIdName(entityCls);
+                this.type = ClassUtil.getIdGenerateStrategy(entityCls);
                 this.createSqlFragment();
             } catch (ClassNotFoundException e) {
                 // ignore

@@ -2,42 +2,46 @@ package com.github.dreamroute.mybatis.pro.sample.springboot;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
-import com.mysql.cj.util.DnsSrv.SrvRecord;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @SpringBootTest
-public class SdkTest {
+class SdkTest {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private DataSource dataSource;
 
     @Test
     void selectByIdTest() {
+        System.err.println(dataSource);
         User user = userMapper.selectById(1L);
-        Assertions.assertEquals("w.dehai", user.getName());
+        assertEquals("w.dehai", user.getName());
     }
 
     @Test
     void selectAllTest() {
         List<User> users = userMapper.selectAll();
-        Assertions.assertEquals(2, users.size());
+        assertEquals(2, users.size());
     }
 
     @Test
     void selectByIdsTest() {
         List<User> users = userMapper.selectByIds(Arrays.asList(1L, 2L));
-        Assertions.assertEquals(2, users.size());
+        assertEquals(2, users.size());
     }
 
     @Test
-    public void insertTest() {
+    void insertTest() {
         User user = new User();
         user.setName("test");
         user.setPassword("test");
@@ -50,7 +54,7 @@ public class SdkTest {
     }
 
     @Test
-    public void insertListTest() {
+    void insertListTest() {
         List<User> users = new ArrayList<>();
         User user1 = new User();
         user1.setName("test");

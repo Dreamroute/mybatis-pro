@@ -176,6 +176,11 @@ public class ClassUtil {
         return idField.getName();
     }
 
+    public static com.github.dreamroute.mybatis.pro.core.annotations.Type getIdGenerateStrategy(Class<?> cls) {
+        Field idField = getIdField(cls);
+        return idField.getAnnotation(Id.class).type();
+    }
+
     private static Field getIdField(Class<?> cls) {
         Set<Field> idFields = getAllFields(cls).stream().filter(field -> field.isAnnotationPresent(Id.class)).collect(Collectors.toSet());
         if (idFields.size() != 1) {

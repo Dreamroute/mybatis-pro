@@ -18,13 +18,13 @@ import java.util.List;
  */
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserMapperTest {
+class UserMapperTest {
 
     @Autowired
     private UserMapper userMapper;
 
     @Test
-    public void findByNameAndPasswordTest() {
+    void findByNameAndPasswordTest() {
         User user = userMapper.findByNameAndPassword("mm", "pwd");
         Assertions.assertEquals(1L, user.getId());
     }
@@ -66,7 +66,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void findByIdNotIn() {
+    void findByIdNotIn() {
         List<Long> list = new ArrayList<>();
         list.add(2L);
         List<User> users = userMapper.findByIdNotIn(list);
