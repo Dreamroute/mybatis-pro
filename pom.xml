@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.dreamroute</groupId>
     <artifactId>mybatis-pro</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -140,17 +140,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <configuration>
@@ -161,11 +150,10 @@
     </build>
 
     <modules>
-
         <module>mybatis-pro-core</module>
         <module>mybatis-pro-sdk</module>
         <module>mybatis-pro-auto-configuration</module>
         <module>mybatis-pro-boot-starter</module>
-        <!--<module>mybatis-pro-samples</module>-->
+        <module>mybatis-pro-samples</module>
     </modules>
 </project>

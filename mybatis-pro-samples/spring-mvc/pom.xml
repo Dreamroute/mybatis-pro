@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro-samples</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
     </parent>
     <artifactId>spring-mvc</artifactId>
 
@@ -14,13 +14,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
