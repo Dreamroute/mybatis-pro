@@ -4,9 +4,9 @@ import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,16 +14,14 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 class SdkTest {
 
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private DataSource dataSource;
 
     @Test
     void selectByIdTest() {
-        System.err.println(dataSource);
         User user = userMapper.selectById(1L);
         assertEquals("w.dehai", user.getName());
     }
