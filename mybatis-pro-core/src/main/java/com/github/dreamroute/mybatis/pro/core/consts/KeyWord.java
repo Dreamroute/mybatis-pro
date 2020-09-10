@@ -28,11 +28,6 @@ public class KeyWord {
     // … where x.age >= ?1
     public static final String GREATER_THAN_EQUAL = "GTE";
 
-    // … where x.startDate > ?1
-    public static final String AFTER = "After";
-    //… where x.startDate < ?1
-    public static final String BEFORE = "Before";
-
     //… where x.age is null
     public static final String IS_NULL = "IsNull";
 
@@ -56,9 +51,6 @@ public class KeyWord {
     // … where x.firstname like %?1
     public static final String ENDING_WITH = "EndWith";
 
-    // … where x.firstname like ?1
-    public static final String CONTAINING = "Contain";
-
     //… where x.lastname <> ?1
     public static final String NOT = "Not";
 
@@ -67,17 +59,9 @@ public class KeyWord {
     // … where x.age not in ?1
     public static final String NOT_IN = "NotIn";
 
-    // … where x.active = true
-    public static final String TRUE = "True";
-    // … where x.active = false
-    public static final String FALSE = "False";
-
     // ... 需要与order by配合
     public static final String DESC = "Desc";
     // … where x.age = ?1 order by x.lastname( desc), 可以配合DESC常量
     public static final String ORDER_BY = "OrderBy";
-
-    // … where UPPER(x.firstame) = UPPER(?1)
-    public static final String IGNORE_CASE = "IgnoreCase";
 
 }
