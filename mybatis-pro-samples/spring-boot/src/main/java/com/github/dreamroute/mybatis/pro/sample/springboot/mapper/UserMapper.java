@@ -1,16 +1,15 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dream.mybatis.pro.sdk.Mapper;
-import com.github.dreamroute.mybatis.pro.core.page.PageParam;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 
 import java.util.List;
 
 public interface UserMapper extends Mapper<User, Long> {
 
-    User findByNameAndPassword(String name, String password);
-
     List<User> findByName(String name);
+
+    User findByNameAndPassword(String name, String password);
 
     List<User> findByNameAndPasswordLike(String name, String password);
 
@@ -21,12 +20,6 @@ public interface UserMapper extends Mapper<User, Long> {
     List<User> findByIdIn(List<Long> list);
 
     List<User> findByIdNotIn(List<Long> list);
-
-    int countByName(String name);
-
-    boolean countByNameAndPhoneNo(String name, String phoneNo);
-
-    int deleteByNameOrPassword(String name, String password);
 
     List<User> findByVersionLT(Long version);
 
@@ -62,6 +55,11 @@ public interface UserMapper extends Mapper<User, Long> {
 
     List<User> findByNameOrderByVersionDesc(String name);
 
-    List<User> findByVersion(Long version, PageParam pageParam);
+    int countByName(String name);
 
+    int countByNameAndPhoneNo(String name, String phoneNo);
+
+    int deleteByNameOrPassword(String name, String password);
+
+    boolean existByNameOrPassword(String name, String password);
 }

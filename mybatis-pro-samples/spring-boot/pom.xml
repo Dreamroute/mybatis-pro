@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro-samples</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
     <artifactId>spring-boot</artifactId>
 
@@ -13,11 +13,6 @@
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-boot-starter</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

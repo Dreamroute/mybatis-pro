@@ -36,7 +36,7 @@ public class ClassUtil {
     private ClassUtil() {}
 
     /**
-     * 根据包名获取包内的所有Mapper接口（实现了com.github.dream.mybatis.pro.sdk.Mapepr的接口）
+     * 根据包名获取包内的所有Mapper接口（实现了com.github.dream.mybatis.pro.sdk.Mapper的接口）
      *
      * @param packages 包名
      * @return 返回包内所有适合的接口
