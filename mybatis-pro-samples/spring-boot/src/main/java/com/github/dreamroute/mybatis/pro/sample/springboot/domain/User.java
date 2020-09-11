@@ -1,7 +1,10 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
+import java.io.Serializable;
+
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +17,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "smart_user")
-public class User extends BaseDomain{
+public class User extends BaseDomain implements Serializable {
 
-    private static final long serialVersionUID = -8522466522078749737L;
+    private static final long serialVersionUID = -4418452798454877258L;
 
     private String name;
     private String password;
