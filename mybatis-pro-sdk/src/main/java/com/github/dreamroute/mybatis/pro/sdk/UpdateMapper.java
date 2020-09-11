@@ -1,4 +1,4 @@
-package com.github.dream.mybatis.pro.sdk;
+package com.github.dreamroute.mybatis.pro.sdk;
 
 /**
  * @author w.dehai

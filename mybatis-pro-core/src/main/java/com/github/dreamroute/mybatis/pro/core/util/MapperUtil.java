@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dream.mybatis.pro.sdk.Mapper;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
@@ -56,7 +56,7 @@ public class MapperUtil {
         this.document = DocumentUtil.createDocumentFromResource(resource);
         this.mapper = MyBatisProUtil.getMapperByResource(resource);
         Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
-        if (parentInters.contains(Mapper.class)) {
+        if (parentInters.contains(BaseMapper.class)) {
             this.entityClsStr = ClassUtil.getMapperGeneric(mapper);
             this.tableName = ClassUtil.getTableNameFromEntity(entityClsStr);
             try {
@@ -111,7 +111,7 @@ public class MapperUtil {
      * 将通用crud方法填充到resource里
      */
     public Resource parse() {
-        Method[] methods = Mapper.class.getMethods();
+        Method[] methods = BaseMapper.class.getMethods();
         Stream.of(methods)
                 .map(Method::getName)
                 .forEach(methodName -> {

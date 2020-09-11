@@ -7,5 +7,13 @@ CREATE TABLE `smart_user`
     `password`    varchar(32) DEFAULT '123456',
     `version`        bigint(20)  DEFAULT NULL,
     `phone_no`    varchar(20) DEFAULT NULL,
+    `create_user` varchar(20) DEFAULT NULL,
+    `create_time` varchar(20) DEFAULT NULL,
     PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `backup_table`(
+    `id` bigint(20) not null auto_increment primary key,
+    `table_name` varchar(100) default null,
+    `data` varchar(2000) default null
 );

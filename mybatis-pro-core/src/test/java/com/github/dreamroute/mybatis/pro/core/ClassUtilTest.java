@@ -35,7 +35,7 @@ class ClassUtilTest {
 
     @Test
     void getName2TypeTest() {
-        Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(DemoMapper.class);
+        Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(DemoBaseMapper.class);
         assertEquals(13, name2Type.size());
     }
 
@@ -43,9 +43,9 @@ class ClassUtilTest {
     void getReturnTypeTest() throws NoSuchMethodException, SecurityException {
 
         // 返回值为entity
-        Method method1 = DemoMapper.class.getDeclaredMethod("findByNameAndPassword", String.class, String.class);
+        Method method1 = DemoBaseMapper.class.getDeclaredMethod("findByNameAndPassword", String.class, String.class);
         // 返回值为List
-        Method method2 = DemoMapper.class.getDeclaredMethod("findByName", String.class);
+        Method method2 = DemoBaseMapper.class.getDeclaredMethod("findByName", String.class);
 
         String type1 = ClassUtil.getReturnType(method1);
         String type2 = ClassUtil.getReturnType(method2);
@@ -56,7 +56,7 @@ class ClassUtilTest {
 
     @Test
     void getSpecialMethodsTest() {
-        List<String> names = ClassUtil.getSpecialMethods(DemoMapper.class);
+        List<String> names = ClassUtil.getSpecialMethods(DemoBaseMapper.class);
         String result = names.stream().collect(Collectors.joining(",", "[", "]"));
         assertEquals("[findByName,findByNameAndPassword,findById]", result);
     }

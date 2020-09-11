@@ -17,5 +17,10 @@
 			<artifactId>mybatis-pro-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.dreamroute</groupId>
+			<artifactId>mybatis-pro-service</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 </project>

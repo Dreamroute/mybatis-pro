@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dream.mybatis.pro.sdk.Mapper;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
@@ -45,7 +45,7 @@ public class ClassUtil {
         return Optional.ofNullable(packages).orElse(new HashSet<>())
                 .stream().map(pkgName -> {
                     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
-                    resolverUtil.find(new IsA(Mapper.class), pkgName);
+                    resolverUtil.find(new IsA(BaseMapper.class), pkgName);
                     return resolverUtil.getClasses();
                 }).flatMap(Set::stream)
                 .collect(Collectors.toSet());
@@ -108,7 +108,7 @@ public class ClassUtil {
         Map<String, Long> methodCount = Arrays.stream(ms).map(Method::getName).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         if (!CollectionUtils.isEmpty(duplicateMethods)) {
-            throw new MyBatisProException(interfaceCls.getName() + "的方法: " + duplicateMethods.keySet() + "不允许与" + Mapper.class.getName() + "内置方法重名");
+            throw new MyBatisProException(interfaceCls.getName() + "的方法: " + duplicateMethods.keySet() + "不允许与" + BaseMapper.class.getName() + "内置方法重名");
         }
         return Arrays.stream(ms).collect(Collectors.toMap(Method::getName, ClassUtil::getReturnType));
     }
@@ -215,5 +215,5 @@ public class ClassUtil {
         Type[] args = pt.getActualTypeArguments();
         return args[0].getTypeName();
     }
-
 }
+

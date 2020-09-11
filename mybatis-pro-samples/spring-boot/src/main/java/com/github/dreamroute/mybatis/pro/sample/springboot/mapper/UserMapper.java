@@ -1,7 +1,7 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
-import com.github.dream.mybatis.pro.sdk.Mapper;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
+import com.github.dreamroute.mybatis.pro.service.Mapper;
 
 import java.util.List;
 
