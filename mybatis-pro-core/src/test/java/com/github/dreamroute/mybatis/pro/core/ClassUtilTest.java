@@ -1,7 +1,9 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import static org.junit.Assert.assertEquals;
+import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
+import org.junit.jupiter.api.Test;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,11 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.Transient;
-
-import org.junit.jupiter.api.Test;
-
-import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author w.dehai
