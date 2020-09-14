@@ -10,9 +10,13 @@ import org.apache.ibatis.annotations.Param;
 public interface Mapper<T, ID> extends BaseMapper<T, ID> {
 
     /**
-     * 动态增加逻辑删除数据
+     * 逻辑删除实际上是物理删除，只是在删除的时候将数据迁移到backupTable(默认表名：backup_table)
+     *
+     * @param backupTable 备份表
+     * @param tableName 被删除数据所在的表名
+     * @param data 被删除数据JSON格式
      */
-    @Insert("insert into backup_table (`table_name`, `data`) values (#{tableName}, #{data})")
-    void insertDynamic(@Param("tableName") String tableName, @Param("data") String data);
+    @Insert("insert into ${backupTable} (`table_name`, `data`) values (#{tableName}, #{data})")
+    void insertDynamic(@Param("backupTable") String backupTable, @Param("tableName") String tableName, @Param("data") String data);
 
 }

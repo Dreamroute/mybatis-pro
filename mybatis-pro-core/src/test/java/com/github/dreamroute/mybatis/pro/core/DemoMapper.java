@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author w.dehai
  */
-public interface DemoBaseMapper extends BaseMapper<Demo, Long> {
+public interface DemoMapper extends BaseMapper<Demo, Long> {
 
     Demo findByNameAndPassword(String name, String password);
 

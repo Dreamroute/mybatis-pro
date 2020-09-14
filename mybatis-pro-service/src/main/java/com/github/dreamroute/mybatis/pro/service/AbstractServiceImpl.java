@@ -3,27 +3,22 @@ package com.github.dreamroute.mybatis.pro.service;
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
+
+import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
+import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 
 /**
  * @author w.dehai
  */
-@SuppressWarnings("ALL")
 public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Autowired
     private Mapper<T, ID> mapper;
-
-    private final Class<T> entityCls;
-
-    public AbstractServiceImpl() {
-        ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
-        Type[] typeArguments = parameterizedType.getActualTypeArguments();
-        entityCls = (Class<T>) typeArguments[0];
-    }
+    @Value("${mybatis.pro.backup-table:backup_table}")
+    private String backupTable;
 
     @Override
     public T insert(T entity) {
@@ -93,10 +88,8 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     private void backup(ID id) {
         T entity = this.select(id);
         String data = JSON.toJSONString(entity);
-        Table tableAnno = entityCls.getAnnotation(Table.class);
-        String tableName = tableAnno.name();
-        mapper.insertDynamic(tableName, data);
+        String tableName = getAnnotationValue(getTypeArgument(getClass()), Table.class, "name");
+        mapper.insertDynamic(backupTable, tableName, data);
     }
-
 
 }

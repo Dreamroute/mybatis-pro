@@ -1,13 +1,11 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import org.apache.ibatis.io.ResolverUtil;
-import org.apache.ibatis.io.ResolverUtil.IsA;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -23,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,34 +31,6 @@ import java.util.stream.Collectors;
 public class ClassUtil {
 
     private ClassUtil() {}
-
-    /**
-     * 根据包名获取包内的所有Mapper接口（实现了com.github.dream.mybatis.pro.sdk.Mapper的接口）
-     *
-     * @param packages 包名
-     * @return 返回包内所有适合的接口
-     */
-    public static Set<Class<?>> getClassesFromPackages(Set<String> packages) {
-        return Optional.ofNullable(packages).orElse(new HashSet<>())
-                .stream().map(pkgName -> {
-                    ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
-                    resolverUtil.find(new IsA(BaseMapper.class), pkgName);
-                    return resolverUtil.getClasses();
-                }).flatMap(Set::stream)
-                .collect(Collectors.toSet());
-    }
-
-    /**
-     * 根据报名获取包内的所有接口
-     *
-     * @param packages 包名
-     * @return 返回包内所有接口
-     */
-    public static Set<Class<?>> getInterfacesFromPackage(Set<String> packages) {
-        return Optional.ofNullable(getClassesFromPackages(packages)).orElse(new HashSet<>())
-                .stream().filter(Class::isInterface)
-                .collect(Collectors.toSet());
-    }
 
     /**
      * 获取方法返回值类型
@@ -84,7 +53,7 @@ public class ClassUtil {
     }
 
     /**
-     * 返回Mapper接口的findBy开头的方法
+     * 返回Mapper接口的xxxBy开头的方法
      *
      * @param interfaceCls Mapper接口
      * @return findBy开头的方法的方法名字
@@ -146,7 +115,7 @@ public class ClassUtil {
      * 判断是否是普通属性，（serialVersionUID或者@javax.persistence.Transient）除外
      */
     public static boolean isBeanProp(Field field) {
-        return !Objects.equals(field.getName(), "serialVersionUID") && !field.isAnnotationPresent(Transient.class);
+        return !(Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class));
     }
 
     private static void recursiveField(Class<?> cls, Set<Field> result) {
@@ -204,16 +173,6 @@ public class ClassUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException("获取表名失败，entity需要本@Table注解标注", e);
         }
-    }
-
-    /**
-     * 获取接口Mapper<T, ID>的泛型真实类型
-     */
-    public static String getMapperGeneric(Class<?> mapperCls) {
-        Type[] genericInterfaces = mapperCls.getGenericInterfaces();
-        ParameterizedType pt = (ParameterizedType) genericInterfaces[0];
-        Type[] args = pt.getActualTypeArguments();
-        return args[0].getTypeName();
     }
 }
 

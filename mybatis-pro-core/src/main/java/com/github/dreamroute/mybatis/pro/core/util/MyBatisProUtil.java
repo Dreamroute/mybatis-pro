@@ -1,5 +1,17 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
+import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.CollectionUtils;
+import org.w3c.dom.Document;
+
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,17 +23,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
-import org.apache.ibatis.parsing.XNode;
-import org.apache.ibatis.parsing.XPathParser;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.w3c.dom.Document;
-
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
+import static cn.hutool.core.util.TypeUtil.getTypeArgument;
 
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
@@ -34,7 +37,7 @@ public class MyBatisProUtil {
 
     public static Resource[] processMyBatisPro(Resource[] resources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = ClassUtil.getInterfacesFromPackage(mapperPackages);
+        Set<Class<?>> mappers = mapperPackages.stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(Collectors.toSet());
         Set<Class<?>> existXmlMapper = getExistMappers(resources);
         mappers.removeAll(existXmlMapper);
 
@@ -122,7 +125,7 @@ public class MyBatisProUtil {
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
             if (!CollectionUtils.isEmpty(specialMethods)) {
-                String entityCls = ClassUtil.getMapperGeneric(mapperCls);
+                String entityCls = getTypeArgument(mapperCls).getTypeName();
                 String tableName = ClassUtil.getTableNameFromEntity(entityCls);
                 Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
                 specialMethods.forEach(specialMethodName -> {

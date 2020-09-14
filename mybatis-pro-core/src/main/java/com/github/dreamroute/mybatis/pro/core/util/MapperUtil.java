@@ -1,10 +1,10 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static cn.hutool.core.util.TypeUtil.getTypeArgument;
 
 /**
  * @author w.dehai
@@ -57,7 +59,7 @@ public class MapperUtil {
         this.mapper = MyBatisProUtil.getMapperByResource(resource);
         Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(BaseMapper.class)) {
-            this.entityClsStr = ClassUtil.getMapperGeneric(mapper);
+            this.entityClsStr = getTypeArgument(mapper).getTypeName();
             this.tableName = ClassUtil.getTableNameFromEntity(entityClsStr);
             try {
                 this.entityCls = ClassUtils.forName(entityClsStr, getClass().getClassLoader());
