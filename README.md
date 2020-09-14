@@ -69,7 +69,7 @@ public interface UserMapper {
 ```
 @Test
 void proTest() {
-    List<User> users = findByVersionBetweenOrderById(2L, 4L);
+    List<User> users = findByVersionBetweenOrderByIdDesc(2L, 4L);
     System.err.println(users);
 }
 ```
