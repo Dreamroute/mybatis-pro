@@ -131,8 +131,6 @@ public class MapperUtil {
     }
 
     private void createSqlFragment() {
-        List<String> columns = new ArrayList<>();
-        List<String> values = new ArrayList<>();
         Map<String, String> values2Columns = new HashMap<>();
         IdType pkType = new IdType();
         PrimaryKey pk = new PrimaryKey();
@@ -152,6 +150,8 @@ public class MapperUtil {
         if (pkType.type == Type.IDENTITY) {
             values2Columns.remove(pk.name);
         }
+        List<String> columns = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         values2Columns.forEach((fieldName, column) -> {
             columns.add(column);
             values.add(fieldName);
