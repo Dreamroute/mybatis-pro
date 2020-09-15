@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
@@ -23,8 +24,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
+import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
-import static cn.hutool.core.util.TypeUtil.getTypeArgument;
 
 /**
  * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
@@ -125,8 +127,8 @@ public class MyBatisProUtil {
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
             if (!CollectionUtils.isEmpty(specialMethods)) {
-                String entityCls = getTypeArgument(mapperCls).getTypeName();
-                String tableName = ClassUtil.getTableNameFromEntity(entityCls);
+                Class<?> entityCls = getTypeArgument(mapperCls);
+                String tableName = getAnnotationValue(entityCls, Table.class, "name");
                 Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
                 specialMethods.forEach(specialMethodName -> {
                     String methodName = null;

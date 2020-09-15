@@ -2,14 +2,16 @@ package com.github.dreamroute.mybatis.pro.core.util;
 
 import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
+import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +22,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static cn.hutool.core.util.TypeUtil.getTypeArgument;
+import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
+import static cn.hutool.core.util.ClassUtil.getTypeArgument;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 
 /**
  * @author w.dehai
@@ -29,23 +33,17 @@ public class MapperUtil {
 
     private final Document document;
     private Class<?> entityCls;
-    private String entityClsStr;
-    private Class<?> mapper;
     private String tableName;
     private String idColumn;
     private String idName;
     private com.github.dreamroute.mybatis.pro.core.annotations.Type type;
 
     // -- biz
-    private String insertPrefix;
-    private String updateByIdPrefix;
+    private final Map<String, String> methodName2Sql = new HashMap<>();
 
-    private Map<String, String> methodName2Sql = new HashMap<>();
-
-    private String commonWhereIdIs = null;
-
-    final String trimStart = "<trim suffixOverrides=','>";
-    final String trimEnd = "</trim>";
+    private static final String TRIM_START = "<trim suffixOverrides=','>";
+    private static final String TRIM_END = "</trim>";
+    private static final String WHERE = " where ";
 
     String insertColumns;
     String insertValues;
@@ -56,20 +54,17 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = DocumentUtil.createDocumentFromResource(resource);
-        this.mapper = MyBatisProUtil.getMapperByResource(resource);
+        Class<?> mapper = MyBatisProUtil.getMapperByResource(resource);
         Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
         if (parentInters.contains(BaseMapper.class)) {
-            this.entityClsStr = getTypeArgument(mapper).getTypeName();
-            this.tableName = ClassUtil.getTableNameFromEntity(entityClsStr);
-            try {
-                this.entityCls = ClassUtils.forName(entityClsStr, getClass().getClassLoader());
-                this.idColumn = ClassUtil.getIdColumn(entityCls);
-                this.idName = ClassUtil.getIdName(entityCls);
-                this.type = ClassUtil.getIdGenerateStrategy(entityCls);
-                this.createSqlFragment();
-            } catch (ClassNotFoundException e) {
-                // ignore
-            }
+            this.entityCls = getTypeArgument(mapper);
+            this.tableName = getAnnotationValue(entityCls, Table.class, "name");
+            Field idField = getIdField(entityCls);
+            this.idName = idField.getName();
+            Column colAnno = idField.getAnnotation(Column.class);
+            this.idColumn = (colAnno != null && !StringUtils.isEmpty(colAnno.name())) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+            this.type = idField.getAnnotation(Id.class).type();
+            this.createSqlFragment();
 
             processBiz();
         }
@@ -79,11 +74,11 @@ public class MapperUtil {
         String selectPrefix = "select * from " + tableName;
         String deletePrefix = "delete from " + tableName;
 
-        insertPrefix = "insert into " + tableName;
-        updateByIdPrefix = "update " + tableName;
+        String insertPrefix = "insert into " + tableName;
+        String updateByIdPrefix = "update " + tableName;
 
-        commonWhereIdIs = " where " + idColumn + " = #{" + idName + "}";
-        String commonWhereIdIn = " where " + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
+        String commonWhereIdIs = WHERE + idColumn + " = #{" + idName + "}";
+        String commonWhereIdIn = WHERE + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
 
         String selectById = selectPrefix + commonWhereIdIs;
         String selectByIds = selectPrefix + commonWhereIdIn;
@@ -99,7 +94,7 @@ public class MapperUtil {
         methodName2Sql.put("insertExcludeNull", insertExcludeNull);
 
         String updateById = updateByIdPrefix + " set " + this.updateByIdColumns + commonWhereIdIs;
-        String updateByIdExcludeNull = updateByIdPrefix + " set " + this.updateByIdExcludeNullColumns + " where " + this.idColumn + " = #{" + this.idName + "}";
+        String updateByIdExcludeNull = updateByIdPrefix + " set " + this.updateByIdExcludeNullColumns + WHERE + this.idColumn + " = #{" + this.idName + "}";
         methodName2Sql.put("updateById", updateById);
         methodName2Sql.put("updateByIdExcludeNull", updateByIdExcludeNull);
 
@@ -121,7 +116,7 @@ public class MapperUtil {
                     String returnType = null;
                     if (methodName.startsWith(MapperLabel.SELECT.getCode())) {
                         ml = MapperLabel.SELECT;
-                        returnType = entityClsStr;
+                        returnType = entityCls.getName();
                     } else if (methodName.startsWith(MapperLabel.INSERT.getCode())) {
                         ml = MapperLabel.INSERT;
                     } else if (methodName.startsWith(MapperLabel.UPDATE.getCode())) {
@@ -178,15 +173,15 @@ public class MapperUtil {
     }
 
     private void createInsertExcludeNullColumnsAndValues(List<String> columns, List<String> values) {
-        StringBuilder insertExcludeNullColumns = new StringBuilder();
-        StringBuilder insertExcludeNullValues = new StringBuilder();
+        StringBuilder insertExcludeNullCols = new StringBuilder();
+        StringBuilder insertExcludeNullVals = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertExcludeNullColumns.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "`,</if>");
-            insertExcludeNullValues.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+            insertExcludeNullCols.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "`,</if>");
+            insertExcludeNullVals.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
         }
 
-        this.insertExcludeNullColumns = trimStart + insertExcludeNullColumns.toString() + trimEnd;
-        this.insertExcludeNullValues = trimStart + insertExcludeNullValues.toString() + trimEnd;
+        this.insertExcludeNullColumns = TRIM_START + insertExcludeNullCols.toString() + TRIM_END;
+        this.insertExcludeNullValues = TRIM_START + insertExcludeNullVals.toString() + TRIM_END;
     }
 
     private void createUpdateByIdColumns(List<String> columns, List<String> values) {
@@ -205,7 +200,7 @@ public class MapperUtil {
         for (int i=0; i<columns.size(); i++) {
             result.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "` = #{" + values.get(i) + "},</if>");
         }
-        this.updateByIdExcludeNullColumns = trimStart + result.toString() + trimEnd;
+        this.updateByIdExcludeNullColumns = TRIM_START + result.toString() + TRIM_END;
     }
 }
 

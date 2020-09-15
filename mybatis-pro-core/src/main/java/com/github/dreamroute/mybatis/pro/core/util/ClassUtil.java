@@ -1,15 +1,11 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
-import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -24,6 +20,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static cn.hutool.core.util.ReflectUtil.getFields;
+import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
 
 /**
  * @author w.dehai
@@ -103,76 +102,25 @@ public class ClassUtil {
      * 获取实体所有属性
      */
     public static Set<Field> getAllFields(Class<?> cls) {
-        Set<Field> result = new HashSet<>();
-        recursiveField(cls, result);
-
-        return result.stream()
+        Field[] fs = getFields(cls);
+        return Arrays.stream(fs)
                 .filter(ClassUtil::isBeanProp)
                 .collect(Collectors.toSet());
     }
 
     /**
-     * 判断是否是普通属性，（serialVersionUID或者@javax.persistence.Transient）除外
+     * 判断是否是普通属性，（serialVersionUID或者@com.github.dreamroute.mybatis.pro.core.annotations.Transient）除外
      */
     public static boolean isBeanProp(Field field) {
-        return !(Objects.equals(field.getName(), "serialVersionUID") || field.isAnnotationPresent(Transient.class));
+        return !Objects.equals(field.getName(), "serialVersionUID") && !hasAnnotation(field, Transient.class);
     }
 
-    private static void recursiveField(Class<?> cls, Set<Field> result) {
-        if (cls != Object.class) {
-            Field[] declaredFields = cls.getDeclaredFields();
-            if (!ObjectUtils.isEmpty(declaredFields)) {
-                result.addAll(Arrays.asList(declaredFields));
-                recursiveField(cls.getSuperclass(), result);
-            }
-        }
-    }
-
-    /**
-     * 获取id字段(有@Column注解那么就是注解的name值)
-     */
-    public static String getIdColumn(Class<?> cls) {
-        Field idField = getIdField(cls);
-        Column colAnno = idField.getAnnotation(Column.class);
-        return (colAnno != null && !StringUtils.isEmpty(colAnno.name())) ? colAnno.name() : SqlUtil.toLine(idField.getName());
-    }
-
-    /**
-     * 获取id属性的属性名
-     */
-    public static String getIdName(Class<?> cls) {
-        Field idField = getIdField(cls);
-        return idField.getName();
-    }
-
-    public static com.github.dreamroute.mybatis.pro.core.annotations.Type getIdGenerateStrategy(Class<?> cls) {
-        Field idField = getIdField(cls);
-        return idField.getAnnotation(Id.class).type();
-    }
-
-    private static Field getIdField(Class<?> cls) {
+    public static Field getIdField(Class<?> cls) {
         Set<Field> idFields = getAllFields(cls).stream().filter(field -> field.isAnnotationPresent(Id.class)).collect(Collectors.toSet());
         if (idFields.size() != 1) {
             throw new MyBatisProException("实体" + cls.getName() + "缺少@Id注解标注的主键字段");
         }
-
         return idFields.iterator().next();
-    }
-
-    /**
-     * 根据实体获取表名
-     *
-     * @param entityStr 实体
-     * @return 返回表名
-     */
-    public static String getTableNameFromEntity(String entityStr) {
-        try {
-            Class<?> entityCls = ClassUtils.forName(entityStr, null);
-            Table table = entityCls.getAnnotation(Table.class);
-            return table.name();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("获取表名失败，entity需要本@Table注解标注", e);
-        }
     }
 }
 

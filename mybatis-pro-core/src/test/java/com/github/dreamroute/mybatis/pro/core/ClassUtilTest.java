@@ -1,10 +1,9 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import cn.hutool.core.util.ReflectUtil;
+import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,10 +50,7 @@ class ClassUtilTest {
     @Test
     void getAllFieldsTest() {
         Set<Field> allFields = ClassUtil.getAllFields(User.class);
-        assertEquals(2, allFields.size());
-
-        Field[] fields = ReflectUtil.getFields(User.class);
-
+        assertEquals(1, allFields.size());
     }
 
 }
