@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.autoconfiguration;
 
+import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil;
 import org.apache.ibatis.annotations.Mapper;
@@ -52,7 +53,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
-import tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
@@ -64,6 +64,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Optional.ofNullable;
+
 /**
  * @author w.dehai
  */
@@ -71,7 +73,7 @@ import java.util.stream.Stream;
 @ConditionalOnSingleCandidate(DataSource.class)
 @EnableConfigurationProperties(MybatisProperties.class)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-@AutoConfigureBefore({MybatisAutoConfiguration.class, MapperAutoConfiguration.class}) // 通用mapper
+@AutoConfigureBefore({MybatisAutoConfiguration.class})
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class})
 public class MyBatisProAutoConfiguration implements InitializingBean {
 
@@ -267,43 +269,23 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     private Set<String> getMapperPackages() {
 
-        Map<String, Object> springMapperScan = context.getBeansWithAnnotation(MapperScan.class);
-        Map<String, Object> tkMapperScan = context.getBeansWithAnnotation(tk.mybatis.spring.annotation.MapperScan.class);
-        if (springMapperScan.isEmpty() && tkMapperScan.isEmpty()) {
-            throw new MyBatisProException("需要在启动类上面设置@MapperScan注解用于标注Mapper接口的路径");
+        Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
+        if (mapperScan.isEmpty()) {
+            throw new MyBatisProException("需要在启动类上面设置@org.mybatis.spring.annotation.MapperScan注解用于标注Mapper接口的路径");
         }
 
-        Class<?> mainCls;
-        String[] value;
-        String[] basePackages;
-        Class<?>[] basePackageClasses;
-        if (!springMapperScan.isEmpty()) {
-            mainCls = springMapperScan.values().iterator().next().getClass();
-            MapperScan ms = AnnotationUtils.findAnnotation(mainCls, MapperScan.class);
-            value = ms.value();
-            basePackages = ms.basePackages();
-            basePackageClasses = ms.basePackageClasses();
-        } else {
-            mainCls = tkMapperScan.values().iterator().next().getClass();
-            tk.mybatis.spring.annotation.MapperScan ms = AnnotationUtils.findAnnotation(mainCls, tk.mybatis.spring.annotation.MapperScan.class);
-            value = ms.value();
-            basePackageClasses = ms.basePackageClasses();
-            basePackages = ms.basePackages();
-        }
+        Class<?> mainCls = mapperScan.values().iterator().next().getClass();
+        MapperScan ms = AnnotationUtils.findAnnotation(mainCls, MapperScan.class);
+        String[] value = ms.value();
+        String[] basePackages = ms.basePackages();
+        Class<?>[] basePackageClasses = ms.basePackageClasses();
 
         Set<String> mapperPackages = new HashSet<>();
-        if (value != null && value.length > 0) {
-            mapperPackages.addAll(Arrays.asList(value));
-        }
-        if (basePackageClasses != null && basePackageClasses.length > 0) {
-            Set<String> packages = Arrays.stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(Collectors.toSet());
-            mapperPackages.addAll(packages);
-        }
-        if (basePackages != null && basePackages.length > 0) {
-            mapperPackages.addAll(Arrays.asList(basePackages));
-        }
+        ofNullable(value).ifPresent(v -> mapperPackages.addAll(Arrays.asList(v)));
+        ofNullable(basePackages).ifPresent(v -> mapperPackages.addAll(Arrays.asList(v)));
+        ofNullable(basePackageClasses).ifPresent(v -> mapperPackages.addAll(Arrays.stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(Collectors.toSet())));
 
-        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
+        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", JSON.toJSONString(mapperPackages));
 
         return mapperPackages;
     }

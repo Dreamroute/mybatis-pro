@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
@@ -27,9 +28,10 @@ import java.util.stream.Collectors;
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMethods;
 
 /**
- * 使用新的resource替换默认resource，并且创建接口Mapper无对应的mapper.xml
+ * 使用新的resource替换默认resource，并且默认创建接口Mapper对应的mapper.xml（如果Mapper接口不存在对应的mapepr.xml文件）
  *
  * @author w.dehai
  */
@@ -75,13 +77,13 @@ public class MyBatisProUtil {
     }
 
     private static Resource createResource(Class<?> mapper) {
-        String mapperFullName = mapper.getName();
+        String namespace = mapper.getName();
         String xml =
                 "<?xml version='1.0' encoding='UTF-8' ?>\n" +
                         "<!DOCTYPE mapper\n" +
                         "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
                         "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
-                        "<mapper namespace='" + mapperFullName + "'></mapper>";
+                        "<mapper namespace='" + namespace + "'></mapper>";
         return new ByteArrayResource(xml.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -111,18 +113,18 @@ public class MyBatisProUtil {
         methods.addAll(insertMethods);
         methods.addAll(updateMethods);
         methods.addAll(deleteMethods);
-        List<String> methodNames = methods.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
+        List<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
         List<String> mapperMethodNames = Arrays.stream(mapperCls.getMethods()).map(Method::getName).collect(Collectors.toList());
-        mapperMethodNames.retainAll(methodNames);
+        mapperMethodNames.retainAll(xmlMethodNames);
         if (!CollectionUtils.isEmpty(mapperMethodNames)) {
-            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + mapperMethodNames + "与xml文件中的方法重名");
+            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + JSON.toJSONString(mapperMethodNames) + "与xml文件中的方法重名");
         }
     }
 
     public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
             Class<?> mapperCls = getMapperByResource(resource);
-            List<String> specialMethods = ClassUtil.getSpecialMethods(mapperCls);
+            List<String> specialMethods = getSpecialMethods(mapperCls);
             validateDuplicateMethods(mapperCls, resource);
 
             Document doc = DocumentUtil.createDocumentFromResource(resource);
