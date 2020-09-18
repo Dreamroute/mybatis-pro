@@ -77,7 +77,7 @@ import static java.util.Optional.ofNullable;
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class})
 public class MyBatisProAutoConfiguration implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyBatisProAutoConfiguration.class);
     private final MybatisProperties properties;
     private final Interceptor[] interceptors;
     @SuppressWarnings("rawtypes")

@@ -1,9 +1,11 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot;
 
+import com.github.dreamroute.sqlprinter.anno.EnableSQLPrinter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@EnableSQLPrinter
 @SpringBootApplication
 @MapperScan(basePackages = {"com.github.dreamroute.mybatis.pro.sample.springboot.mapper"})
 public class Application {
