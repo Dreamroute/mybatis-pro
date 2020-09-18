@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core.autoconfiguration;
+package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
