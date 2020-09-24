@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
-        <version>1.0.5</version>
+        <version>1.1.1</version>
     </parent>
     <artifactId>mybatis-pro-service</artifactId>
 

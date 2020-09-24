@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
-        <version>1.0.5</version>
+        <version>1.1.1</version>
     </parent>
     <artifactId>mybatis-pro-samples</artifactId>
     <packaging>pom</packaging>
@@ -16,8 +16,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.dreamroute</groupId>
-            <artifactId>sqlprinter</artifactId>
-            <version>1.6.0-RELEASE</version>
+            <artifactId>sqlprinter-spring-boot-starter</artifactId>
+            <version>2.0.0-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

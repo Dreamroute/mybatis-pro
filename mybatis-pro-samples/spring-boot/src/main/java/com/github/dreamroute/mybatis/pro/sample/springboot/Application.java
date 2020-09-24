@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot;
 
-import com.github.dreamroute.sqlprinter.anno.EnableSQLPrinter;
+import com.github.dreamroute.sqlprinter.starter.anno.EnableSQLPrinter;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
