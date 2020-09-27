@@ -99,5 +99,5 @@ void mapperTest() {
 - [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
 - [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
-## QQ交流群
-群号：1087075009
+## 作者信息
+Email: 342252328@qq.com
