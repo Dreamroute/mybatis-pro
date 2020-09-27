@@ -70,7 +70,6 @@ public interface UserMapper {
 @Test
 void proTest() {
     List<User> users = findByVersionBetweenOrderByIdDesc(2L, 4L);
-    System.err.println(users);
 }
 ```
 - mybatis-plus：
@@ -81,7 +80,6 @@ void plusTest() {
     LambdaQueryWrapper<User> query = qw.between(User::getVersion, 2L, 4L);
     query.orderByDesc(User::getId);
     List<User> users = userMapper.selectList(query);
-    System.err.println(users);
 }
 ```
 
@@ -93,7 +91,6 @@ void mapperTest() {
     e.orderBy("id").desc();
     Criteria criteria = e.createCriteria().andBetween("version", 2L, 4L);
     List<User> users = userMapper.selectByExample(e);
-    System.err.println(users);
 }
 ```
 
