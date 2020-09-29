@@ -24,7 +24,10 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
+import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getMapperByResource;
 
 /**
  * @author w.dehai
@@ -53,9 +56,9 @@ public class MapperUtil {
     String updateByIdExcludeNullColumns;
 
     public MapperUtil(Resource resource) {
-        this.document = DocumentUtil.createDocumentFromResource(resource);
-        Class<?> mapper = MyBatisProUtil.getMapperByResource(resource);
-        Set<Class<?>> parentInters = ClassUtil.getAllParentInterface(mapper);
+        this.document = createDocumentFromResource(resource);
+        Class<?> mapper = getMapperByResource(resource);
+        Set<Class<?>> parentInters = getAllParentInterface(mapper);
         if (parentInters.contains(BaseMapper.class)) {
             this.entityCls = getTypeArgument(mapper);
             this.tableName = getAnnotationValue(entityCls, Table.class, "name");

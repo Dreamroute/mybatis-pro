@@ -4,7 +4,6 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
@@ -18,11 +17,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
+import static java.util.Arrays.stream;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * @author w.dehai
@@ -73,12 +77,12 @@ public class ClassUtil {
      */
     public static Map<String, String> getMethodName2ReturnType(Class<?> interfaceCls) {
         Method[] ms = interfaceCls.getMethods();
-        Map<String, Long> methodCount = Arrays.stream(ms).map(Method::getName).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-        if (!CollectionUtils.isEmpty(duplicateMethods)) {
+        Map<String, Long> methodCount = stream(ms).map(Method::getName).collect(groupingBy(identity(), counting()));
+        Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(toMap(Entry::getKey, Entry::getValue));
+        if (!isEmpty(duplicateMethods)) {
             throw new MyBatisProException(interfaceCls.getName() + "的方法: " + duplicateMethods.keySet() + "不允许与" + BaseMapper.class.getName() + "内置方法重名");
         }
-        return Arrays.stream(ms).collect(Collectors.toMap(Method::getName, ClassUtil::getReturnType));
+        return stream(ms).collect(toMap(Method::getName, ClassUtil::getReturnType));
     }
 
     /**

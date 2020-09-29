@@ -1,16 +1,8 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import com.github.dreamroute.mybatis.pro.core.annotations.Type;
+import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -20,9 +12,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Type;
-import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author w.dehai
@@ -57,8 +55,7 @@ public class DocumentUtil {
      */
     public static Document createDocumentFromResource(Resource resource) {
         try {
-
-            // 改写resource，加入findBy方法的<select>标签
+            // 改写resource，加入xxxBy方法的标签
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setValidating(false);
             documentBuilderFactory.setNamespaceAware(false);

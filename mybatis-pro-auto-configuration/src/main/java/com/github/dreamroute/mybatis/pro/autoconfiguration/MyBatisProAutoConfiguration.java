@@ -1,8 +1,6 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
-import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -56,15 +54,17 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Optional.ofNullable;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 /**
  * @author w.dehai
@@ -155,8 +155,8 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         StopWatch watch = new StopWatch();
         watch.start();
         Set<String> mapperPackages = getMapperPackages();
-        if (!ObjectUtils.isEmpty(resources) || !CollectionUtils.isEmpty(mapperPackages)) {
-            Resource[] rs = MyBatisProUtil.processMyBatisPro(resources, mapperPackages);
+        if (!isEmpty(resources) || !isEmpty(mapperPackages)) {
+            Resource[] rs = processMyBatisPro(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
         logger.info("织入mybatis-pro结束 ......");
@@ -166,7 +166,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
         Set<String> factoryPropertyNames = Stream
                 .of(new BeanWrapperImpl(SqlSessionFactoryBean.class).getPropertyDescriptors()).map(PropertyDescriptor::getName)
-                .collect(Collectors.toSet());
+                .collect(toSet());
         Class<? extends LanguageDriver> defaultLanguageDriver = this.properties.getDefaultScriptingLanguageDriver();
         if (factoryPropertyNames.contains("scriptingLanguageDrivers") && !ObjectUtils.isEmpty(this.languageDrivers)) {
             // Need to mybatis-spring 2.0.2+
@@ -271,21 +271,24 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
         Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
         if (mapperScan.isEmpty()) {
-            throw new MyBatisProException("需要在启动类上面设置@org.mybatis.spring.annotation.MapperScan注解用于标注Mapper接口的路径");
+            throw new MyBatisProException("需要在启动类上设置@org.mybatis.spring.annotation.MapperScan注解用于标注Mapper接口的路径，并且只能存在一个@MapperScan注解");
         }
 
         Class<?> mainCls = mapperScan.values().iterator().next().getClass();
         MapperScan ms = AnnotationUtils.findAnnotation(mainCls, MapperScan.class);
+        if (ms == null) {
+            throw new MyBatisProException();
+        }
         String[] value = ms.value();
         String[] basePackages = ms.basePackages();
         Class<?>[] basePackageClasses = ms.basePackageClasses();
 
         Set<String> mapperPackages = new HashSet<>();
-        ofNullable(value).ifPresent(v -> mapperPackages.addAll(Arrays.asList(v)));
-        ofNullable(basePackages).ifPresent(v -> mapperPackages.addAll(Arrays.asList(v)));
-        ofNullable(basePackageClasses).ifPresent(v -> mapperPackages.addAll(Arrays.stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(Collectors.toSet())));
+        mapperPackages.addAll(asList(value));
+        mapperPackages.addAll(asList(basePackages));
+        mapperPackages.addAll(stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(toSet()));
 
-        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", JSON.toJSONString(mapperPackages));
+        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
 
         return mapperPackages;
     }

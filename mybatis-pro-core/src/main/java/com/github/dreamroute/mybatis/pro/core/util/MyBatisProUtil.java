@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
@@ -10,30 +9,41 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
 import org.w3c.dom.Document;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
+import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
+import static cn.hutool.core.util.ClassUtil.loadClass;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
+import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.DELETE;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.MAPPER;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.NAMESPACE;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.SELECT;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getMethodName2ReturnType;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMethods;
+import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
+import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
+import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
- * 使用新的resource替换默认resource，并且默认创建接口Mapper对应的mapper.xml（如果Mapper接口不存在对应的mapepr.xml文件）
+ * 使用新的resource替换默认resource，如果Mapper接口不存在对应的mapepr.xml文件，就创建接口Mapper对应的mapper.xml（）
  *
  * @author w.dehai
  */
@@ -43,14 +53,14 @@ public class MyBatisProUtil {
 
     public static Resource[] processMyBatisPro(Resource[] resources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = mapperPackages.stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
-        Set<Class<?>> existXmlMapper = getExistMappers(resources);
+        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
+        Set<Class<?>> existXmlMapper = stream(ofNullable(resources).orElse(new Resource[0])).map(MyBatisProUtil::getMapperByResource).collect(toSet());
         mappers.removeAll(existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
         Set<Resource> extraResource = mappers.stream().map(MyBatisProUtil::createResource).collect(toSet());
         allResources.addAll(extraResource);
-        allResources.addAll(asList(resources));
+        allResources.addAll(asList(ofNullable(resources).orElseGet(() -> new Resource[0])));
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
@@ -61,20 +71,14 @@ public class MyBatisProUtil {
         return result.toArray(new Resource[0]);
     }
 
-    private static Set<Class<?>> getExistMappers(Resource[] resources) {
-        return Arrays.stream(Optional.ofNullable(resources).orElse(new Resource[0]))
-                .map(MyBatisProUtil::getMapperByResource)
-                .collect(Collectors.toSet());
-    }
-
     public static Class<?> getMapperByResource(Resource resource) {
         try {
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
-            XNode mapperNode = xPathParser.evalNode(MapperLabel.MAPPER.getCode());
-            String namespace = mapperNode.getStringAttribute(MapperLabel.NAMESPACE.getCode());
-            return ClassUtils.forName(namespace, MyBatisProUtil.class.getClassLoader());
+            XNode mapperNode = xPathParser.evalNode(MAPPER.getCode());
+            String namespace = mapperNode.getStringAttribute(NAMESPACE.getCode());
+            return loadClass(namespace);
         } catch (Exception e) {
-            throw new MyBatisProException(e);
+            throw new MyBatisProException();
         }
     }
 
@@ -90,17 +94,63 @@ public class MyBatisProUtil {
     }
 
     /**
-     * 将方法名转换成sql语句
-     *
-     * @param methodName 方法名
-     * @return 返回sql语句
+     * 处理通用crud方法
      */
-    private static String createCondition(String methodName) {
-        return SqlUtil.createSql(methodName);
+    private static Set<Resource> processMapperMethods(Set<Resource> all) {
+        return ofNullable(all).orElseGet(HashSet::new)
+                .stream()
+                .map(resource -> new MapperUtil(resource).parse())
+                .collect(toSet());
     }
 
+    public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
+        return resources.stream().map(resource -> {
+            Class<?> mapperCls = getMapperByResource(resource);
+            List<String> specialMethods = getSpecialMethods(mapperCls);
+            validateDuplicateMethods(mapperCls, resource);
+
+            Document doc = createDocumentFromResource(resource);
+            if (!isEmpty(specialMethods)) {
+                Class<?> entityCls = getTypeArgument(mapperCls);
+                if (!hasAnnotation(entityCls, Table.class)) {
+                    throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@com.github.dreamroute.mybatis.pro.core.annotations.Table注解");
+                }
+                String tableName = getAnnotationValue(entityCls, Table.class, "name");
+                Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
+                specialMethods.forEach(specialMethodName -> {
+                    String methodName = null;
+                    String sql = null;
+                    MapperLabel ml = SELECT;
+                    if (specialMethodName.startsWith("findBy")) {
+                        methodName = specialMethodName.substring(6);
+                        sql = "select * from " + tableName;
+                    } else if (specialMethodName.startsWith("deleteBy")) {
+                        methodName = specialMethodName.substring(8);
+                        sql = "delete from " + tableName;
+                        ml = DELETE;
+                    } else if (specialMethodName.startsWith("countBy")) {
+                        methodName = specialMethodName.substring(7);
+                        sql = "select count(*) c from " + tableName;
+                    } else if (specialMethodName.startsWith("existBy")) {
+                        methodName = specialMethodName.substring(7);
+                        sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from " + tableName;
+                    }
+                    sql += " where " + createCondition(methodName);
+
+                    //  对于delete需要特殊处理，delete不需要设置resultType
+                    String resultType = ml == DELETE ? null : name2Type.get(specialMethodName);
+                    fillSqlNode(doc, ml, specialMethodName, resultType, sql, null, null);
+                });
+            }
+            return createResourceFromDocument(doc);
+        }).collect(toSet());
+    }
+
+    /**
+     * 校验Mapper接口内的xxxBy方法不能与xml文件的方法有同名
+     */
     private static void validateDuplicateMethods(Class<?> mapperCls, Resource resource) {
-        XPathParser xPathParser = null;
+        XPathParser xPathParser;
         try {
             xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
         } catch (Exception e) {
@@ -115,62 +165,22 @@ public class MyBatisProUtil {
         methods.addAll(insertMethods);
         methods.addAll(updateMethods);
         methods.addAll(deleteMethods);
-        List<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(MapperLabel.ID.getCode())).collect(Collectors.toList());
-        List<String> mapperMethodNames = Arrays.stream(mapperCls.getMethods()).map(Method::getName).collect(Collectors.toList());
+        List<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(ID.getCode())).collect(toList());
+        List<String> mapperMethodNames = stream(mapperCls.getMethods()).map(Method::getName).collect(toList());
         mapperMethodNames.retainAll(xmlMethodNames);
-        if (!CollectionUtils.isEmpty(mapperMethodNames)) {
-            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + JSON.toJSONString(mapperMethodNames) + "与xml文件中的方法重名");
+        if (!isEmpty(mapperMethodNames)) {
+            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(mapperMethodNames) + "与xml文件中的方法重名");
         }
     }
 
-    public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
-        return resources.stream().map(resource -> {
-            Class<?> mapperCls = getMapperByResource(resource);
-            List<String> specialMethods = getSpecialMethods(mapperCls);
-            validateDuplicateMethods(mapperCls, resource);
-
-            Document doc = DocumentUtil.createDocumentFromResource(resource);
-            if (!CollectionUtils.isEmpty(specialMethods)) {
-                Class<?> entityCls = getTypeArgument(mapperCls);
-                String tableName = getAnnotationValue(entityCls, Table.class, "name");
-                Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(mapperCls);
-                specialMethods.forEach(specialMethodName -> {
-                    String methodName = null;
-                    String sql = null;
-                    MapperLabel ml = MapperLabel.SELECT;
-                    if (specialMethodName.startsWith("findBy")) {
-                        methodName = specialMethodName.substring(6);
-                        sql = "select * from " + tableName;
-                    } else if (specialMethodName.startsWith("deleteBy")) {
-                        methodName = specialMethodName.substring(8);
-                        sql = "delete from " + tableName;
-                        ml = MapperLabel.DELETE;
-                    } else if (specialMethodName.startsWith("countBy")) {
-                        methodName = specialMethodName.substring(7);
-                        sql = "select count(*) c from " + tableName;
-                    } else if (specialMethodName.startsWith("existBy")) {
-                        methodName = specialMethodName.substring(7);
-                        sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from " + tableName;
-                    }
-                    sql += " where " + createCondition(methodName);
-
-                    //  对于delete需要特殊处理，delete不需要设置resultType
-                    String resultType = ml == MapperLabel.DELETE ? null : name2Type.get(specialMethodName);
-                    DocumentUtil.fillSqlNode(doc, ml, specialMethodName, resultType, sql, null, null);
-                });
-            }
-            return DocumentUtil.createResourceFromDocument(doc);
-        }).collect(Collectors.toSet());
-    }
-
     /**
-     * 处理通用crud方法
+     * 将方法名转换成sql语句
+     *
+     * @param methodName 方法名
+     * @return 返回sql语句
      */
-    private static Set<Resource> processMapperMethods(Set<Resource> all) {
-        return Optional.ofNullable(all).orElse(new HashSet<>())
-                .stream()
-                .map(resource -> new MapperUtil(resource).parse())
-                .collect(Collectors.toSet());
+    private static String createCondition(String methodName) {
+        return SqlUtil.createSql(methodName);
     }
 
 }
