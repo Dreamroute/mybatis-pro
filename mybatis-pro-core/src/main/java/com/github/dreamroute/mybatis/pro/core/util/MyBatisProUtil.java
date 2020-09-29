@@ -29,6 +29,8 @@ import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMethods;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * 使用新的resource替换默认resource，并且默认创建接口Mapper对应的mapper.xml（如果Mapper接口不存在对应的mapepr.xml文件）
@@ -41,14 +43,14 @@ public class MyBatisProUtil {
 
     public static Resource[] processMyBatisPro(Resource[] resources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = mapperPackages.stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(Collectors.toSet());
+        Set<Class<?>> mappers = mapperPackages.stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> existXmlMapper = getExistMappers(resources);
         mappers.removeAll(existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
-        Set<Resource> extraResource = mappers.stream().map(MyBatisProUtil::createResource).collect(Collectors.toSet());
+        Set<Resource> extraResource = mappers.stream().map(MyBatisProUtil::createResource).collect(toSet());
         allResources.addAll(extraResource);
-        allResources.addAll(Arrays.asList(resources));
+        allResources.addAll(asList(resources));
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
