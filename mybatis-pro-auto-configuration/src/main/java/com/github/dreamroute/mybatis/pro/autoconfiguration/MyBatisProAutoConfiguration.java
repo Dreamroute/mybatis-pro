@@ -267,18 +267,18 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     }
 
+    /**
+     * 获取mapper接口的包路径集合
+     */
     private Set<String> getMapperPackages() {
 
         Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
-        if (mapperScan.isEmpty()) {
+        if (mapperScan == null || mapperScan.isEmpty() || mapperScan.size() > 1) {
             throw new MyBatisProException("需要在启动类上设置@org.mybatis.spring.annotation.MapperScan注解用于标注Mapper接口的路径，并且只能存在一个@MapperScan注解");
         }
 
         Class<?> mainCls = mapperScan.values().iterator().next().getClass();
         MapperScan ms = AnnotationUtils.findAnnotation(mainCls, MapperScan.class);
-        if (ms == null) {
-            throw new MyBatisProException();
-        }
         String[] value = ms.value();
         String[] basePackages = ms.basePackages();
         Class<?>[] basePackageClasses = ms.basePackageClasses();
