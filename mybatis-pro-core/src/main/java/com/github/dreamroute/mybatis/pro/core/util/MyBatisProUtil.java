@@ -106,10 +106,10 @@ public class MyBatisProUtil {
     public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
             Class<?> mapperCls = getMapperByResource(resource);
-            List<String> specialMethods = getSpecialMethods(mapperCls);
             validateDuplicateMethods(mapperCls, resource);
 
             Document doc = createDocumentFromResource(resource);
+            List<String> specialMethods = getSpecialMethods(mapperCls);
             if (!isEmpty(specialMethods)) {
                 Class<?> entityCls = getTypeArgument(mapperCls);
                 if (!hasAnnotation(entityCls, Table.class)) {
@@ -169,7 +169,7 @@ public class MyBatisProUtil {
         List<String> mapperMethodNames = stream(mapperCls.getMethods()).map(Method::getName).collect(toList());
         mapperMethodNames.retainAll(xmlMethodNames);
         if (!isEmpty(mapperMethodNames)) {
-            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(mapperMethodNames) + "与xml文件中的方法重名");
+            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(mapperMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
         }
     }
 
