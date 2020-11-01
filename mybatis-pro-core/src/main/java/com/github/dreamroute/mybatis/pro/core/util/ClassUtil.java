@@ -3,7 +3,6 @@ package com.github.dreamroute.mybatis.pro.core.util;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
@@ -20,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
+import static com.alibaba.fastjson.JSON.toJSONString;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
@@ -80,7 +80,7 @@ public class ClassUtil {
         Map<String, Long> methodCount = stream(ms).map(Method::getName).collect(groupingBy(identity(), counting()));
         Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(toMap(Entry::getKey, Entry::getValue));
         if (!isEmpty(duplicateMethods)) {
-            throw new MyBatisProException(interfaceCls.getName() + "的方法: " + duplicateMethods.keySet() + "不允许与" + BaseMapper.class.getName() + "内置方法重名");
+            throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJSONString(duplicateMethods.keySet()) + "存在重复的方法名");
         }
         return stream(ms).collect(toMap(Method::getName, ClassUtil::getReturnType));
     }

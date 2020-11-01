@@ -120,26 +120,26 @@ public class MyBatisProUtil {
                 specialMethods.forEach(specialMethodName -> {
                     String methodName = null;
                     String sql = null;
-                    MapperLabel ml = SELECT;
+                    MapperLabel mapperLabel = SELECT;
                     if (specialMethodName.startsWith("findBy")) {
                         methodName = specialMethodName.substring(6);
-                        sql = "select * from " + tableName;
+                        sql = "select * from ";
                     } else if (specialMethodName.startsWith("deleteBy")) {
                         methodName = specialMethodName.substring(8);
-                        sql = "delete from " + tableName;
-                        ml = DELETE;
+                        sql = "delete from ";
+                        mapperLabel = DELETE;
                     } else if (specialMethodName.startsWith("countBy")) {
                         methodName = specialMethodName.substring(7);
-                        sql = "select count(*) c from " + tableName;
+                        sql = "select count(*) c from ";
                     } else if (specialMethodName.startsWith("existBy")) {
                         methodName = specialMethodName.substring(7);
-                        sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from " + tableName;
+                        sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from ";
                     }
-                    sql += " where " + createCondition(methodName);
+                    sql += tableName + " where " + createCondition(methodName);
 
                     //  对于delete需要特殊处理，delete不需要设置resultType
-                    String resultType = ml == DELETE ? null : name2Type.get(specialMethodName);
-                    fillSqlNode(doc, ml, specialMethodName, resultType, sql, null, null);
+                    String resultType = mapperLabel == DELETE ? null : name2Type.get(specialMethodName);
+                    fillSqlNode(doc, mapperLabel, specialMethodName, resultType, sql, null, null);
                 });
             }
             return createResourceFromDocument(doc);
