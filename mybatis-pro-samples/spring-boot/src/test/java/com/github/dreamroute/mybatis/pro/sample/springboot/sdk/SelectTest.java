@@ -62,4 +62,10 @@ class SelectTest {
         assertArrayEquals(new Long[]{1L, 2L, 3L}, ids);
     }
 
+    @Test
+    void selectByNameAndPasswordTest() {
+        List<User> users = userMapper.selectByNameAndPasssword("w.dehai", "123456");
+        System.err.println(users);
+    }
+
 }

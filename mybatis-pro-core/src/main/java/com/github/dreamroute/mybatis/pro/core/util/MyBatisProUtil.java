@@ -12,7 +12,6 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +34,7 @@ import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMe
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
@@ -90,7 +90,7 @@ public class MyBatisProUtil {
                         "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
                         "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
                         "<mapper namespace='" + namespace + "'></mapper>";
-        return new ByteArrayResource(xml.getBytes(StandardCharsets.UTF_8));
+        return new ByteArrayResource(xml.getBytes(UTF_8));
     }
 
     /**

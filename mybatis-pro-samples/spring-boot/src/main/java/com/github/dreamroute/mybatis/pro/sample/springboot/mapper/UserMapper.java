@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.service.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -62,4 +63,7 @@ public interface UserMapper extends Mapper<User, Long> {
     int deleteByNameOrPassword(String name, String password);
 
     boolean existByNameOrPassword(String name, String password);
+
+    @Select("select * from smart_user where name = #{name} and password = #{password}")
+    List<User> selectByNameAndPasssword(String name, String password);
 }
