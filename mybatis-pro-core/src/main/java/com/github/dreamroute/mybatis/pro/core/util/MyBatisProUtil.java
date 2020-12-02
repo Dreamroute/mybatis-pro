@@ -34,6 +34,7 @@ import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMe
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
+import static com.google.common.collect.Sets.difference;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -55,10 +56,10 @@ public class MyBatisProUtil {
 
         Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> existXmlMapper = stream(ofNullable(resources).orElse(new Resource[0])).map(MyBatisProUtil::getMapperByResource).collect(toSet());
-        mappers.removeAll(existXmlMapper);
+        Set<Class<?>> extra = difference(mappers, existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
-        Set<Resource> extraResource = mappers.stream().map(MyBatisProUtil::createResource).collect(toSet());
+        Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createResource).collect(toSet());
         allResources.addAll(extraResource);
         allResources.addAll(asList(ofNullable(resources).orElseGet(() -> new Resource[0])));
 
