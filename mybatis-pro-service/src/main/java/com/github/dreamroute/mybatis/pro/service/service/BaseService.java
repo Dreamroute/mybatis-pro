@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.service;
+package com.github.dreamroute.mybatis.pro.service.service;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.service;
+package com.github.dreamroute.mybatis.pro.service.mapper;
 
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.apache.ibatis.annotations.Insert;

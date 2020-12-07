@@ -1,7 +1,8 @@
-package com.github.dreamroute.mybatis.pro.service;
+package com.github.dreamroute.mybatis.pro.service.service;
 
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
+import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,6 +18,7 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Autowired
     private Mapper<T, ID> mapper;
+
     @Value("${mybatis.pro.backup-table:backup_table}")
     private String backupTable;
 
