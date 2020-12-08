@@ -1,60 +1,37 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.config.resp;
 
 /**
- * 
  * @author w.dehai
- *
  */
 public enum RespEnum {
 
-    /**
-     * 请求成功
-     */
-    SUCCESS("0", "请求成功"),
+    SUCCESS(0, "success"),
+
+    LOGIN_FAILD(10000, "登录异常，用户名或密码错误"),
 
     /**
-     * 登录异常
+     * 系统异常，主要针对500错误，让前端看不到500错误
      */
-    LOGIN_FAILD("10000", "登录异常，用户名或密码错误"),
-
-    /**
-     * 系统异常，主要针对500错误，开发者禁止使用此类型
-     */
-    SYSTEM_ERR("10001", "提交的信息不符合规范,请重新提交"),
-
-    /**
-     * 新增失败
-     */
-    INSERT_ERR("10002", "新增失败"),
-
-    /**
-     * 删除失败
-     */
-    DELETE_ERR("10003", "删除失败"),
-
-    /**
-     * 修改失败
-     */
-    UPDATE_ERR("10004", "修改失败"),
+    SYSTEM_ERR(10001, "提交的信息不符合规范，请重新提交"),
     ;
 
-    RespEnum(String code, String desc) {
+    RespEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    private String code;
+    private Integer code;
     private String desc;
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
     public String getDesc() {
         return desc;
     }
-    
-    public RespEnum code(String code) {
+
+    public RespEnum code(Integer code) {
         this.code = code;
         return this;
     }
