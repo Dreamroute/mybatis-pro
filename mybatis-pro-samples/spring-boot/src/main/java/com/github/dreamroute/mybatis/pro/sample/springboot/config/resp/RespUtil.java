@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.config.resp;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import lombok.Data;
 
 import static com.alibaba.fastjson.JSON.toJSONString;
@@ -61,6 +62,10 @@ public final class RespUtil {
                 DisableCircularReferenceDetect
         };
         return toJSONString(resp, features);
+    }
+
+    public static void main(String[] args) {
+        throw new MyBatisProException(RespEnum.LOGIN_FAILD.toString());
     }
 
 }
