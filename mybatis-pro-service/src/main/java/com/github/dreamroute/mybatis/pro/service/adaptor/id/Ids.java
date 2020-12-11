@@ -1,8 +1,7 @@
 package com.github.dreamroute.mybatis.pro.service.adaptor.id;
 
+import com.github.dreamroute.mybatis.pro.service.adaptor.validator.ElementNotEmpty;
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
 
 /**
  * 前端请求中只有多个id参数
@@ -12,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class Ids {
 
-    @NotEmpty
+    @ElementNotEmpty
     private Long[] ids;
 
 }
