@@ -90,7 +90,7 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     private void backup(ID id) {
         T entity = this.select(id);
         String data = JSON.toJSONString(entity);
-        String tableName = getAnnotationValue(getTypeArgument(getClass()), Table.class, "name");
+        String tableName = getAnnotationValue(getTypeArgument(getClass()), Table.class);
         mapper.insertDynamic(backupTable, tableName, data);
     }
 

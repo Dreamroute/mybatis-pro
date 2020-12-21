@@ -8,7 +8,6 @@ import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 
 import java.lang.reflect.Field;
@@ -28,6 +27,8 @@ import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParent
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getMapperByResource;
+import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author w.dehai
@@ -39,6 +40,7 @@ public class MapperUtil {
     private String tableName;
     private String idColumn;
     private String idName;
+    private Class<?> mapper;
     private com.github.dreamroute.mybatis.pro.core.annotations.Type type;
 
     // -- biz
@@ -57,15 +59,15 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = createDocumentFromResource(resource);
-        Class<?> mapper = getMapperByResource(resource);
+        mapper = getMapperByResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
         if (parentInters.contains(BaseMapper.class)) {
             this.entityCls = getTypeArgument(mapper);
-            this.tableName = getAnnotationValue(entityCls, Table.class, "name");
+            this.tableName = getAnnotationValue(entityCls, Table.class);
             Field idField = getIdField(entityCls);
             this.idName = idField.getName();
-            Column colAnno = idField.getAnnotation(Column.class);
-            this.idColumn = (colAnno != null && !StringUtils.isEmpty(colAnno.name())) ? colAnno.name() : SqlUtil.toLine(idField.getName());
+            String col = getAnnotationValue(idField, Column.class);
+            this.idColumn = isEmpty(col) ? toLine(idField.getName()) : col;
             this.type = idField.getAnnotation(Id.class).type();
             this.createSqlFragment();
 
@@ -140,7 +142,7 @@ public class MapperUtil {
 
         ReflectionUtils.doWithFields(entityCls, field -> {
             Column colAn = field.getAnnotation(Column.class);
-            String column = Optional.ofNullable(colAn).map(Column::name).orElse(SqlUtil.toLine(field.getName()));
+            String column = Optional.ofNullable(colAn).map(Column::value).orElse(SqlUtil.toLine(field.getName()));
             values2Columns.put(field.getName(), column);
 
             Id idAn = field.getAnnotation(Id.class);

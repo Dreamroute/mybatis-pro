@@ -17,8 +17,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-@Table(name = "smart_dict")
+@EqualsAndHashCode(callSuper = true)
+@Table("smart_dict")
 public class Dict extends IdEntity {
     private Integer value;
     private String labelValue;

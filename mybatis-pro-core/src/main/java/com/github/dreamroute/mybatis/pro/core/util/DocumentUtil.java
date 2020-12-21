@@ -10,8 +10,10 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Text;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -21,6 +23,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.MAPPER;
 
 /**
  * @author w.dehai
@@ -44,7 +48,11 @@ public class DocumentUtil {
             String xml = bos.toString("UTF-8");
             // 必须要将尖括号进行替换，否则要报错
             String replace = xml.replace("&gt;", ">").replace("&lt;", "<");
-            return new ByteArrayResource(replace.getBytes(StandardCharsets.UTF_8));
+            NamedNodeMap attributes = document.getElementsByTagName(MAPPER.getCode()).item(0).getAttributes();
+            String namespace = attributes.item(0).getTextContent();
+            // 这里必须要把使用带有desc参数的ByteArrayResource构造方法，因为mybatis的configuration.isResourceLoaded(resource)根据resource的toString方法判断是否存在
+            // 而mybatis-pro插件生成的resource都是byteArrayResource，如果不带desc，那么所有的resource的toString就都相同，反之带上desc的toString方法就能区分
+            return new ByteArrayResource(replace.getBytes(StandardCharsets.UTF_8), namespace);
         } catch (Exception e) {
             throw new MyBatisProException("Document转成Resource失败", e);
         }
@@ -57,6 +65,8 @@ public class DocumentUtil {
         try {
             // 改写resource，加入xxxBy方法的标签
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             documentBuilderFactory.setValidating(false);
             documentBuilderFactory.setNamespaceAware(false);
             DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();

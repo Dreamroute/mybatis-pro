@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
+import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.service.entity.IdEntity;
@@ -14,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "smart_user")
+@Table("smart_user")
 public class User extends IdEntity {
 
     private String name;
@@ -22,5 +23,6 @@ public class User extends IdEntity {
     private Long version;
     @Transient
     private Integer gender;
+    @Column("phone_no")
     private String phoneNo;
 }

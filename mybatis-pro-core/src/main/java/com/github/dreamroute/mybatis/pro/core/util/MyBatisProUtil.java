@@ -59,7 +59,7 @@ public class MyBatisProUtil {
         Set<Class<?>> extra = difference(mappers, existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
-        Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createResource).collect(toSet());
+        Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createEmptyResource).collect(toSet());
         allResources.addAll(extraResource);
         allResources.addAll(asList(ofNullable(resources).orElseGet(() -> new Resource[0])));
 
@@ -83,7 +83,7 @@ public class MyBatisProUtil {
         }
     }
 
-    private static Resource createResource(Class<?> mapper) {
+    private static Resource createEmptyResource(Class<?> mapper) {
         String namespace = mapper.getName();
         String xml =
                 "<?xml version='1.0' encoding='UTF-8' ?>\n" +
@@ -116,7 +116,7 @@ public class MyBatisProUtil {
                 if (!hasAnnotation(entityCls, Table.class)) {
                     throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@com.github.dreamroute.mybatis.pro.core.annotations.Table注解");
                 }
-                String tableName = getAnnotationValue(entityCls, Table.class, "name");
+                String tableName = getAnnotationValue(entityCls, Table.class);
                 Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
                 specialMethods.forEach(specialMethodName -> {
                     String methodName = null;

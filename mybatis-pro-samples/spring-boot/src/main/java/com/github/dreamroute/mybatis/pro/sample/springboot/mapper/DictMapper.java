@@ -8,4 +8,4 @@ import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
  * @author w.dehai
  *
  */
-public interface DictMapper extends Mapper<Long, Dict> {}
+public interface DictMapper extends Mapper<Dict, Long> {}
