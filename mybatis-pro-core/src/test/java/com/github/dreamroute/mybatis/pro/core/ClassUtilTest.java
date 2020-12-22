@@ -43,8 +43,8 @@ class ClassUtilTest {
     @Test
     void getSpecialMethodsTest() {
         List<String> names = ClassUtil.getSpecialMethods(DemoMapper.class);
-        String result = names.stream().collect(Collectors.joining(",", "[", "]"));
-        assertEquals("[findByName,findByNameAndPassword,findById]", result);
+        String result = names.stream().sorted().collect(Collectors.joining(",", "[", "]"));
+        assertEquals("[findById,findByName,findByNameAndPassword]", result);
     }
 
     @Test
