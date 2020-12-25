@@ -44,7 +44,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
- * 使用新的resource替换默认resource，如果Mapper接口不存在对应的mapepr.xml文件，就创建接口Mapper对应的mapper.xml（）
+ * 使用新的resource替换默认resource，如果Mapper接口不存在对应的mapepr.xml文件，就创建接口Mapper对应的mapper.xml
  *
  * @author w.dehai
  */
@@ -52,16 +52,16 @@ public class MyBatisProUtil {
 
     private MyBatisProUtil() {}
 
-    public static Resource[] processMyBatisPro(Resource[] resources, Set<String> mapperPackages) {
+    public static Resource[] processMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(pkgName -> scanPackageBySuper(pkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
-        Set<Class<?>> existXmlMapper = stream(ofNullable(resources).orElse(new Resource[0])).map(MyBatisProUtil::getMapperByResource).collect(toSet());
+        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
+        Set<Class<?>> existXmlMapper = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(MyBatisProUtil::getNamespaceFromXmlResource).collect(toSet());
         Set<Class<?>> extra = difference(mappers, existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
         Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createEmptyResource).collect(toSet());
         allResources.addAll(extraResource);
-        allResources.addAll(asList(ofNullable(resources).orElseGet(() -> new Resource[0])));
+        allResources.addAll(asList(ofNullable(xmlResources).orElseGet(() -> new Resource[0])));
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
@@ -72,7 +72,12 @@ public class MyBatisProUtil {
         return result.toArray(new Resource[0]);
     }
 
-    public static Class<?> getMapperByResource(Resource resource) {
+    /**
+     * 从mapper.xml文件中获取namespace
+     *
+     * @param resource mapper.xml数据流
+     */
+    public static Class<?> getNamespaceFromXmlResource(Resource resource) {
         try {
             XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
             XNode mapperNode = xPathParser.evalNode(MAPPER.getCode());
@@ -106,7 +111,7 @@ public class MyBatisProUtil {
 
     public static Set<Resource> processSpecialMethods(Set<Resource> resources) {
         return resources.stream().map(resource -> {
-            Class<?> mapperCls = getMapperByResource(resource);
+            Class<?> mapperCls = getNamespaceFromXmlResource(resource);
             validateDuplicateMethods(mapperCls, resource);
 
             Document doc = createDocumentFromResource(resource);

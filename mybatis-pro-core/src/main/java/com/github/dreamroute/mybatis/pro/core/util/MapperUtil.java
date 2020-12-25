@@ -27,7 +27,7 @@ import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
-import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getMapperByResource;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getNamespaceFromXmlResource;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -60,7 +60,7 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = createDocumentFromResource(resource);
-        mapper = getMapperByResource(resource);
+        mapper = getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
         if (parentInters.contains(BaseMapper.class)) {
             this.entityCls = getTypeArgument(mapper);
