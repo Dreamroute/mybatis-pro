@@ -5,6 +5,7 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ReflectionUtils;
@@ -64,6 +65,9 @@ public class MapperUtil {
         if (parentInters.contains(BaseMapper.class)) {
             this.entityCls = getTypeArgument(mapper);
             this.tableName = getAnnotationValue(entityCls, Table.class);
+            if (isEmpty(tableName)) {
+                throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@com.github.dreamroute.mybatis.pro.core.annotations.Table注解");
+            }
             Field idField = getIdField(entityCls);
             this.idName = idField.getName();
             String col = getAnnotationValue(idField, Column.class);
