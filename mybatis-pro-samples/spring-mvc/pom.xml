@@ -8,6 +8,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>spring-mvc</artifactId>
+    <name>${project.artifactId}</name>
 
     <build>
         <plugins>

@@ -8,4 +8,5 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mybatis-pro-sdk</artifactId>
+    <name>${project.artifactId}</name>
 </project>

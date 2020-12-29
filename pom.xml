@@ -13,7 +13,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>mybatis-pro</name>
+    <name>${project.artifactId}</name>
     <url>https://github.com/Dreamroute/mybatis-pro</url>
     <description>mybatis-pro</description>
 
