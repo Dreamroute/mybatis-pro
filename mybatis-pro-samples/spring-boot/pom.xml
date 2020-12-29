@@ -5,6 +5,7 @@
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro-samples</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>spring-boot</artifactId>
 
@@ -12,7 +13,7 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-boot-starter</artifactId>
-            <version>${revision}</version>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 

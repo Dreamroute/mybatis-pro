@@ -4,23 +4,24 @@
 		<groupId>com.github.dreamroute</groupId>
 		<artifactId>mybatis-pro</artifactId>
 		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>mybatis-pro-boot-starter</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-auto-configuration</artifactId>
-			<version>${revision}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-core</artifactId>
-			<version>${revision}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-service</artifactId>
-			<version>${revision}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+/.flattened-pom.xml
+/mybatis-pro-service/.flattened-pom.xml
+/mybatis-pro-sdk/.flattened-pom.xml
+/mybatis-pro-samples/.flattened-pom.xml
+/mybatis-pro-samples/spring-mvc/.flattened-pom.xml
+/mybatis-pro-samples/spring-boot/.flattened-pom.xml
+/mybatis-pro-core/.flattened-pom.xml
+/mybatis-pro-boot-starter/.flattened-pom.xml
+/mybatis-pro-auto-configuration/.flattened-pom.xml

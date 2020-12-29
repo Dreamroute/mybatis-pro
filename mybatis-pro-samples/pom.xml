@@ -5,6 +5,7 @@
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mybatis-pro-samples</artifactId>
     <packaging>pom</packaging>
