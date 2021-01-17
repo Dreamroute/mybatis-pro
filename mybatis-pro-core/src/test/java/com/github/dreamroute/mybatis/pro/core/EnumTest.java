@@ -1,10 +1,7 @@
 package com.github.dreamroute.mybatis.pro.core;
 
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumMarker;
-import com.github.dreamroute.mybatis.pro.core.typehandler.EnumUtil;
 import org.junit.jupiter.api.Test;
-
-import static com.github.dreamroute.mybatis.pro.core.typehandler.EnumUtil.valueOf;
 
 public class EnumTest {
 
@@ -20,16 +17,21 @@ public class EnumTest {
         }
 
         @Override
-        public int getValue() {
+        public Integer getValue() {
             return this.value;
+        }
+
+        @Override
+        public String getDesc() {
+            return this.desc;
         }
     }
 
     @Test
     void createEnumTest() {
-        Gender male = EnumUtil.valueOf(Gender.class, 1);
+        Gender male = EnumMarker.valueOf(Gender.class, 1);
         System.err.println(male);
-        Gender female = valueOf(Gender.class, 2);
+        Gender female = EnumMarker.valueOf(Gender.class, 2);
         System.err.println(female);
     }
 

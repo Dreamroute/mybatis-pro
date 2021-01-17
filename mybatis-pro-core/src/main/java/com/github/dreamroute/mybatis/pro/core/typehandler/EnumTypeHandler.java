@@ -39,7 +39,7 @@ public class EnumTypeHandler<E extends Enum<?> & EnumMarker> extends BaseTypeHan
             return null;
         } else {
             try {
-                return EnumUtil.valueOf(type, value);
+                return EnumMarker.valueOf(type, value);
             } catch (Exception ex) {
                 throw new IllegalArgumentException("Cannot convert " + value + " to " + type.getSimpleName() + " by ordinal value.", ex);
             }
@@ -53,7 +53,7 @@ public class EnumTypeHandler<E extends Enum<?> & EnumMarker> extends BaseTypeHan
             return null;
         } else {
             try {
-                return EnumUtil.valueOf(type, value);
+                return EnumMarker.valueOf(type, value);
             } catch (Exception ex) {
                 throw new IllegalArgumentException("Cannot convert " + value + " to " + type.getSimpleName() + " by ordinal value.", ex);
             }

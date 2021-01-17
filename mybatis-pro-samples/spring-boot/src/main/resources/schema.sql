@@ -12,6 +12,13 @@ CREATE TABLE `smart_user`
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE `smart_typehandler`
+(
+    `id`                bigint(20) NOT NULL AUTO_INCREMENT,
+    `gender`          tinyint DEFAULT NULL,
+    PRIMARY KEY (`id`)
+);
+
 CREATE TABLE `smart_dict` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `value` tinyint(4) DEFAULT NULL,
