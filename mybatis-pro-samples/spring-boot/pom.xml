@@ -16,6 +16,11 @@
             <artifactId>mybatis-pro-boot-starter</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.dreamroute</groupId>
+            <artifactId>sqlprinter-spring-boot-starter</artifactId>
+            <version>100</version>
+        </dependency>
     </dependencies>
 
     <build>
