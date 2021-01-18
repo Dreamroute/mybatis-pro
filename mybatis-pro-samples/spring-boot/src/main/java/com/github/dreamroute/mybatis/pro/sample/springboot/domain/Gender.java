@@ -8,9 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  Gender implements EnumMarker {
 
-    MALE("男", 1), FEMALE("女", 2);
+    MALE(1, "男"), FEMALE(2, "女");
 
-    private final String desc;
     private final Integer value;
+    private final String desc;
 
 }
