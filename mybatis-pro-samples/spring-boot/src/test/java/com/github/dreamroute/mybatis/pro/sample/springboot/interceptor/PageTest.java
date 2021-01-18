@@ -1,6 +1,7 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
 import com.github.dreamroute.mybatis.pro.core.page.PageParam;
+import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -12,8 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
 
+import java.util.List;
+
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class PageTest {
@@ -39,7 +43,15 @@ class PageTest {
     @Test
     void selectTest() {
         PageParam pageParam = new PageParam();
-        Object result = userMapper.selectAllPage(pageParam);
+        pageParam.setDefaultPage(1);
+        pageParam.setDefaultPageSize(2);
+        pageParam.setDefaultUseFlag(true);
+        pageParam.setDefaultCheckFlag(true);
+
+        pageParam.setName("w.dehai");
+
+        List<User> result = userMapper.selectAllPage(pageParam);
+        assertEquals(1, result.size());
     }
 
 }

@@ -68,5 +68,5 @@ public interface UserMapper extends Mapper<User, Long> {
     @Select("select * from smart_user where name = #{name} and password = #{password}")
     List<User> selectByNameAndPasssword(String name, String password);
 
-    Object selectAllPage(PageParam pageParam);
+    List<User> selectAllPage(PageParam pageParam);
 }

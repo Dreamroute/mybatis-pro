@@ -13,6 +13,16 @@ public class PageParam {
     //    当前sql查询实现分页后的总页数，回填
     private Integer totlePage;
 
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Integer getDefaultPage() {
         return defaultPage;
     }

@@ -174,7 +174,9 @@ public class PageInterceptor implements Interceptor {
         String sql = (String) metaStatementHandler.getValue("delegate.boundSql.sql");
 
 //        将sql改写成统计记录数的sql语句,这里是mysql的改写语句,将第一次查询结果作为第二次查询的表
-        String countSql = "select count(*) as totle from (" + sql + ") $_paging";
+//        String countSql = "select count(*) as totle from (" + sql + ") $_paging";
+
+        String countSql = "select count(*) as totle from (" + sql + ") t";
 
 //        获取connection连接对象，用于执行countsql语句
         Connection conn = (Connection) invocation.getArgs()[0];
@@ -221,7 +223,7 @@ public class PageInterceptor implements Interceptor {
     private Object updateSql2Limit(Invocation invocation, MetaObject metaStatementHandler, BoundSql boundSql, int page, int pageSize) throws InvocationTargetException, IllegalAccessException, SQLException {
         String sql = (String) metaStatementHandler.getValue("delegate.boundSql.sql");
         //构建新的分页sql语句
-        String limitSql = "select * from (" + sql + ") $_paging_table limit ?,?";
+        String limitSql = "select * from (" + sql + ") t limit ?,?";
         //修改当前要执行的sql语句
         metaStatementHandler.setValue("delegate.boundSql.sql", limitSql);
         //相当于调用prepare方法，预编译sql并且加入参数，但是少了分页的两个参数，它返回一个PreparedStatement对象
