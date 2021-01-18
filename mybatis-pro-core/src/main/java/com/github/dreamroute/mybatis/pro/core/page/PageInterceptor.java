@@ -101,6 +101,11 @@ public class PageInterceptor implements Interceptor {
         defaultPageSize = Integer.valueOf(strDefaultPageSize);
         defaultUseFlag = Boolean.valueOf(strDefaultUseFlag);
         defaultCheckFlag = Boolean.valueOf(strDefaultCheckFlag);
+
+        defaultPage = 1;
+        defaultPageSize = 3;
+        defaultCheckFlag = true;
+        defaultUseFlag = true;
     }
 
 

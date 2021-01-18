@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.core;
 
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.util.ClassUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -51,6 +52,12 @@ class ClassUtilTest {
     void getAllFieldsTest() {
         Set<Field> allFields = ClassUtil.getAllFields(User.class);
         assertEquals(1, allFields.size());
+    }
+
+    @Test
+    void getInnerMethodNamesTest() {
+        Set<String> methodNames = ClassUtil.getInnerMethodNames();
+        Assertions.assertNotNull(methodNames);
     }
 
 }

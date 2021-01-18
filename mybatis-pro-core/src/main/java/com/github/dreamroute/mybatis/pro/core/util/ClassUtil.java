@@ -3,6 +3,7 @@ package com.github.dreamroute.mybatis.pro.core.util;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static com.alibaba.fastjson.JSON.toJSONString;
 import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -67,6 +70,18 @@ public class ClassUtil {
                 .map(Method::getName)
                 .filter(name -> name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy")   )
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取BaseMapper的所有方法名
+     */
+    public static Set<String> getInnerMethodNames() {
+        Set<Class<?>> parentInterfaces = getAllParentInterface(BaseMapper.class);
+        return ofNullable(parentInterfaces).orElseGet(HashSet::new).stream()
+                .map(cls -> cls.getDeclaredMethods())
+                .flatMap(Arrays::stream)
+                .map(Method::getName)
+                .collect(toSet());
     }
 
     /**
