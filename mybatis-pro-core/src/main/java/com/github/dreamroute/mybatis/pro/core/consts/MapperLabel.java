@@ -1,10 +1,15 @@
 package com.github.dreamroute.mybatis.pro.core.consts;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * mapper.xml关键字
  *
  * @author w.dehai
  */
+@Getter
+@AllArgsConstructor
 public enum  MapperLabel {
 
     INSERT("insert"),
@@ -20,13 +25,5 @@ public enum  MapperLabel {
     KEY_PROPERTY("keyProperty");
 
     private final String code;
-
-    MapperLabel(String code) {
-        this.code = code;
-    }
-
-    public String getCode() {
-        return this.code;
-    }
 
 }
