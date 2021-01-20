@@ -1,8 +1,8 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
-import com.github.dreamroute.mybatis.pro.core.page.PageParam;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
+import com.github.dreamroute.mybatis.pro.service.interceptor.PageParam;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
-
 import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;

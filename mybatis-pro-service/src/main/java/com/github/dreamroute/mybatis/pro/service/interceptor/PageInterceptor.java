@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core.page;
+package com.github.dreamroute.mybatis.pro.service.interceptor;
 
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;

@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core.page;
+package com.github.dreamroute.mybatis.pro.service.interceptor;
 
 public class PageParam {
     private Integer defaultPage;

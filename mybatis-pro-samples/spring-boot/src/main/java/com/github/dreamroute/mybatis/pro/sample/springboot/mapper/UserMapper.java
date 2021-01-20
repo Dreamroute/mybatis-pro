@@ -1,7 +1,7 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
-import com.github.dreamroute.mybatis.pro.core.page.PageParam;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
+import com.github.dreamroute.mybatis.pro.service.interceptor.PageParam;
 import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
 import org.apache.ibatis.annotations.Select;
 
