@@ -3,6 +3,9 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
+import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageResponse;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.page.PageMethod;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
@@ -12,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
@@ -46,8 +48,10 @@ class PageTest {
         PageRequest<User> pageRequest = new PageRequest<>();
         pageRequest.setParam(user);
 
-        List<User> result = userMapper.selectAllPage(pageRequest);
-        assertEquals(1, result.size());
+        Page<User> page = PageMethod.startPage(1, 10).doSelectPage(() -> userMapper.selectAllPage(pageRequest.getParam()));
+        PageResponse<User> response = new PageResponse<>(page);
+        assertEquals(1, response.getData().size());
+
     }
 
 }
