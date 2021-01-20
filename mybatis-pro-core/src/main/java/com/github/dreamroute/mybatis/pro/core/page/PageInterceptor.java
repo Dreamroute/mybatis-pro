@@ -1,5 +1,18 @@
 package com.github.dreamroute.mybatis.pro.core.page;
 
+import org.apache.ibatis.executor.parameter.ParameterHandler;
+import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,18 +21,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.ibatis.executor.parameter.ParameterHandler;
-import org.apache.ibatis.executor.statement.StatementHandler;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
-import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
+import static org.apache.ibatis.mapping.SqlCommandType.INSERT;
 
 /**
  * Created by chenboge on 2017/5/14.
@@ -43,17 +45,17 @@ public class PageInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         StatementHandler statementHandler = getActuralHandlerObject(invocation);
+        BoundSql boundSql = statementHandler.getBoundSql();
 
         MetaObject metaStatementHandler = SystemMetaObject.forObject(statementHandler);
-
-        String sql = statementHandler.getBoundSql().getSql();
-
-//        检测未通过，不是select语句
-        if (!checkIsSelectFalg(sql)) {
+        MappedStatement ms = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
+        SqlCommandType sqlCommandType = ms.getSqlCommandType();
+        // 非select不处理
+        if (sqlCommandType != INSERT) {
             return invocation.proceed();
         }
 
-        BoundSql boundSql = statementHandler.getBoundSql();
+        String sql = statementHandler.getBoundSql().getSql();
 
         Object paramObject = boundSql.getParameterObject();
 
@@ -191,7 +193,8 @@ public class PageInterceptor implements Interceptor {
             //构建统计总记录数的BoundSql
             BoundSql countBoundSql = new BoundSql(configuration, countSql, boundSql.getParameterMappings(), boundSql.getParameterObject());
             //构建ParameterHandler，用于设置统计sql的参数
-            ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, boundSql.getParameterObject(), countBoundSql);
+//            ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, boundSql.getParameterObject(), countBoundSql);
+            ParameterHandler parameterHandler = configuration.newParameterHandler(mappedStatement, boundSql.getParameterObject(), countBoundSql);
             //设置总数sql的参数
             parameterHandler.setParameters(ps);
             //执行查询语句
