@@ -5,6 +5,7 @@ import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
 import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageResponse;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.page.PageMethod;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -51,6 +52,13 @@ class PageTest {
         Page<User> page = PageMethod.startPage(1, 10).doSelectPage(() -> userMapper.selectAllPage(pageRequest.getParam()));
         PageResponse<User> response = new PageResponse<>(page);
         assertEquals(1, response.getData().size());
+
+        PageMethod.startPage(1, 10);
+        Object o = userMapper.selectAllPage(pageRequest.getParam());
+        System.err.println(o);
+
+        PageInfo<User> users = PageMethod.startPage(1, 10).doSelectPageInfo(() -> userMapper.selectAllPage(pageRequest.getParam()));
+        System.err.println(users);
 
     }
 
