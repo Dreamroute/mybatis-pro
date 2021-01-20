@@ -2,7 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
-import com.github.dreamroute.mybatis.pro.service.interceptor.PageParam;
+import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
@@ -41,15 +41,12 @@ class PageTest {
 
     @Test
     void selectTest() {
-        PageParam pageParam = new PageParam();
-        pageParam.setDefaultPage(1);
-        pageParam.setDefaultPageSize(2);
-        pageParam.setDefaultUseFlag(true);
-        pageParam.setDefaultCheckFlag(true);
+        User user = new User();
+        user.setName("w.dehai");
+        PageRequest<User> pageRequest = new PageRequest<>();
+        pageRequest.setParam(user);
 
-        pageParam.setName("w.dehai");
-
-        List<User> result = userMapper.selectAllPage(pageParam);
+        List<User> result = userMapper.selectAllPage(pageRequest);
         assertEquals(1, result.size());
     }
 

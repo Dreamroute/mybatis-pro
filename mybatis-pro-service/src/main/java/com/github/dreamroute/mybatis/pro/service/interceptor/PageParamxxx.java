@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.service.interceptor;
 
-public class PageParam {
+public class PageParamxxx {
     private Integer defaultPage;
     //    默认每页显示条数
     private Integer defaultPageSize;

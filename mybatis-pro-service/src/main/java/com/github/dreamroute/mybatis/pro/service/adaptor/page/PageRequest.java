@@ -24,15 +24,17 @@ public final class PageRequest<E> {
     /** 分页信息 **/
     @NotNull
     @Min(1)
-    private Integer pageNum;
+    @Builder.Default
+    private Integer pageNum = 1;
 
-    @NotNull
     @Min(1)
+    @NotNull
+    @Builder.Default
     @Max(Long.MAX_VALUE)
-    private Integer pageSize;
+    private Integer pageSize = 10;
 
     /** 请求参数对象 **/
     @Valid
-    private E params;
+    private E param;
 
 }

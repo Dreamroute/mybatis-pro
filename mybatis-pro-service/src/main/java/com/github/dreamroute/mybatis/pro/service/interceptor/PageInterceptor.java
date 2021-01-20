@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.service.interceptor;
 
+import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -59,16 +60,16 @@ public class PageInterceptor implements Interceptor {
 
         Object paramObject = boundSql.getParameterObject();
 
-        PageParam pageParam = getPageParam(paramObject);
+        PageRequest<?> pageRequest = getPageParam(paramObject);
 
-        if (pageParam == null)
+        if (pageRequest == null)
             return invocation.proceed();
 
-        Integer pageNum = pageParam.getDefaultPage() == null ? defaultPage : pageParam.getDefaultPage();
-        Integer pageSize = pageParam.getDefaultPageSize() == null ? defaultPageSize : pageParam.getDefaultPageSize();
+        Integer pageNum = pageRequest.getPageNum();
+        Integer pageSize = pageRequest.getPageSize();
 
-        Boolean useFlag = pageParam.isDefaultUseFlag() == null ? defaultUseFlag : pageParam.isDefaultUseFlag();
-        Boolean checkFlag = pageParam.isDefaultCheckFlag() == null ? defaultCheckFlag : pageParam.isDefaultCheckFlag();
+        Boolean useFlag = true;
+        Boolean checkFlag = true;
 
         //不使用分页功能
         if (!useFlag) {
@@ -76,12 +77,6 @@ public class PageInterceptor implements Interceptor {
         }
 
         int totle = getTotle(invocation, metaStatementHandler, boundSql);
-
-        //将动态获取到的分页参数回填到pageParam中
-        setTotltToParam(pageParam, totle, pageSize);
-
-        //检查当前页码的有效性
-        checkPage(checkFlag, pageNum, pageParam.getTotlePage());
 
         //修改sql
         return updateSql2Limit(invocation, metaStatementHandler, boundSql, pageNum, pageSize);
@@ -128,37 +123,30 @@ public class PageInterceptor implements Interceptor {
         return (StatementHandler) object;
     }
 
-    //    判断是否是select语句，只有select语句，才会用到分页
-    private boolean checkIsSelectFalg(String sql) {
-        String trimSql = sql.trim();
-        int index = trimSql.toLowerCase().indexOf("select");
-        return index == 0;
-    }
-
     /*
     获取分页的参数
 
     参数可以通过map，@param注解进行参数传递。或者请求pojo继承自PageParam  将PageParam中的分页数据放进去
      */
-    private PageParam getPageParam(Object paramerObject) {
+    private PageRequest<?> getPageParam(Object paramerObject) {
         if (paramerObject == null) {
             return null;
         }
 
-        PageParam pageParam = null;
+        PageRequest<?> pageParam = null;
         //通过map和@param注解将PageParam参数传递进来，pojo继承自PageParam不推荐使用  这里从参数中提取出传递进来的pojo继承自PageParam
 
 //        首先处理传递进来的是map对象和通过注解方式传值的情况，从中提取出PageParam,循环获取map中的键值对，取出PageParam对象
         if (paramerObject instanceof Map) {
             @SuppressWarnings("unchecked") Map<String, Object> params = (Map<String, Object>) paramerObject;
             for (Map.Entry<String, Object> entry : params.entrySet()) {
-                if (entry.getValue() instanceof PageParam) {
-                    return (PageParam) entry.getValue();
+                if (entry.getValue() instanceof PageRequest) {
+                    return (PageRequest) entry.getValue();
                 }
             }
-        } else if (paramerObject instanceof PageParam) {
+        } else if (paramerObject instanceof PageRequest) {
 //            继承方式 pojo继承自PageParam 只取出我们希望得到的分页参数
-            pageParam = (PageParam) paramerObject;
+            pageParam = (PageRequest) paramerObject;
 
         }
         return pageParam;
@@ -216,12 +204,6 @@ public class PageInterceptor implements Interceptor {
         return totle;
     }
 
-    //    设置条数参数到pageparam对象
-    private void setTotltToParam(PageParam param, int totle, int pageSize) {
-        param.setTotle(totle);
-        param.setTotlePage(totle % pageSize == 0 ? totle / pageSize : (totle / pageSize) + 1);
-    }
-
     //    修改原始sql语句为分页sql语句
     private Object updateSql2Limit(Invocation invocation, MetaObject metaStatementHandler, BoundSql boundSql, int page, int pageSize) throws InvocationTargetException, IllegalAccessException, SQLException {
         String sql = (String) metaStatementHandler.getValue("delegate.boundSql.sql");
@@ -237,14 +219,5 @@ public class PageInterceptor implements Interceptor {
         ps.setInt(count - 1, (page - 1) * pageSize);
         ps.setInt(count, pageSize);
         return ps;
-    }
-
-    //    验证当前页码的有效性
-    private void checkPage(boolean checkFlag, Integer pageNumber, Integer pageTotle) throws Exception {
-        if (checkFlag) {
-            if (pageNumber > pageTotle) {
-                throw new Exception("查询失败，查询页码" + pageNumber + "大于总页数" + pageTotle);
-            }
-        }
     }
 }
