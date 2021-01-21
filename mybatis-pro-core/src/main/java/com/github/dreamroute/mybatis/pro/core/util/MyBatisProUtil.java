@@ -29,6 +29,7 @@ import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.MAPPER;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.NAMESPACE;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.SELECT;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getInnerMethodNames;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getMethodName2ReturnType;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMethods;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
@@ -172,10 +173,15 @@ public class MyBatisProUtil {
         methods.addAll(updateMethods);
         methods.addAll(deleteMethods);
         List<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(ID.getCode())).collect(toList());
-        List<String> mapperMethodNames = stream(mapperCls.getMethods()).map(Method::getName).collect(toList());
-        mapperMethodNames.retainAll(xmlMethodNames);
-        if (!isEmpty(mapperMethodNames)) {
-            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(mapperMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
+
+        // BaseMapper的方法 + xxxBy方法
+        Set<String> innerMethodNames = getInnerMethodNames();
+        List<String> specialMethods = getSpecialMethods(mapperCls);
+        innerMethodNames.addAll(specialMethods);
+
+        innerMethodNames.retainAll(xmlMethodNames);
+        if (!isEmpty(innerMethodNames)) {
+            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(innerMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
         }
     }
 

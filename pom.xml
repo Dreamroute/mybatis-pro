@@ -59,6 +59,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <mapper-spring-boot-starter.version>2.1.5</mapper-spring-boot-starter.version>
         <mybatis-spring-boot-starter.version>2.1.3</mybatis-spring-boot-starter.version>
+        <spring-boot-configuration-processor.version>1.3.0</spring-boot-configuration-processor.version>
     </properties>
 
     <dependencies>
@@ -66,6 +67,11 @@
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>${mybatis-spring-boot-starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${spring-boot-configuration-processor.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

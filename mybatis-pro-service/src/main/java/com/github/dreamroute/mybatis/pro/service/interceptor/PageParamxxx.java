@@ -1,6 +1,6 @@
-package com.github.dreamroute.mybatis.pro.core.page;
+package com.github.dreamroute.mybatis.pro.service.interceptor;
 
-public class PageParam {
+public class PageParamxxx {
     private Integer defaultPage;
     //    默认每页显示条数
     private Integer defaultPageSize;
@@ -12,6 +12,16 @@ public class PageParam {
     private Integer totle;
     //    当前sql查询实现分页后的总页数，回填
     private Integer totlePage;
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Integer getDefaultPage() {
         return defaultPage;
