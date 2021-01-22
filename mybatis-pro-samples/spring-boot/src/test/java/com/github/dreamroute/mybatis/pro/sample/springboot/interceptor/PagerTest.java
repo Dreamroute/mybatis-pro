@@ -2,9 +2,9 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
-import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
-import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageResponse;
-import com.github.dreamroute.mybatis.pro.service.interceptor.Pager;
+import com.github.dreamroute.pager.starter.PageRequest;
+import com.github.dreamroute.pager.starter.PageResponse;
+import com.github.dreamroute.pager.starter.Pager;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;

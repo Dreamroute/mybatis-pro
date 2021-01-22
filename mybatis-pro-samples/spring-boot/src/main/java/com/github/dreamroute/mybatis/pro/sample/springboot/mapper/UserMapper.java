@@ -1,9 +1,8 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
-import com.github.dreamroute.mybatis.pro.service.adaptor.page.PageRequest;
-import com.github.dreamroute.mybatis.pro.service.interceptor.PageContainer;
 import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
+import com.github.dreamroute.pager.starter.PageRequest;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -72,5 +71,5 @@ public interface UserMapper extends Mapper<User, Long> {
     List<User> selectAllPage(User pageRequest);
 
     @Select("select * from smart_user")
-    PageContainer<User> selectByPage(PageRequest<User> pr);
+    List<User> selectByPage(PageRequest<User> pr);
 }
