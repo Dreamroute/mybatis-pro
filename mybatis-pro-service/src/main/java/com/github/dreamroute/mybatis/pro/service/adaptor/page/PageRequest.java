@@ -22,16 +22,17 @@ import javax.validation.constraints.NotNull;
 public final class PageRequest<E> {
 
     /** 分页信息 **/
-    @NotNull
     @Min(1)
+    @NotNull
     @Builder.Default
-    private Integer pageNum = 1;
+    @Max(Integer.MAX_VALUE)
+    private int pageNum = 1;
 
     @Min(1)
     @NotNull
     @Builder.Default
-    @Max(Long.MAX_VALUE)
-    private Integer pageSize = 10;
+    @Max(Integer.MAX_VALUE)
+    private int pageSize = 10;
 
     /** 请求参数对象 **/
     @Valid

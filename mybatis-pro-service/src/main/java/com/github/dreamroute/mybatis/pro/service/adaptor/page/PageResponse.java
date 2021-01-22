@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.service.adaptor.page;
 
-import com.github.pagehelper.Page;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,16 +18,16 @@ import java.util.List;
 @NoArgsConstructor
 public class PageResponse<T> {
 
-    private Integer pageNum;
-    private Integer pageSize;
-    private Long totalNum;
+    private int pageNum;
+    private int pageSize;
+    private long totalNum;
     private List<T> data;
 
-    public PageResponse(Page<T> page) {
-        this.pageNum = page.getPageNum();
-        this.pageSize = page.getPageSize();
-        this.totalNum = page.getTotal();
-        this.data = page;
-    }
+//    public PageResponse(Page<T> page) {
+//        this.pageNum = page.getPageNum();
+//        this.pageSize = page.getPageSize();
+//        this.totalNum = page.getTotal();
+//        this.data = page;
+//    }
 
 }
