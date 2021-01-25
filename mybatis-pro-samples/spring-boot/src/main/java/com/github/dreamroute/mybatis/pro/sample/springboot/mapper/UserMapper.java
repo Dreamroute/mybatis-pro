@@ -2,7 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
-import com.github.dreamroute.pager.starter.PageRequest;
+import com.github.dreamroute.pager.starter.api.PageRequest;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
