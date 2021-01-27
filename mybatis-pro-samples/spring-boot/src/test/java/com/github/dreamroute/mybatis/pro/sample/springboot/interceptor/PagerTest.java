@@ -2,9 +2,9 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
-import com.github.dreamroute.pager.starter.PageRequest;
-import com.github.dreamroute.pager.starter.PageResponse;
-import com.github.dreamroute.pager.starter.Pager;
+import com.github.dreamroute.pager.starter.api.PageRequest;
+import com.github.dreamroute.pager.starter.api.PageResponse;
+import com.github.dreamroute.pager.starter.api.Pager;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class PagerTest {
@@ -46,7 +47,7 @@ class PagerTest {
         pr.setParam(User.builder().name("w.dehai").build());
 
         PageResponse<User> page = Pager.page(pr, userMapper::selectByPage);
-        System.err.println(page);
+        assertEquals(3L, page.getTotalNum());
     }
 
 }
