@@ -4,10 +4,16 @@
 		<groupId>com.github.dreamroute</groupId>
 		<artifactId>mybatis-pro</artifactId>
 		<version>${revision}</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>mybatis-pro-boot-starter</artifactId>
-	<name>${project.artifactId}</name>
+
+	<name>mybatis-pro</name>
+	<url>https://github.com/Dreamroute/${project.name}</url>
+	<scm>
+		<connection>${project.url}</connection>
+		<developerConnection>${project.url}</developerConnection>
+		<url>${project.url}</url>
+	</scm>
 
 	<dependencies>
 		<dependency>
@@ -26,4 +32,20 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
