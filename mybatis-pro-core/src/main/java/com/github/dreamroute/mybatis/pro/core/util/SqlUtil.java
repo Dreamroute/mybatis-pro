@@ -86,19 +86,19 @@ public class SqlUtil {
             } else if (statement.endsWith(KeyWord.LIKE) && !statement.endsWith(KeyWord.NOT_LIKE)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LIKE));
                 String column = toLine(variableName);
-                builder.append(column).append(" like '%${").append(variableName).append("}%'").append(key);
+                builder.append(column).append(" like CONCAT('%', #{").append(variableName).append("}, '%')").append(key);
             } else if (statement.endsWith(KeyWord.NOT_LIKE)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT_LIKE));
                 String column = toLine(variableName);
-                builder.append(column).append(" not like '%${").append(variableName).append("}%'").append(key);
+                builder.append(column).append(" not like CONCAT('%', #{").append(variableName).append("}, '%')").append(key);
             } else if (statement.endsWith(KeyWord.STARTING_WITH)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.STARTING_WITH));
                 String column = toLine(variableName);
-                builder.append(column).append(" like '${").append(variableName).append("}%'").append(key);
+                builder.append(column).append(" like CONCAT(#{").append(variableName).append("}, '%')").append(key);
             } else if (statement.endsWith(KeyWord.ENDING_WITH)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.ENDING_WITH));
                 String column = toLine(variableName);
-                builder.append(column).append(" like '%${").append(variableName).append("}'").append(key);
+                builder.append(column).append(" like CONCAT('%', #{").append(variableName).append("})").append(key);
             } else if (statement.endsWith(KeyWord.NOT)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT));
                 String column = toLine(variableName);
