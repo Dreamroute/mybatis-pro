@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>pager-spring-boot-starter</artifactId>
-            <version>1.5-RELEASE</version>
+            <version>1.6-RELEASE</version>
         </dependency>
     </dependencies>
 
