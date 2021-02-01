@@ -74,6 +74,4 @@ public interface UserMapper extends Mapper<User, Long> {
     @Pager
     @Select("select * from smart_user")
     List<User> selectByPage(PageRequest<User> pr);
-
-    User selectById(Long id);
 }
