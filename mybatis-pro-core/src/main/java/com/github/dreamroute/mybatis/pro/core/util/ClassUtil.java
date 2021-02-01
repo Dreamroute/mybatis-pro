@@ -111,7 +111,7 @@ public class ClassUtil {
         Map<String, Long> methodCount = stream(ms).map(Method::getName).collect(groupingBy(identity(), counting()));
         Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(e -> e.getValue() > 1).collect(toMap(Entry::getKey, Entry::getValue));
         if (!isEmpty(duplicateMethods)) {
-            throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJSONString(duplicateMethods.keySet()) + "存在重复的方法名");
+            throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJSONString(duplicateMethods.keySet()) + "存在重复的方法名, 原因可能是此方法与MyBatis Pro的内置方法名冲突了");
         }
         return stream(ms).collect(toMap(Method::getName, ClassUtil::getReturnType));
     }
