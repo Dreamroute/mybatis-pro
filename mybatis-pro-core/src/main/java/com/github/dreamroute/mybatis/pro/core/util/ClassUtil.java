@@ -4,12 +4,17 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +27,6 @@ import java.util.stream.Collectors;
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static com.alibaba.fastjson.JSON.toJSONString;
 import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -66,19 +70,31 @@ public class ClassUtil {
      */
     public static List<String> getSpecialMethods(Class<?> interfaceCls) {
         Method[] methods = interfaceCls.getDeclaredMethods();
-        return Arrays.stream(methods)
-                .map(Method::getName)
-                .filter(name -> name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy")   )
-                .collect(Collectors.toList());
+        List<String> names = new ArrayList<>();
+        for (Method m : methods) {
+            String name = m.getName();
+            boolean isBy = name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy");
+            boolean isAnnoCrud = hasAnnotation(m, Select.class) || hasAnnotation(m, Update.class) || hasAnnotation(m, Insert.class) || hasAnnotation(m, Delete.class);
+            if (isBy && isAnnoCrud) {
+                throw new MyBatisProException("接口方法" + interfaceCls.getName() + "." + name +
+                        "是[findBy, updateBy, deleteBy, countBy]之一, 会被MybatisPro框架自动创建SQL语句，不能使用[@Select, @Update, @Insert, @Delete]来自定义SQL，请对方法重新命名");
+            }
+            if (isBy) {
+                names.add(name);
+            }
+        }
+        return names;
     }
+
+
 
     /**
      * 获取BaseMapper的所有方法名
      */
     public static Set<String> getInnerMethodNames() {
         Set<Class<?>> parentInterfaces = getAllParentInterface(BaseMapper.class);
-        return ofNullable(parentInterfaces).orElseGet(HashSet::new).stream()
-                .map(cls -> cls.getDeclaredMethods())
+        return parentInterfaces.stream()
+                .map(Class::getDeclaredMethods)
                 .flatMap(Arrays::stream)
                 .map(Method::getName)
                 .collect(toSet());
