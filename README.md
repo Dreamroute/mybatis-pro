@@ -45,7 +45,7 @@
         <version>latest version</version>
     </dependency>
 ```
-最新版本：[点击查看](https://search.maven.org/artifact/com.github.dreamroute/mybatis-pro-boot-starter)
+### 最新版本：[点击查看](https://search.maven.org/artifact/com.github.dreamroute/mybatis-pro-boot-starter)
 - Spring MVC
 ```$xslt
     
