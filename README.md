@@ -64,12 +64,12 @@ public interface UserMapper {
 ```
 你无需在xml文件中编写sql，也无需使用注解@Select("xxx")的sql，框架自动根据方法名：
 
-**findByNameAndPassword**切割成`findBy`,`NameAndPassword`，组成如下sql：
+**findByNameAndPassword**切割成`findBy`,`Name`, `And`, `Password`，组成如下sql：
 
 `select * from user where name = #{name} and password = #{password}`
 
 ## 对比（mybatis-plus、通用mapper）
-> **需求：查询version在2~4之间，并且根据id反向排序**
+> **需求：查询字段version在2~4之间，并且根据id反向排序**
 
 - mybatis-pro：
 ```
