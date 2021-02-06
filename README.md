@@ -1,10 +1,9 @@
-## mybatis-pro
+## MyBatis-Pro
+###[优雅的解决MyBatis单表的一切问题]
 
 <p align="left">
     <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
 </p>
-
-## 优雅的解决MyBatis单表的一切问题
 
 ## 地址
 - [GitHub](https://github.com/Dreamroute/mybatis-pro)
