@@ -3,7 +3,7 @@ package com.github.dreamroute.mybatis.pro.core.util;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
+import com.github.dreamroute.mybatis.pro.sdk.Mapper;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
@@ -11,7 +11,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +54,7 @@ public class MyBatisProUtil {
 
     public static Resource[] processMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, BaseMapper.class)).flatMap(Set::stream).collect(toSet());
+        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> existXmlMapper = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(MyBatisProUtil::getNamespaceFromXmlResource).collect(toSet());
         Set<Class<?>> extra = difference(mappers, existXmlMapper);
 

@@ -3,7 +3,7 @@ package com.github.dreamroute.mybatis.pro.core.util;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
+import com.github.dreamroute.mybatis.pro.sdk.Mapper;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
@@ -92,7 +92,7 @@ public class ClassUtil {
      * 获取BaseMapper的所有方法名
      */
     public static Set<String> getInnerMethodNames() {
-        Set<Class<?>> parentInterfaces = getAllParentInterface(BaseMapper.class);
+        Set<Class<?>> parentInterfaces = getAllParentInterface(Mapper.class);
         return parentInterfaces.stream()
                 .map(Class::getDeclaredMethods)
                 .flatMap(Arrays::stream)
