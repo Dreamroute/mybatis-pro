@@ -29,7 +29,7 @@
 - 内置逻辑删除，可放心大胆的在生产环境进行delete操作
 - 【可选】[分页插件](https://github.com/Dreamroute/pager) 支持单表、多表关联查询
 - 【可选】[sql打印插件](https://github.com/Dreamroute/sqlprinter) 已经用实际参数替换了"?"占位符，可从控制台复制出来直接执行
-- 【可选】[乐观锁插件](https://github.com/Dreamroute/locker)
+- 【可选】[乐观锁插件](https://github.com/Dreamroute/locker) 透明解决乐观锁问题
 ## 设计原则
   框架本身依赖mybatis-spring，仅在应用启动时织入框架逻辑，不破坏任何mybatis核心，原则上可以兼容任何mybatis版本
   
