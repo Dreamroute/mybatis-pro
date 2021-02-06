@@ -24,9 +24,9 @@
 - 包含单表增删改查方法
 - 根据Mapper方法名自动生成SQL，无需编写sql语句
 - 与通用Mapper、MyBatis-Plus等三方框架兼容（虽然有了mybatis-pro之后并不需要整合这俩）
-- 内置枚举类型处理器
-- 内置泛型Service，简化重复造轮子
-- 内置逻辑删除，可放心大胆的在生产环境进行delete操作
+- 【可选】内置枚举类型处理器，自动优雅解决枚举类型的转换
+- 【可选】内置泛型Service，简化重复造轮子
+- 【可选】内置逻辑删除，可放心大胆的在生产环境进行delete操作
 - 【可选】[分页插件](https://github.com/Dreamroute/pager) 支持单表、多表关联查询
 - 【可选】[sql打印插件](https://github.com/Dreamroute/sqlprinter) 已经用实际参数替换了"?"占位符，可从控制台复制出来直接执行
 - 【可选】[乐观锁插件](https://github.com/Dreamroute/locker) 透明解决乐观锁问题
