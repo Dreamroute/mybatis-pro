@@ -89,7 +89,7 @@ public class ClassUtil {
 
 
     /**
-     * 获取BaseMapper的所有方法名
+     * 获取Mapper的所有方法名
      */
     public static Set<String> getInnerMethodNames() {
         Set<Class<?>> parentInterfaces = getAllParentInterface(Mapper.class);
