@@ -6,7 +6,7 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
-import com.github.dreamroute.mybatis.pro.sdk.BaseMapper;
+import com.github.dreamroute.mybatis.pro.sdk.Mapper;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ReflectionUtils;
 import org.w3c.dom.Document;
@@ -62,7 +62,7 @@ public class MapperUtil {
         this.document = createDocumentFromResource(resource);
         mapper = getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
-        if (parentInters.contains(BaseMapper.class)) {
+        if (parentInters.contains(Mapper.class)) {
             this.entityCls = getTypeArgument(mapper);
             this.tableName = getAnnotationValue(entityCls, Table.class);
             if (isEmpty(tableName)) {
@@ -117,7 +117,7 @@ public class MapperUtil {
      * 将通用crud方法填充到resource里
      */
     public Resource parse() {
-        Method[] methods = BaseMapper.class.getMethods();
+        Method[] methods = Mapper.class.getMethods();
         Stream.of(methods)
                 .map(Method::getName)
                 .forEach(methodName -> {

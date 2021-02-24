@@ -1,14 +1,14 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
-import com.github.dreamroute.mybatis.pro.service.mapper.Mapper;
+import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
 import com.github.dreamroute.pager.starter.anno.Pager;
 import com.github.dreamroute.pager.starter.api.PageRequest;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-public interface UserMapper extends Mapper<User, Long> {
+public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByName(String name);
 
