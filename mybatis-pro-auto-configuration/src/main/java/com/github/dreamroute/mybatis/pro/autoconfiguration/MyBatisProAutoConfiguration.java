@@ -1,7 +1,6 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -277,23 +276,24 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
      */
     private Set<String> getMapperPackages() {
 
+        Set<String> mapperPackages = new HashSet<>();
         Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
-        if (mapperScan == null || mapperScan.isEmpty() || mapperScan.size() > 1) {
-            throw new MyBatisProException("需要在启动类上设置@org.mybatis.spring.annotation.MapperScan注解用于标注Mapper接口的路径，并且只能存在一个@MapperScan注解");
+        if (!mapperScan.isEmpty()) {
+            for (Object scan : mapperScan.values()) {
+                Class<?> scanCls = scan.getClass();
+                MapperScan ms = AnnotationUtils.findAnnotation(scanCls, MapperScan.class);
+                String[] value = ms != null ? ms.value() : new String[0];
+                String[] basePackages = ms != null ? ms.basePackages() : new String[0];
+                Class<?>[] basePackageClasses = ms != null ? ms.basePackageClasses(): new Class<?>[0];
+
+                mapperPackages.addAll(asList(value));
+                mapperPackages.addAll(asList(basePackages));
+                mapperPackages.addAll(stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(toSet()));
+            }
+
+            logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
         }
 
-        Class<?> mainCls = mapperScan.values().iterator().next().getClass();
-        MapperScan ms = AnnotationUtils.findAnnotation(mainCls, MapperScan.class);
-        String[] value = ms.value();
-        String[] basePackages = ms.basePackages();
-        Class<?>[] basePackageClasses = ms.basePackageClasses();
-
-        Set<String> mapperPackages = new HashSet<>();
-        mapperPackages.addAll(asList(value));
-        mapperPackages.addAll(asList(basePackages));
-        mapperPackages.addAll(stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(toSet()));
-
-        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
 
         return mapperPackages;
     }

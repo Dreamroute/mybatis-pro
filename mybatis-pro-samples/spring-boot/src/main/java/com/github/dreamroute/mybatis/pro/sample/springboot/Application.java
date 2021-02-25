@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @EnableSQLPrinter
 @SpringBootApplication
-@MapperScan({"com.github.dreamroute.mybatis.pro.sample.springboot.mapper"})
+@MapperScan("com.github.dreamroute.mybatis.pro.sample.springboot.mapper")
 public class Application {
 
     public static void main(String[] args) {
