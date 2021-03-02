@@ -1,38 +1,33 @@
 package com.github.dreamroute.mybatis.pro.core;
 
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumMarker;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.jupiter.api.Test;
 
-public class EnumTest {
+import static com.github.dreamroute.mybatis.pro.core.EnumTest.Gender.FEMALE;
+import static com.github.dreamroute.mybatis.pro.core.EnumTest.Gender.MALE;
+import static lombok.AccessLevel.PRIVATE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    static enum Gender implements EnumMarker {
+class EnumTest {
+
+    @Getter
+    @AllArgsConstructor(access = PRIVATE)
+    enum Gender implements EnumMarker {
         MALE("男", 1), FEMALE("女", 2);
 
-        private String desc;
-        private Integer value;
+        private final String desc;
+        private final Integer value;
 
-        Gender(String desc, Integer value) {
-            this.desc = desc;
-            this.value = value;
-        }
-
-        @Override
-        public Integer getValue() {
-            return this.value;
-        }
-
-        @Override
-        public String getDesc() {
-            return this.desc;
-        }
     }
 
     @Test
     void createEnumTest() {
         Gender male = EnumMarker.valueOf(Gender.class, 1);
-        System.err.println(male);
+        assertEquals(MALE, male);
         Gender female = EnumMarker.valueOf(Gender.class, 2);
-        System.err.println(female);
+        assertEquals(FEMALE, female);
     }
 
 }
