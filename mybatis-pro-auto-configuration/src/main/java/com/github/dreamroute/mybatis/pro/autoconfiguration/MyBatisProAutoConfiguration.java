@@ -151,6 +151,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
         Resource[] resources = this.properties.resolveMapperLocations();
 
+        // 注册枚举type-handler
         org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration) ReflectUtil.getFieldValue(factory, "configuration");
         configuration.getTypeHandlerRegistry().register(new EnumTypeHandler());
 
