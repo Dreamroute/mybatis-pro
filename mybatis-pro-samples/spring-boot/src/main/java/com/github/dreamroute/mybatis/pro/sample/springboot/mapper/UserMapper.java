@@ -74,4 +74,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
     @Pager
     @Select("select * from smart_user")
     List<User> selectByPage(PageRequest<User> pr);
+
+    List<User> findByNameAndPasswordCanEmpty(String name, String password);
+
+    List<User> findByNameOrderByVersionDescCanEmpty(String name);
 }

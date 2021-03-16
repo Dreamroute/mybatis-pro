@@ -193,6 +193,21 @@ class FindByTest {
         assertArrayEquals(new Long[] {2L, 1L}, versions);
     }
 
+    @Test
+    void findByNameAndPasswordExcludeNullTest() {
+        userMapper.findByNameAndPasswordCanEmpty("w.dehai", null);
+        userMapper.findByNameAndPasswordCanEmpty(null, "123456");
+        userMapper.findByNameAndPasswordCanEmpty(null, null);
+        userMapper.findByNameAndPasswordCanEmpty("w.dehai", "");
+    }
+
+    @Test
+    void findByNameOrderByVersionDescCanEmptyTest() {
+        userMapper.findByNameOrderByVersionDescCanEmpty(null);
+        userMapper.findByNameOrderByVersionDescCanEmpty("");
+        userMapper.findByNameOrderByVersionDescCanEmpty("w.dehai");
+    }
+
 }
 
 

@@ -141,7 +141,7 @@ public class MyBatisProUtil {
                         methodName = specialMethodName.substring(7);
                         sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from ";
                     }
-                    sql += tableName + " where " + createCondition(methodName);
+                    sql += tableName + " <where> " + createCondition(methodName);
 
                     //  对于delete需要特殊处理，delete不需要设置resultType
                     String resultType = mapperLabel == DELETE ? null : name2Type.get(specialMethodName);

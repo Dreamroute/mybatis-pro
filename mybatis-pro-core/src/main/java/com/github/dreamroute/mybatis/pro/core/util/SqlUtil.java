@@ -17,6 +17,7 @@ public class SqlUtil {
 
     private static final String AND = KeyWord.AND;
     private static final String OR = KeyWord.OR;
+    private static final String CAN_EMPTY = "CanEmpty";
 
     private static final String ANDING = " and ";
     private static final String ORING = " or ";
@@ -27,11 +28,13 @@ public class SqlUtil {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         methodName = methodName.replace(KeyWord.ORDER_BY, OB);
         List<String> result = nameToken(methodName);
-        return fragment(result);
+        return fragment(result, methodName.endsWith(CAN_EMPTY));
     }
 
-    private static String fragment(List<String> tokens) {
+    private static String fragment(List<String> tokens, boolean canEmpty) {
         StringBuilder builder = new StringBuilder();
+        StringBuilder condition = new StringBuilder();
+        StringBuilder orderByStr = new StringBuilder();
         for (String token : tokens) {
             String key;
             int pos;
@@ -42,75 +45,79 @@ public class SqlUtil {
                 key = ORING;
                 pos = token.length() - 2;
             } else {
+                if (token.endsWith(CAN_EMPTY)) {
+                    token = token.substring(0, token.length() - CAN_EMPTY.length());
+                }
                 key = "";
                 pos = token.length();
             }
             String statement = token.substring(0, pos);
+            String column;
 
             if (statement.endsWith(KeyWord.BETWEEN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.BETWEEN));
-                String column = toLine(variableName);
-                builder.append(column).append(" ").append(KeyWord.BETWEEN.toLowerCase()).append(" #{start} and #{end}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" ").append(KeyWord.BETWEEN.toLowerCase()).append(" #{start} and #{end}");
             } else if (statement.endsWith(KeyWord.LESS_THAN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LESS_THAN));
-                String column = toLine(variableName);
-                builder.append(column).append(" <![CDATA[<]]> #{").append(variableName).append("}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" <![CDATA[<]]> #{").append(variableName).append("}");
             } else if (statement.endsWith(KeyWord.LESS_THAN_EQUAL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LESS_THAN_EQUAL));
-                String column = toLine(variableName);
-                builder.append(column).append(" <![CDATA[<=]]> #{").append(variableName).append("}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" <![CDATA[<=]]> #{").append(variableName).append("}");
             } else if (statement.endsWith(KeyWord.GREATER_THAN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.GREATER_THAN));
-                String column = toLine(variableName);
-                builder.append(column).append(" <![CDATA[>]]> #{").append(variableName).append("}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" <![CDATA[>]]> #{").append(variableName).append("}");
             } else if (statement.endsWith(KeyWord.GREATER_THAN_EQUAL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.GREATER_THAN_EQUAL));
-                String column = toLine(variableName);
-                builder.append(column).append(" <![CDATA[>=]]> #{").append(variableName).append("}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" <![CDATA[>=]]> #{").append(variableName).append("}");
             } else if (statement.endsWith(KeyWord.IS_NULL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NULL));
-                String column = toLine(variableName);
-                builder.append(column).append(" is null").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" is null");
             } else if (statement.endsWith(KeyWord.IS_NOT_NULL)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NOT_NULL));
-                String column = toLine(variableName);
-                builder.append(column).append(" is not null").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" is not null");
             } else if (statement.endsWith(KeyWord.IS_BLANK)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_BLANK));
-                String column = toLine(variableName);
-                builder.append(column).append(" is null or ").append(column).append(" = ''").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" is null or ").append(column).append(" = ''");
             } else if (statement.endsWith(KeyWord.IS_NOT_BLANK)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IS_NOT_BLANK));
-                String column = toLine(variableName);
-                builder.append(column).append(" is not null and ").append(column).append(" != ''").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" is not null and ").append(column).append(" != ''");
             } else if (statement.endsWith(KeyWord.LIKE) && !statement.endsWith(KeyWord.NOT_LIKE)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.LIKE));
-                String column = toLine(variableName);
-                builder.append(column).append(" like CONCAT('%', #{").append(variableName).append("}, '%')").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" like CONCAT('%', #{").append(variableName).append("}, '%')");
             } else if (statement.endsWith(KeyWord.NOT_LIKE)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT_LIKE));
-                String column = toLine(variableName);
-                builder.append(column).append(" not like CONCAT('%', #{").append(variableName).append("}, '%')").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" not like CONCAT('%', #{").append(variableName).append("}, '%')");
             } else if (statement.endsWith(KeyWord.STARTING_WITH)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.STARTING_WITH));
-                String column = toLine(variableName);
-                builder.append(column).append(" like CONCAT(#{").append(variableName).append("}, '%')").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" like CONCAT(#{").append(variableName).append("}, '%')");
             } else if (statement.endsWith(KeyWord.ENDING_WITH)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.ENDING_WITH));
-                String column = toLine(variableName);
-                builder.append(column).append(" like CONCAT('%', #{").append(variableName).append("})").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" like CONCAT('%', #{").append(variableName).append("})");
             } else if (statement.endsWith(KeyWord.NOT)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT));
-                String column = toLine(variableName);
-                builder.append(column).append(" <![CDATA[<>]]> ").append("#{").append(variableName).append("}").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" <![CDATA[<>]]> ").append("#{").append(variableName).append("}");
             } else if (statement.endsWith(KeyWord.IN) && !statement.endsWith(KeyWord.NOT_IN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.IN));
-                String column = toLine(variableName);
-                builder.append(column).append(" in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
             } else if (statement.endsWith(KeyWord.NOT_IN)) {
                 String variableName = firstLower(removeKeyWord(statement, KeyWord.NOT_IN));
-                String column = toLine(variableName);
-                builder.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>").append(key);
+                column = toLine(variableName);
+                condition.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
             } else {
 
                 // 这里处理两类：1.处理不带后缀的条件，2.处理最后一个条件（可能包含OrderBy和DESC）
@@ -119,30 +126,41 @@ public class SqlUtil {
                 int desc = statement.indexOf(KeyWord.DESC);
                 if (desc != -1) {
                     statement = statement.substring(0, statement.length() - 4);
+                    orderByStr.append(" desc ");
                 }
 
                 // 2. 处理OrderBy(也就是被替换之后的ORDERBY)
-                String orderByColumn = null;
                 int orderBy = statement.indexOf(OB);
                 if (orderBy != -1) {
                     String[] ob = statement.split(OB);
                     statement = ob[0];
-                    orderByColumn = ob[1];
+                    String orderByColumn = ob[1];
+                    orderByStr.insert(0, orderByColumn).append(" ").insert(0, " order by ");
                 }
 
                 // 3. 处理条件
                 String variableName = firstLower(statement);
-                String column = toLine(variableName);
-                builder.append(column).append(" = ").append("#{").append(variableName).append("}").append(key);
-                if (orderBy != -1) {
-                    orderByColumn = toLine(firstLower(orderByColumn)); // 将OrderBy字段首字符转小写以及转下划线
-                    builder.append(" order by ").append(orderByColumn);
-                }
-                if (desc != -1) {
-                    builder.append(" desc");
-                }
+                column = toLine(variableName);
+                condition.append(column).append(" = ").append("#{").append(variableName).append("}");
             }
+            if (canEmpty) {
+                builder.append("<if test = \"" + column + " != null and " + column + " != ''\">" + condition + "</if>");
+            } else {
+                builder.append(condition);
+            }
+            condition = new StringBuilder();
+
+            builder.append(key);
         }
+        builder.insert(0, "<trim suffixOverrides = 'and|AND| and | AND |or|OR| or | OR '>");
+        builder.append(" </trim>");
+        builder.append(" </where>");
+
+        // 将order by放在最后处理
+        if (orderByStr != null && orderByStr.length() > 0) {
+            builder.append(orderByStr);
+        }
+
         return builder.toString();
     }
 
