@@ -50,4 +50,14 @@ class DeleteByTest {
         assertEquals(0, users.size());
     }
 
+    @Test
+    void deleteByNameOrPasswordCanEmptyTest() {
+        List<User> users = userMapper.selectAll();
+        assertEquals(2, users.size());
+
+        userMapper.deleteByNameOrPasswordCanEmpty("w.dehai", null);
+        users = userMapper.selectAll();
+        assertEquals(1, users.size());
+    }
+
 }

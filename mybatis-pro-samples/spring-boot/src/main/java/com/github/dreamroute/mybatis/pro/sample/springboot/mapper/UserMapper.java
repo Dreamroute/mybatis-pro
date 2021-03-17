@@ -62,7 +62,11 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     int countByNameAndPhoneNo(String name, String phoneNo);
 
+    int countByNameAndPhoneNoCanEmpty(String name, String phoneNo);
+
     int deleteByNameOrPassword(String name, String password);
+
+    int deleteByNameOrPasswordCanEmpty(String name, String password);
 
     boolean existByNameOrPassword(String name, String password);
 
@@ -78,4 +82,5 @@ public interface UserMapper extends BaseMapper<User, Long> {
     List<User> findByNameAndPasswordCanEmpty(String name, String password);
 
     List<User> findByNameOrderByVersionDescCanEmpty(String name);
+
 }

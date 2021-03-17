@@ -33,6 +33,7 @@ class CountByTest {
                 .columns("id", "name", "password", "phone_no")
                 .values(1L, "w.dehai", "123456", "1306006")
                 .values(2L, "Jaedong", "123", "1306006")
+                .values(3L, "Jaedong", "123", "1352332")
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }
@@ -47,6 +48,15 @@ class CountByTest {
     void countByNameAndPhoneNo() {
         int result = userMapper.countByNameAndPhoneNo("w.dehai", "1306006");
         assertEquals(1, result);
+    }
+
+    @Test
+    void countByNameAndPhoneNoCanEmptyTest() {
+        assertEquals(2, userMapper.countByNameAndPhoneNoCanEmpty("", "1306006"));
+        assertEquals(2, userMapper.countByNameAndPhoneNoCanEmpty(null, "1306006"));
+        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty("", ""));
+        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty(null, null));
+        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty(null, ""));
     }
 
 }
