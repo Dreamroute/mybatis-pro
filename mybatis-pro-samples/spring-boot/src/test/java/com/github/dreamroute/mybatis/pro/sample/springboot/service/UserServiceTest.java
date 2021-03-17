@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author w.dehai
  */
 @SpringBootTest
-public class UserServiceTest {
+class UserServiceTest {
 
     @Autowired
     private UserService userService;
