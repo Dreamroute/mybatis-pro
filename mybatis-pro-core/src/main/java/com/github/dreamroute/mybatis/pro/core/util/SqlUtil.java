@@ -24,11 +24,11 @@ public class SqlUtil {
 
     private static final String OB = "ORDERBY";
 
-    public static String createSql(String methodName) {
+    public static String createConditionFragment(String conditions) {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
-        methodName = methodName.replace(KeyWord.ORDER_BY, OB);
-        List<String> result = nameToken(methodName);
-        return fragment(result, methodName.endsWith(CAN_EMPTY));
+        conditions = conditions.replace(KeyWord.ORDER_BY, OB);
+        List<String> result = nameToken(conditions);
+        return fragment(result, conditions.endsWith(CAN_EMPTY));
     }
 
     private static String fragment(List<String> tokens, boolean canEmpty) {
@@ -121,11 +121,10 @@ public class SqlUtil {
                 condition.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
             } else {
 
-                // 这里处理两类：1.处理不带后缀的条件，2.处理最后一个条件（可能包含OrderBy和DESC）
+                // 这里处理两类：1.处理等号的条件，2.处理最后一个条件（可能包含OrderBy和DESC和canEmpty）
 
                 // 1. 处理DESC
-                int desc = statement.indexOf(KeyWord.DESC);
-                if (desc != -1) {
+                if (statement.contains(KeyWord.DESC)) {
                     statement = statement.substring(0, statement.length() - 4);
                     orderByStr.append(" desc ");
                 }
@@ -135,7 +134,7 @@ public class SqlUtil {
                 if (orderBy != -1) {
                     String[] ob = statement.split(OB);
                     statement = ob[0];
-                    String orderByColumn = ob[1];
+                    String orderByColumn = toLine(firstLower(ob[1]));
                     orderByStr.insert(0, orderByColumn).append(" ").insert(0, " order by ");
                 }
 
@@ -145,10 +144,11 @@ public class SqlUtil {
                 condition.append(column).append(" = ").append("#{").append(variableName).append("}");
             }
             if (canEmpty) {
-                builder.append("<if test = \"" + variableName + " != null and " + variableName + " != ''\">" + condition + "</if>");
+                builder.append("<if test = \"").append(variableName).append(" != null and ").append(variableName).append(" != ''\">").append(condition).append("</if>");
             } else {
                 builder.append(condition);
             }
+            // 清空condition
             condition = new StringBuilder();
 
             builder.append(key);
@@ -158,7 +158,7 @@ public class SqlUtil {
         builder.append(" </where>");
 
         // 将order by放在最后处理
-        if (orderByStr != null && orderByStr.length() > 0) {
+        if (orderByStr.length() > 0) {
             builder.append(orderByStr);
         }
 

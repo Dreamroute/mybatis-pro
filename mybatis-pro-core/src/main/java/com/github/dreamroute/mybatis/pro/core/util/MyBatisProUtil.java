@@ -124,24 +124,24 @@ public class MyBatisProUtil {
                 String tableName = getAnnotationValue(entityCls, Table.class);
                 Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
                 specialMethods.forEach(specialMethodName -> {
-                    String methodName = null;
+                    String conditions = null;
                     String sql = null;
                     MapperLabel mapperLabel = SELECT;
                     if (specialMethodName.startsWith("findBy")) {
-                        methodName = specialMethodName.substring(6);
+                        conditions = specialMethodName.substring(6);
                         sql = "select * from ";
                     } else if (specialMethodName.startsWith("deleteBy")) {
-                        methodName = specialMethodName.substring(8);
+                        conditions = specialMethodName.substring(8);
                         sql = "delete from ";
                         mapperLabel = DELETE;
                     } else if (specialMethodName.startsWith("countBy")) {
-                        methodName = specialMethodName.substring(7);
+                        conditions = specialMethodName.substring(7);
                         sql = "select count(*) c from ";
                     } else if (specialMethodName.startsWith("existBy")) {
-                        methodName = specialMethodName.substring(7);
+                        conditions = specialMethodName.substring(7);
                         sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from ";
                     }
-                    sql += tableName + " <where> " + createCondition(methodName);
+                    sql += tableName + " <where> " + createCondition(conditions);
 
                     //  对于delete需要特殊处理，delete不需要设置resultType
                     String resultType = mapperLabel == DELETE ? null : name2Type.get(specialMethodName);
@@ -187,11 +187,11 @@ public class MyBatisProUtil {
     /**
      * 将方法名转换成sql语句
      *
-     * @param methodName 方法名
+     * @param conditions 方法名
      * @return 返回sql语句
      */
-    private static String createCondition(String methodName) {
-        return SqlUtil.createSql(methodName);
+    private static String createCondition(String conditions) {
+        return SqlUtil.createConditionFragment(conditions);
     }
 
 }
