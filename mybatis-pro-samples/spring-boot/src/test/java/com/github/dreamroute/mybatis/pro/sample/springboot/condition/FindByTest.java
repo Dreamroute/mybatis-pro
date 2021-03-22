@@ -208,6 +208,12 @@ class FindByTest {
         userMapper.findByNameOrderByVersionDescOpt("w.dehai");
     }
 
+    @Test
+    void findByVersionTest() {
+        List<User> users = userMapper.findByVersionOpt(null);
+        assertEquals(3, users.size());
+    }
+
 }
 
 

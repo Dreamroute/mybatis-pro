@@ -83,4 +83,9 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByNameOrderByVersionDescOpt(String name);
 
+    /**
+     * 对于Opt结尾的方法，在生成sql的时候使用了<if test obj != null and obj != '' />这种针对字符串的风格，这里测试一下非字符串类型的查询，看是否可以兼容
+     */
+    List<User> findByVersionOpt(Long version);
+
 }
