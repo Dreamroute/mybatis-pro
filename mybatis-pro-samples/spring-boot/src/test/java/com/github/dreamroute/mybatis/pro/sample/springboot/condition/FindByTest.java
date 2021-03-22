@@ -195,17 +195,17 @@ class FindByTest {
 
     @Test
     void findByNameAndPasswordExcludeNullTest() {
-        userMapper.findByNameAndPasswordCanEmpty("w.dehai", null);
-        userMapper.findByNameAndPasswordCanEmpty(null, "123456");
-        userMapper.findByNameAndPasswordCanEmpty(null, null);
-        userMapper.findByNameAndPasswordCanEmpty("w.dehai", "");
+        userMapper.findByNameAndPasswordOpt("w.dehai", null);
+        userMapper.findByNameAndPasswordOpt(null, "123456");
+        userMapper.findByNameAndPasswordOpt(null, null);
+        userMapper.findByNameAndPasswordOpt("w.dehai", "");
     }
 
     @Test
-    void findByNameOrderByVersionDescCanEmptyTest() {
-        userMapper.findByNameOrderByVersionDescCanEmpty(null);
-        userMapper.findByNameOrderByVersionDescCanEmpty("");
-        userMapper.findByNameOrderByVersionDescCanEmpty("w.dehai");
+    void findByNameOrderByVersionDescOptTest() {
+        userMapper.findByNameOrderByVersionDescOpt(null);
+        userMapper.findByNameOrderByVersionDescOpt("");
+        userMapper.findByNameOrderByVersionDescOpt("w.dehai");
     }
 
 }

@@ -62,11 +62,11 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     int countByNameAndPhoneNo(String name, String phoneNo);
 
-    int countByNameAndPhoneNoCanEmpty(String name, String phoneNo);
+    int countByNameAndPhoneNoOpt(String name, String phoneNo);
 
     int deleteByNameOrPassword(String name, String password);
 
-    int deleteByNameOrPasswordCanEmpty(String name, String password);
+    int deleteByNameOrPasswordOpt(String name, String password);
 
     boolean existByNameOrPassword(String name, String password);
 
@@ -79,8 +79,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
     @Select("select * from smart_user")
     List<User> selectByPage(PageRequest<User> pr);
 
-    List<User> findByNameAndPasswordCanEmpty(String name, String password);
+    List<User> findByNameAndPasswordOpt(String name, String password);
 
-    List<User> findByNameOrderByVersionDescCanEmpty(String name);
+    List<User> findByNameOrderByVersionDescOpt(String name);
 
 }

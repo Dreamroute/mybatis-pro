@@ -51,12 +51,12 @@ class CountByTest {
     }
 
     @Test
-    void countByNameAndPhoneNoCanEmptyTest() {
-        assertEquals(2, userMapper.countByNameAndPhoneNoCanEmpty("", "1306006"));
-        assertEquals(2, userMapper.countByNameAndPhoneNoCanEmpty(null, "1306006"));
-        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty("", ""));
-        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty(null, null));
-        assertEquals(3, userMapper.countByNameAndPhoneNoCanEmpty(null, ""));
+    void countByNameAndPhoneNoOptTest() {
+        assertEquals(2, userMapper.countByNameAndPhoneNoOpt("", "1306006"));
+        assertEquals(2, userMapper.countByNameAndPhoneNoOpt(null, "1306006"));
+        assertEquals(3, userMapper.countByNameAndPhoneNoOpt("", ""));
+        assertEquals(3, userMapper.countByNameAndPhoneNoOpt(null, null));
+        assertEquals(3, userMapper.countByNameAndPhoneNoOpt(null, ""));
     }
 
 }

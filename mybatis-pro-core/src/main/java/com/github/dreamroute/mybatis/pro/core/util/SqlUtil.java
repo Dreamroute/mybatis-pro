@@ -17,7 +17,7 @@ public class SqlUtil {
 
     private static final String AND = KeyWord.AND;
     private static final String OR = KeyWord.OR;
-    private static final String CAN_EMPTY = "CanEmpty";
+    private static final String OPT = "Opt";
 
     private static final String ANDING = " and ";
     private static final String ORING = " or ";
@@ -28,10 +28,10 @@ public class SqlUtil {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         conditions = conditions.replace(KeyWord.ORDER_BY, OB);
         List<String> result = nameToken(conditions);
-        return fragment(result, conditions.endsWith(CAN_EMPTY));
+        return fragment(result, conditions.endsWith(OPT));
     }
 
-    private static String fragment(List<String> tokens, boolean canEmpty) {
+    private static String fragment(List<String> tokens, boolean opt) {
         StringBuilder builder = new StringBuilder();
         StringBuilder condition = new StringBuilder();
         StringBuilder orderByStr = new StringBuilder();
@@ -45,8 +45,8 @@ public class SqlUtil {
                 key = ORING;
                 pos = token.length() - 2;
             } else {
-                if (token.endsWith(CAN_EMPTY)) {
-                    token = token.substring(0, token.length() - CAN_EMPTY.length());
+                if (token.endsWith(OPT)) {
+                    token = token.substring(0, token.length() - OPT.length());
                 }
                 key = "";
                 pos = token.length();
@@ -121,7 +121,7 @@ public class SqlUtil {
                 condition.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
             } else {
 
-                // 这里处理两类：1.处理等号的条件，2.处理最后一个条件（可能包含OrderBy和DESC和canEmpty）
+                // 这里处理两类：1.处理等号的条件，2.处理最后一个条件（可能包含OrderBy和DESC和opt）
 
                 // 1. 处理DESC
                 if (statement.contains(KeyWord.DESC)) {
@@ -143,7 +143,7 @@ public class SqlUtil {
                 column = toLine(variableName);
                 condition.append(column).append(" = ").append("#{").append(variableName).append("}");
             }
-            if (canEmpty) {
+            if (opt) {
                 builder.append("<if test = \"").append(variableName).append(" != null and ").append(variableName).append(" != ''\">").append(condition).append("</if>");
             } else {
                 builder.append(condition);
