@@ -16,7 +16,7 @@ public interface BaseMapper<T, ID> extends Mapper<T, ID> {
      * @param tableName 被删除数据所在的表名
      * @param data 被删除数据JSON格式
      */
-    @Insert("insert into ${backupTable} (`table_name`, `data`) values (#{tableName}, #{data})")
+    @Insert("insert into ${backupTable} (table_name, data) values (#{tableName}, #{data})")
     void insertDynamic(@Param("backupTable") String backupTable, @Param("tableName") String tableName, @Param("data") String data);
 
 }

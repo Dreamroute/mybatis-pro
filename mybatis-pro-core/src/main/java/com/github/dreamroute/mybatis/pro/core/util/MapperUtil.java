@@ -166,7 +166,7 @@ public class MapperUtil {
             values.add(fieldName);
         });
 
-        this.insertColumns = columns.stream().map(column -> "`" + column + "`").collect(Collectors.joining(",", "(", ")"));
+        this.insertColumns = columns.stream().map(column -> column).collect(Collectors.joining(",", "(", ")"));
         this.insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
         this.createInsertExcludeNullColumnsAndValues(columns, values);
         this.createUpdateByIdColumns(columns, values);
@@ -185,7 +185,7 @@ public class MapperUtil {
         StringBuilder insertExcludeNullCols = new StringBuilder();
         StringBuilder insertExcludeNullVals = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertExcludeNullCols.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "`,</if>");
+            insertExcludeNullCols.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
             insertExcludeNullVals.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
         }
 
@@ -196,7 +196,7 @@ public class MapperUtil {
     private void createUpdateByIdColumns(List<String> columns, List<String> values) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            result.append("`").append(columns.get(i)).append("` = #{").append(values.get(i)).append("}");
+            result.append(columns.get(i)).append(" = #{").append(values.get(i)).append("}");
             if (i != columns.size() - 1) {
                 result.append(",");
             }
@@ -207,7 +207,7 @@ public class MapperUtil {
     private void createUpdateByIdExcludeNullColumns(List<String> columns, List<String> values) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            result.append("<if test = '" + values.get(i) + " != null'>`" + columns.get(i) + "` = #{" + values.get(i) + "},</if>");
+            result.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + " = #{" + values.get(i) + "},</if>");
         }
         this.updateByIdExcludeNullColumns = TRIM_START + result.toString() + TRIM_END;
     }
