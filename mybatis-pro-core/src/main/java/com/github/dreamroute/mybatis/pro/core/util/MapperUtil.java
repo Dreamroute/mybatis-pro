@@ -4,6 +4,8 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
+import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
+import com.github.dreamroute.mybatis.pro.core.consts.DbDriverThreadLocal;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.Mapper;
@@ -24,6 +26,7 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
+import static com.github.dreamroute.mybatis.pro.core.consts.DbDriver.SQLSERVER;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
@@ -58,7 +61,10 @@ public class MapperUtil {
     String updateByIdColumns;
     String updateByIdExcludeNullColumns;
 
+    private final DbDriver dbDriver;
+
     public MapperUtil(Resource resource) {
+        dbDriver = DbDriverThreadLocal.DB_DRIVER.get();
         this.document = createDocumentFromResource(resource);
         mapper = getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
@@ -95,9 +101,13 @@ public class MapperUtil {
         methodName2Sql.put("selectByIds", selectByIds);
         methodName2Sql.put("selectAll", selectPrefix);
 
+        // sqlserver的insertList特殊处理，否则只会返回最后1个id
+        String msReturnIds = SQLSERVER.equals(dbDriver) ? " OUTPUT inserted.id " : "";
+
         String insert = insertPrefix + this.insertColumns + " VALUES " + this.insertValues;
-        String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
-        String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") VALUES (" + this.insertExcludeNullValues + ")";
+        String insertList = insertPrefix + " " + this.insertColumns + msReturnIds + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
+
+        String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") " + " VALUES (" + this.insertExcludeNullValues + ")";
         methodName2Sql.put("insert", insert);
         methodName2Sql.put("insertList", insertList);
         methodName2Sql.put("insertExcludeNull", insertExcludeNull);

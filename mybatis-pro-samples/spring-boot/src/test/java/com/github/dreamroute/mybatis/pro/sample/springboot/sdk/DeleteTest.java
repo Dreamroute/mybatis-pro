@@ -34,9 +34,9 @@ class DeleteTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("id", "name")
-                .values(1L, "w.dehai")
-                .values(2, "Jaedong")
+                .columns("name")
+                .values("w.dehai")
+                .values("Jaedong")
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }

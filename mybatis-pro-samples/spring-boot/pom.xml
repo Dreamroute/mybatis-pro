@@ -26,6 +26,15 @@
             <artifactId>pager-spring-boot-starter</artifactId>
             <version>1.6-RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.dreamroute</groupId>
+            <artifactId>hikari-spring-boot-starter</artifactId>
+            <version>1.4-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

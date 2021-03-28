@@ -1,7 +1,11 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
+import com.github.dreamroute.mybatis.pro.core.consts.DbDriverThreadLocal;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumTypeHandler;
+import lombok.SneakyThrows;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -64,6 +68,7 @@ import java.util.stream.Stream;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -90,6 +95,8 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     @Autowired
     private ApplicationContext context;
+    @Autowired
+    private DataSource dataSource;
 
     public MyBatisProAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
                                        @SuppressWarnings("rawtypes") ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
@@ -159,11 +166,17 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         logger.info("织入mybatis-pro开始 ......");
         StopWatch watch = new StopWatch();
         watch.start();
+
+        DbDriver driver = getDriver();
+        DbDriverThreadLocal.DB_DRIVER.set(driver);
+
         Set<String> mapperPackages = getMapperPackages();
         if (!isEmpty(resources) || !isEmpty(mapperPackages)) {
             Resource[] rs = processMyBatisPro(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
+
+        DbDriverThreadLocal.DB_DRIVER.remove();
         logger.info("织入mybatis-pro结束 ......");
         watch.stop();
         logger.info("织入mybatis-pro耗时: {}", watch.getTotalTimeSeconds());
@@ -186,6 +199,19 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         }
 
         return factory.getObject();
+    }
+
+    @SneakyThrows
+    private DbDriver getDriver(){
+        String driver = dataSource.getConnection().getMetaData().getDriverName().toUpperCase(ENGLISH);
+        if (driver.contains("MYSQL")) {
+            return DbDriver.MYSQL;
+        } else if (driver.contains("SQL SERVER")) {
+            return DbDriver.SQLSERVER;
+        } else if (driver.contains("ORACLE")) {
+            return DbDriver.H2;
+        }
+        throw new MyBatisProException("不兼容的数据库类型");
     }
 
     private void applyConfiguration(SqlSessionFactoryBean factory) {

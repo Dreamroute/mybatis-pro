@@ -31,10 +31,10 @@ class PagerTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("id", "name")
-                .values(1L, "w.dehai")
-                .values(2L, "Jaedong")
-                .values(3L, "Dreamroute")
+                .columns("name")
+                .values("w.dehai")
+                .values("Jaedong")
+                .values("Dreamroute")
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }
