@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.github.dreamroute.mybatis.pro.core.consts.DbDriver.SQLSERVER;
+import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,7 +61,9 @@ class InsertTest {
         }
         userMapper.insertList(users);
         List<Long> ids = users.stream().map(User::getId).filter(Objects::nonNull).collect(toList());
-        assertEquals(size, ids.size());
+        if (!getDriver(dataSource).equals(SQLSERVER)) {
+            assertEquals(size, ids.size());
+        }
     }
 
 }

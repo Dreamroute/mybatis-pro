@@ -25,4 +25,8 @@ public class User extends IdEntity {
     private Integer gender;
     @Column("phone_no")
     private String phoneNo;
+
+    public void setId(Long id) {
+        super.setId(id);
+    }
 }

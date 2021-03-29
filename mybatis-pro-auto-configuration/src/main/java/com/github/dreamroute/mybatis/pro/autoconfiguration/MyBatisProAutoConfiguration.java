@@ -3,9 +3,7 @@ package com.github.dreamroute.mybatis.pro.autoconfiguration;
 import cn.hutool.core.util.ReflectUtil;
 import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
 import com.github.dreamroute.mybatis.pro.core.consts.DbDriverThreadLocal;
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumTypeHandler;
-import lombok.SneakyThrows;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -65,10 +63,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -167,7 +165,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         StopWatch watch = new StopWatch();
         watch.start();
 
-        DbDriver driver = getDriver();
+        DbDriver driver = getDriver(dataSource);
         DbDriverThreadLocal.DB_DRIVER.set(driver);
 
         Set<String> mapperPackages = getMapperPackages();
@@ -199,19 +197,6 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         }
 
         return factory.getObject();
-    }
-
-    @SneakyThrows
-    private DbDriver getDriver(){
-        String driver = dataSource.getConnection().getMetaData().getDriverName().toUpperCase(ENGLISH);
-        if (driver.contains("MYSQL")) {
-            return DbDriver.MYSQL;
-        } else if (driver.contains("SQL SERVER")) {
-            return DbDriver.SQLSERVER;
-        } else if (driver.contains("ORACLE")) {
-            return DbDriver.H2;
-        }
-        throw new MyBatisProException("不兼容的数据库类型");
     }
 
     private void applyConfiguration(SqlSessionFactoryBean factory) {
