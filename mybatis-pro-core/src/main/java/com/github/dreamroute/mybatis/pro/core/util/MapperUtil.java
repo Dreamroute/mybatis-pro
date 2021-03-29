@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
-import static com.github.dreamroute.mybatis.pro.core.consts.DbDriver.SQLSERVER;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
@@ -101,11 +100,8 @@ public class MapperUtil {
         methodName2Sql.put("selectByIds", selectByIds);
         methodName2Sql.put("selectAll", selectPrefix);
 
-        // sqlserver的insertList特殊处理，否则只会返回最后1个id
-        String msReturnIds = SQLSERVER.equals(dbDriver) ? " OUTPUT inserted.id " : "";
-
         String insert = insertPrefix + this.insertColumns + " VALUES " + this.insertValues;
-        String insertList = insertPrefix + " " + this.insertColumns + msReturnIds + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
+        String insertList = insertPrefix + " " + this.insertColumns + " VALUES <foreach collection='list' item='item' index='index' separator=','>" + this.insertValues.replace("#{", "#{item.") + "</foreach>";
 
         String insertExcludeNull = insertPrefix + " (" + this.insertExcludeNullColumns + ") " + " VALUES (" + this.insertExcludeNullValues + ")";
         methodName2Sql.put("insert", insert);
