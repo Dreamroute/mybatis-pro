@@ -12,6 +12,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByName(String name);
 
+    User findByPassword(String password, String... cols);
+
     User findByNameAndPassword(String name, String password);
 
     List<User> findByNameAndPasswordLike(String name, String password);
@@ -88,4 +90,5 @@ public interface UserMapper extends BaseMapper<User, Long> {
      */
     List<User> findByVersionOpt(Long version);
 
+    List<User> findByIdLTE(long id, String... cols);
 }
