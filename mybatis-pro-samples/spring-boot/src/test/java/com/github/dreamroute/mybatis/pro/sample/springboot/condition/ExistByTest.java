@@ -7,6 +7,7 @@ import com.ninja_squad.dbsetup.operation.Insert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
@@ -26,11 +27,14 @@ class ExistByTest {
     @Autowired
     private DataSource dataSource;
 
+    @Value("${phone-no}")
+    private String phoneNo;
+
     @BeforeEach
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no")
+                .columns("name", "password", phoneNo)
                 .values("w.dehai", "123456", "1306006")
                 .values("Jaedong", "123", "1306006")
                 .build();

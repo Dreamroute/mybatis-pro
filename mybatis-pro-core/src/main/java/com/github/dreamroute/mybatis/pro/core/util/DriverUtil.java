@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
+import com.github.dreamroute.mybatis.pro.core.consts.DriverType;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import lombok.SneakyThrows;
 
@@ -14,14 +14,14 @@ import static java.util.Locale.ENGLISH;
 public class DriverUtil {
 
     @SneakyThrows
-    public static DbDriver getDriver(DataSource ds){
+    public static DriverType getDriver(DataSource ds){
         String driver = ds.getConnection().getMetaData().getDriverName().toUpperCase(ENGLISH);
         if (driver.contains("MYSQL")) {
-            return DbDriver.MYSQL;
+            return DriverType.MYSQL;
         } else if (driver.contains("SQL SERVER")) {
-            return DbDriver.SQLSERVER;
+            return DriverType.SQLSERVER;
         } else if (driver.contains("ORACLE")) {
-            return DbDriver.H2;
+            return DriverType.H2;
         }
         throw new MyBatisProException("不兼容的数据库类型");
     }

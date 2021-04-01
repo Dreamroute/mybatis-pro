@@ -4,8 +4,6 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Type;
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriverThreadLocal;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.Mapper;
@@ -60,10 +58,7 @@ public class MapperUtil {
     String updateByIdColumns;
     String updateByIdExcludeNullColumns;
 
-    private final DbDriver dbDriver;
-
     public MapperUtil(Resource resource) {
-        dbDriver = DbDriverThreadLocal.DB_DRIVER.get();
         this.document = createDocumentFromResource(resource);
         mapper = getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
@@ -92,7 +87,7 @@ public class MapperUtil {
         String updateByIdPrefix = "update " + tableName;
 
         String commonWhereIdIs = WHERE + idColumn + " = #{" + idName + "}";
-        String commonWhereIdIn = WHERE + idColumn + " in <foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
+        String commonWhereIdIn = WHERE + idColumn + " in <foreach collection='list' item='" + idName + "' index='index' open='(' close=')' separator=','>#{" + idName + "}</foreach>";
 
         String selectById = selectPrefix + commonWhereIdIs;
         String selectByIds = selectPrefix + commonWhereIdIn;

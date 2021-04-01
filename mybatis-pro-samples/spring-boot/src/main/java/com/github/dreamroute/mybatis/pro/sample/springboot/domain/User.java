@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
 import com.github.dreamroute.mybatis.pro.service.entity.IdEntity;
@@ -23,7 +22,6 @@ public class User extends IdEntity {
     private Long version;
     @Transient
     private Integer gender;
-    @Column("phone_no")
     private String phoneNo;
 
     public void setId(Long id) {

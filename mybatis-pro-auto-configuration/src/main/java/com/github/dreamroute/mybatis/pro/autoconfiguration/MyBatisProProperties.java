@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "mybatis.pro")
 public class MyBatisProProperties {
     /**
-     * 逻辑删除备份表
+     * 逻辑删除备份表名
      */
     private String backupTable = "backup_table";
 }

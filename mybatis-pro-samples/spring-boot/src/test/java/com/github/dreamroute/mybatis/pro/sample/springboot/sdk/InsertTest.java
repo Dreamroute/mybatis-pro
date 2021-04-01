@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.github.dreamroute.mybatis.pro.core.consts.DbDriver.SQLSERVER;
+import static com.github.dreamroute.mybatis.pro.core.consts.DriverType.SQLSERVER;
 import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static java.util.stream.Collectors.toList;

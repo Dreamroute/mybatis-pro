@@ -1,8 +1,6 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriverThreadLocal;
 import com.github.dreamroute.mybatis.pro.core.typehandler.EnumTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -30,6 +28,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
@@ -63,7 +62,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
+import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -75,7 +74,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  */
 @Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
-@EnableConfigurationProperties(MybatisProperties.class)
+@EnableConfigurationProperties({MybatisProperties.class})
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @AutoConfigureBefore({MybatisAutoConfiguration.class})
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class})
@@ -93,8 +92,8 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     @Autowired
     private ApplicationContext context;
-    @Autowired
-    private DataSource dataSource;
+    @Value("${mybatis.configuration.map-underscore-to-camel-case:true}")
+    private boolean toLine;
 
     public MyBatisProAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
                                        @SuppressWarnings("rawtypes") ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
@@ -165,8 +164,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         StopWatch watch = new StopWatch();
         watch.start();
 
-        DbDriver driver = getDriver(dataSource);
-        DbDriverThreadLocal.DB_DRIVER.set(driver);
+        TO_LINE.set(toLine);
 
         Set<String> mapperPackages = getMapperPackages();
         if (!isEmpty(resources) || !isEmpty(mapperPackages)) {
@@ -174,7 +172,8 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
             factory.setMapperLocations(rs);
         }
 
-        DbDriverThreadLocal.DB_DRIVER.remove();
+        TO_LINE.remove();
+
         logger.info("织入mybatis-pro结束 ......");
         watch.stop();
         logger.info("织入mybatis-pro耗时: {}", watch.getTotalTimeSeconds());

@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;
+
 /**
  * @author w.dehai
  */
@@ -207,14 +209,17 @@ public class SqlUtil {
 
     // 驼峰转下划线
     public static String toLine(String camelCase) {
-        Pattern humpPattern = Pattern.compile("[A-Z]");
-        Matcher matcher = humpPattern.matcher(camelCase);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
+        if (TO_LINE.get()) {
+            Pattern humpPattern = Pattern.compile("[A-Z]");
+            Matcher matcher = humpPattern.matcher(camelCase);
+            StringBuffer sb = new StringBuffer();
+            while (matcher.find()) {
+                matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
+            }
+            matcher.appendTail(sb);
+            return sb.toString();
         }
-        matcher.appendTail(sb);
-        return sb.toString();
+        return camelCase;
     }
 
 }

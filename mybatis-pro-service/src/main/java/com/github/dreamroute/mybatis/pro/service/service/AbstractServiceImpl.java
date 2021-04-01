@@ -2,7 +2,7 @@ package com.github.dreamroute.mybatis.pro.service.service;
 
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
-import com.github.dreamroute.mybatis.pro.core.consts.DbDriver;
+import com.github.dreamroute.mybatis.pro.core.consts.DriverType;
 import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
-import static com.github.dreamroute.mybatis.pro.core.consts.DbDriver.SQLSERVER;
+import static com.github.dreamroute.mybatis.pro.core.consts.DriverType.SQLSERVER;
 import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
 
 /**
@@ -42,7 +42,7 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Override
     public List<T> insertList(List<T> entityList) {
-        DbDriver driver = getDriver(dataSource);
+        DriverType driver = getDriver(dataSource);
         if (driver.equals(SQLSERVER)) {
             entityList.forEach(mapper::insert);
         } else {
