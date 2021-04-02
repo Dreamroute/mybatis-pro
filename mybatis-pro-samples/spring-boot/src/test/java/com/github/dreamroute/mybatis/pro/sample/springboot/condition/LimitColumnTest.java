@@ -1,19 +1,22 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.condition;
 
+import com.github.dreamroute.mybatis.pro.sample.springboot.domain.Dict;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
+import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.DictMapper;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,9 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @SpringBootTest
 class LimitColumnTest {
-    @Autowired
+    @Resource
     private UserMapper userMapper;
-    @Autowired
+    @Resource
+    private DictMapper dictMapper;
+    @Resource
     private DataSource dataSource;
 
     @Value("${phone-no}")
@@ -41,6 +46,14 @@ class LimitColumnTest {
                 .values("w.dehai", "123", "1306006", 2L)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
+
+        new DbSetup(new DataSourceDestination(dataSource), truncate("smart_dict")).launch();
+        Insert insert2 = insertInto("smart_dict")
+                .columns("value", "cnName")
+                .values(1, "有效")
+                .values(0, "无效")
+                .build();
+        new DbSetup(new DataSourceDestination(dataSource), insert2).launch();
     }
 
     @Test
@@ -57,4 +70,20 @@ class LimitColumnTest {
         List<User> users =  userMapper.findByIdLTE(2L, new String[] {"id", "name", "password", "version"});
         assertEquals(2, users.size());
     }
+
+    /**
+     * 限制列插件测试多个selectById是否会冲突，因为都存在于BaseMapper之中，
+     */
+    @Test
+    void selectByIdTest() {
+        User user = userMapper.selectById(1L, "id", "name");
+        assertEquals("w.dehai", user.getName());
+        Dict dict = dictMapper.selectById(1L, "id", "value", "cnName");
+        assertEquals("有效", dict.getCnName());
+        List<User> all = userMapper.selectAll("id");
+        assertEquals(3, all.size());
+        List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phone_no");
+        assertEquals(2, all.size());
+    }
+
 }
