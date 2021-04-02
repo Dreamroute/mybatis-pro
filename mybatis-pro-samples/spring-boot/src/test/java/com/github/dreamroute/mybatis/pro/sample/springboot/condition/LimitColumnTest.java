@@ -83,7 +83,7 @@ class LimitColumnTest {
         List<User> all = userMapper.selectAll("id");
         assertEquals(3, all.size());
         List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phone_no");
-        assertEquals(2, all.size());
+        assertEquals(2, users.size());
     }
 
 }

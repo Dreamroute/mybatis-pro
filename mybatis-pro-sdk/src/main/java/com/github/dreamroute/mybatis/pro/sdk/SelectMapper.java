@@ -15,7 +15,7 @@ public interface SelectMapper<T, ID> {
     /**
      * 根据多个id查询多个
      */
-    List<T> selectByIds(List<ID> ids, String... cols);
+    List<T> selectByIds(List<ID> list, String... cols);
 
     /**
      * 全表查询

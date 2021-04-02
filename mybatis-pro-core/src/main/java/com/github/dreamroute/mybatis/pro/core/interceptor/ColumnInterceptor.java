@@ -61,8 +61,8 @@ public class ColumnInterceptor implements Interceptor {
                 if (args[1] instanceof ParamMap) {
                     ParamMap<Object> params = (ParamMap<Object>) args[1];
                     if (params.containsKey("cols")) {
-                        Object cols = params.get("cols");
-                        if (cols != null) {
+                        String[] cols = (String[]) params.get("cols");
+                        if (cols != null && cols.length > 0) {
                             String[] cs = (String[]) cols;
                             colums = String.join(", ", cs);
                         }
