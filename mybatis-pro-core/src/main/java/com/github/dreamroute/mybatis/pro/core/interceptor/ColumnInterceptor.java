@@ -24,9 +24,12 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * 处理findBy限制列拦截器，findBy方法的最后1个参数如果是列名数组，那么将列名替换掉之前的星号
@@ -56,36 +59,47 @@ public class ColumnInterceptor implements Interceptor {
         String methodName = FileUtil.getSuffix(id);
 
         if (methodName.startsWith("findBy") || BASE_MAPPER_SELECT_METHODS.contains(methodName)) {
-            COLS_CACHE.computeIfAbsent(id, key -> {
-                String colums = ASTERISK;
-                if (args[1] instanceof ParamMap) {
-                    ParamMap<Object> params = (ParamMap<Object>) args[1];
-                    if (params.containsKey("cols")) {
-                        String[] cols = (String[]) params.get("cols");
-                        if (cols != null && cols.length > 0) {
-                            String[] cs = (String[]) cols;
-                            colums = String.join(", ", cs);
-                        }
+            String colums = ASTERISK;
+            if (args[1] instanceof ParamMap) {
+                ParamMap<Object> params = (ParamMap<Object>) args[1];
+                if (params.containsKey("cols")) {
+                    String[] cols = (String[]) params.get("cols");
+                    if (cols != null && cols.length > 0) {
+                        colums = String.join(", ", cols);
+                        String finalColums = colums;
+
+                        // 这里：不能对ms进行缓存，因为同一个方法，传入的列限制参数可能是有多个的，因此每次调用都需要动态替换
+                        COLS_CACHE.computeIfAbsent(id + "#" + colums, k -> {
+                            Class<?> type = ms.getResultMaps().get(0).getType();
+                            Map<String, String> alias = FIELDS_ALIAS_CACHE.get(type);
+
+                            // 对于同一个方法只需要处理一次即可，ms是常驻内存的
+                            String aliasCols = stream(cols).map(fieldName -> {
+                                String as = alias.get(fieldName);
+                                return isEmpty(as) ? fieldName : (as + " AS " + fieldName);
+                            }).collect(Collectors.joining(", "));
+
+                            MetaObject mo = SystemMetaObject.forObject(ms);
+                            SqlSource sqlSource = ms.getSqlSource();
+                            if (sqlSource instanceof DynamicSqlSource) {
+                                List<Object> contents = (List<Object>) mo.getValue("sqlSource.rootSqlNode.contents");
+                                StaticTextSqlNode stsn = (StaticTextSqlNode) contents.get(0);
+                                MetaObject stsnMo = SystemMetaObject.forObject(stsn);
+                                String sql = (String) stsnMo.getValue("text");
+                                sql = sql.replace(ASTERISK, aliasCols);
+                                stsnMo.setValue("text", sql);
+                                contents.set(0, stsn);
+                            } else if (sqlSource instanceof RawSqlSource) {
+                                String sql = (String) mo.getValue("sqlSource.sqlSource.sql");
+                                sql = sql.replace(ASTERISK, aliasCols);
+                                mo.setValue("sqlSource.sqlSource.sql", sql);
+                            }
+                            return aliasCols;
+                        });
                     }
                 }
-                // 对于同一个方法只需要处理一次即可，ms是常驻内存的
-                MetaObject mo = SystemMetaObject.forObject(ms);
-                SqlSource sqlSource = ms.getSqlSource();
-                if (sqlSource instanceof DynamicSqlSource) {
-                    List<Object> contents = (List<Object>) mo.getValue("sqlSource.rootSqlNode.contents");
-                    StaticTextSqlNode stsn = (StaticTextSqlNode) contents.get(0);
-                    MetaObject stsnMo = SystemMetaObject.forObject(stsn);
-                    String sql = (String) stsnMo.getValue("text");
-                    sql = sql.replace(ASTERISK, colums);
-                    stsnMo.setValue("text", sql);
-                    contents.set(0, stsn);
-                } else if (sqlSource instanceof RawSqlSource) {
-                    String sql = (String) mo.getValue("sqlSource.sqlSource.sql");
-                    sql = sql.replace(ASTERISK, colums);
-                    mo.setValue("sqlSource.sqlSource.sql", sql);
-                }
-                return colums;
-            });
+            }
+
         }
         return invocation.proceed();
     }

@@ -27,6 +27,7 @@ import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getNamespaceFromXmlResource;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -71,7 +72,7 @@ public class MapperUtil {
             Field idField = getIdField(entityCls);
             this.idName = idField.getName();
             String col = getAnnotationValue(idField, Column.class);
-            this.idColumn = isEmpty(col) ? toLine(idField.getName()) : col;
+            this.idColumn = isEmpty(col) ? toLine(idField.getName(), FIELDS_ALIAS_CACHE.get(entityCls)) : col;
             this.type = idField.getAnnotation(Id.class).type();
             this.createSqlFragment();
 
@@ -147,7 +148,7 @@ public class MapperUtil {
 
         ReflectionUtils.doWithFields(entityCls, field -> {
             Column colAn = field.getAnnotation(Column.class);
-            String column = Optional.ofNullable(colAn).map(Column::value).orElse(SqlUtil.toLine(field.getName()));
+            String column = Optional.ofNullable(colAn).map(Column::value).orElse(SqlUtil.toLine(field.getName(), FIELDS_ALIAS_CACHE.get(entityCls)));
             values2Columns.put(field.getName(), column);
 
             Id idAn = field.getAnnotation(Id.class);

@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.util;
 
+import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
@@ -9,12 +10,16 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
@@ -40,6 +45,7 @@ import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -52,6 +58,9 @@ public class MyBatisProUtil {
 
     private MyBatisProUtil() {}
 
+    // Map<Class, <fieldName, alias>>
+    public static final Map<Class<?>, Map<String, String>> FIELDS_ALIAS_CACHE = new HashMap<>();
+
     public static Resource[] processMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
         Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
@@ -62,6 +71,9 @@ public class MyBatisProUtil {
         Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createEmptyResource).collect(toSet());
         allResources.addAll(extraResource);
         allResources.addAll(asList(ofNullable(xmlResources).orElseGet(() -> new Resource[0])));
+
+        // 缓存属性别名
+        allResources.stream().map(MyBatisProUtil::getNamespaceFromXmlResource).map(cn.hutool.core.util.ClassUtil::getTypeArgument).forEach(MyBatisProUtil::cacheAlias);
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
@@ -121,6 +133,7 @@ public class MyBatisProUtil {
                 if (!hasAnnotation(entityCls, Table.class)) {
                     throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@com.github.dreamroute.mybatis.pro.core.annotations.Table注解");
                 }
+
                 String tableName = getAnnotationValue(entityCls, Table.class);
                 Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
                 specialMethods.forEach(specialMethodName -> {
@@ -141,7 +154,7 @@ public class MyBatisProUtil {
                         conditions = specialMethodName.substring(7);
                         sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from ";
                     }
-                    sql += tableName + " <where> " + createCondition(conditions);
+                    sql += tableName + " <where> " + createCondition(conditions, FIELDS_ALIAS_CACHE.get(entityCls));
 
                     //  对于delete需要特殊处理，delete不需要设置resultType
                     String resultType = mapperLabel == DELETE ? null : name2Type.get(specialMethodName);
@@ -150,6 +163,18 @@ public class MyBatisProUtil {
             }
             return createResourceFromDocument(doc);
         }).collect(toSet());
+    }
+
+    private static void cacheAlias(Class<?> cls) {
+        Set<Field> allFields = ClassUtil.getAllFields(cls);
+        Map<String, String> result = ofNullable(allFields).orElseGet(HashSet::new)
+                .stream()
+                .collect(toMap(Field::getName, filed -> {
+                    String alias = getAnnotationValue(filed, Column.class);
+                    return StringUtils.isEmpty(alias) ? "" : alias;
+                }));
+        result = Optional.ofNullable(result).orElseGet(HashMap::new);
+        FIELDS_ALIAS_CACHE.put(cls, result);
     }
 
     /**
@@ -190,8 +215,8 @@ public class MyBatisProUtil {
      * @param conditions 方法名
      * @return 返回sql语句
      */
-    private static String createCondition(String conditions) {
-        return SqlUtil.createConditionFragment(conditions);
+    private static String createCondition(String conditions, Map<String, String> alias) {
+        return SqlUtil.createConditionFragment(conditions, alias);
     }
 
 }

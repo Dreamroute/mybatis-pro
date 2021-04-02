@@ -59,10 +59,9 @@ class LimitColumnTest {
     @Test
     void findByPasswordTest() {
         // 这里对同一个方法测试2次，测试缓存功能
-        for (int i = 0; i < 2; i++) {
-            User user = userMapper.findByPassword("123456", "id", "name");
-            assertEquals(1L, user.getId());
-        }
+        User u1 = userMapper.findByPassword("123456", "id", "name");
+        User u2 = userMapper.findByPassword("123456", "id", "name", "password");
+        // TODO
     }
 
     @Test
