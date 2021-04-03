@@ -230,4 +230,15 @@ public class SqlUtil {
         return camelCase;
     }
 
+    public static String toLine(String camelCase) {
+        Pattern humpPattern = Pattern.compile("[A-Z]");
+        Matcher matcher = humpPattern.matcher(camelCase);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
 }

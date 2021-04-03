@@ -35,9 +35,13 @@ class LimitColumnTest {
 
     @Value("${phone-no}")
     private String phoneNo;
+    @Value("${cn-name}")
+    private String cnName;
 
     @BeforeEach
     void init() {
+
+        // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
                 .columns("name", "password", phoneNo, "version")
@@ -47,9 +51,10 @@ class LimitColumnTest {
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
 
+        // init smat_dict
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_dict")).launch();
         Insert insert2 = insertInto("smart_dict")
-                .columns("value", "cnName")
+                .columns("value", cnName)
                 .values(1, "有效")
                 .values(0, "无效")
                 .build();
@@ -60,6 +65,7 @@ class LimitColumnTest {
     void findByPasswordTest() {
         // 这里对同一个方法测试2次，测试缓存功能
         User u1 = userMapper.findByPassword("123456", "id", "name");
+        List<User> u3 = userMapper.findByIdIn(newArrayList(1L));
         User u2 = userMapper.findByPassword("123456", "id", "name", "password");
         // TODO
     }
@@ -81,7 +87,7 @@ class LimitColumnTest {
         assertEquals("有效", dict.getCnName());
         List<User> all = userMapper.selectAll("id");
         assertEquals(3, all.size());
-        List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phone_no");
+        List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phoneNo");
         assertEquals(2, users.size());
     }
 

@@ -22,9 +22,9 @@ CREATE TABLE `smart_typehandler`
 CREATE TABLE `smart_dict` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `value` tinyint(4) DEFAULT NULL,
-  `labelValue` varchar(50) DEFAULT NULL,
-  `enName` varchar(50) DEFAULT NULL,
-  `cnName` varchar(50) DEFAULT NULL,
+  `label_value` varchar(50) DEFAULT NULL,
+  `en_name` varchar(50) DEFAULT NULL,
+  `cn_name` varchar(50) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );

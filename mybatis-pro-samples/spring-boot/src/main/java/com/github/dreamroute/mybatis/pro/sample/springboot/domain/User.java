@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 public class User {
 
     @Id
-    @Column("SysNo")
+//    @Column("SysNo")
     private Long id;
     private String name;
     private String password;
