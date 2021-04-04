@@ -4,9 +4,11 @@ import com.github.dreamroute.mybatis.pro.sample.springboot.domain.Dict;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.DictMapper;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
+import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper.FindByIdLTDto;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
 import com.ninja_squad.dbsetup.operation.Insert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.util.List;
 
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
@@ -65,8 +68,8 @@ class LimitColumnTest {
     void findByPasswordTest() {
         // 这里对同一个方法测试2次，测试缓存功能
         User u1 = userMapper.findByPassword("123456", "id", "name");
-        List<User> u3 = userMapper.findByIdIn(newArrayList(1L));
         User u2 = userMapper.findByPassword("123456", "id", "name", "password");
+        List<User> u3 = userMapper.findByIdIn(newArrayList(1L));
         // TODO
     }
 
@@ -89,6 +92,12 @@ class LimitColumnTest {
         assertEquals(3, all.size());
         List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phoneNo");
         assertEquals(2, users.size());
+    }
+
+    @Test
+    void cacheTest() {
+        userMapper.findByIdLT(2L);
+        Assertions.assertTrue(FIELDS_ALIAS_CACHE.containsKey(FindByIdLTDto.class));
     }
 
 }

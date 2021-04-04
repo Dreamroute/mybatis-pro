@@ -1,9 +1,11 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
+import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
 import com.github.dreamroute.pager.starter.anno.Pager;
 import com.github.dreamroute.pager.starter.api.PageRequest;
+import lombok.Data;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -52,7 +54,7 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByNameNot(String name);
 
-    List<User> findByNameIn(List<String> name);
+    List<User> findByNameIn(List<String> list, String... cols);
 
     List<User> findByNameNotIn(List<String> names);
 
@@ -91,4 +93,13 @@ public interface UserMapper extends BaseMapper<User, Long> {
     List<User> findByVersionOpt(Long version);
 
     List<User> findByIdLTE(long id, String... cols);
+
+    FindByIdLTDto findByIdLT(Long id);
+
+    @Data
+    class FindByIdLTDto {
+        @Column("sysNo")
+        private Long id;
+        private String name;
+    }
 }

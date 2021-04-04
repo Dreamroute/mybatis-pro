@@ -11,17 +11,23 @@ import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.isFindByMethod;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
@@ -37,55 +43,68 @@ import static org.springframework.util.StringUtils.isEmpty;
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
 })
-public class LimitColumnInterceptor implements Interceptor {
+public class LimitColumnInterceptor implements Interceptor, ApplicationListener<ContextRefreshedEvent> {
 
     private static final String ASTERISK = "*";
-    private static final List<String> BASE_MAPPER_SELECT_METHODS;
-    private static final String FIND_BY = "findBy";
     private static final String COLS = "cols";
 
-    @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
-    private boolean underscoreToCamel;
+
+    private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
+    private static final List<String> BASE_MAPPER_SELECT_METHODS;
+    private static final Map<String, String> COLS_ALIAS = new HashMap();
 
     static {
         Method[] selectMethods = SelectMapper.class.getDeclaredMethods();
         BASE_MAPPER_SELECT_METHODS = stream(selectMethods).map(Method::getName).collect(toList());
     }
 
+    private Configuration configuration;
+
+    @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
+    private boolean underscoreToCamel;
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        configuration = event.getApplicationContext().getBean(SqlSessionFactory.class).getConfiguration();
+    }
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         StatementHandler sh = (StatementHandler) ProxyUtil.getOriginObj(invocation.getTarget());
-        MetaObject mo = SystemMetaObject.forObject(sh);
+        MetaObject mo = configuration.newMetaObject(sh);
 
         MappedStatement ms = (MappedStatement) mo.getValue("delegate.mappedStatement");
         String id = ms.getId();
-        String methodName = FileUtil.getSuffix(id);
-        if (!(methodName.startsWith(FIND_BY) || BASE_MAPPER_SELECT_METHODS.contains(methodName))) {
+        Boolean cached = ID_CACHE.computeIfAbsent(id, k -> {
+            String methodName = FileUtil.getSuffix(k);
+            return isFindByMethod(methodName) || BASE_MAPPER_SELECT_METHODS.contains(methodName);
+        });
+        if (Boolean.FALSE.equals(cached))
             return invocation.proceed();
-        }
 
-        Class<?> type = ms.getResultMaps().get(0).getType();
-        Map<String, String> alias = FIELDS_ALIAS_CACHE.get(type);
+        Class<?> returnType = ms.getResultMaps().get(0).getType();
+        Map<String, String> alias = FIELDS_ALIAS_CACHE.get(returnType);
 
         BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
-        String cols = existCols(boundSql, alias);
+        String cols = existCols(id, boundSql, alias);
         cols = cols == null ? toColumns(alias.keySet(), alias) : cols;
 
         String sql = boundSql.getSql();
 
         sql = sql.replace(ASTERISK, cols);
-        SystemMetaObject.forObject(boundSql).setValue("sql", sql);
+        configuration.newMetaObject(boundSql).setValue("sql", sql);
         return invocation.proceed();
     }
 
-    private String existCols(BoundSql boundSql, Map<String, String> alias) {
+    private String existCols(String id, BoundSql boundSql, Map<String, String> alias) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject instanceof ParamMap) {
             ParamMap<Object> params = (ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
                 String[] cols = (String[]) params.get(COLS);
                 if (cols != null && cols.length > 0) {
-                    return toColumns(Arrays.asList(cols), alias);
+                    String cl = String.join(",", cols);
+                    return COLS_ALIAS.computeIfAbsent(id + "#" + cl, k -> toColumns(Arrays.asList(cols), alias));
                 }
             }
         }

@@ -217,15 +217,8 @@ public class SqlUtil {
             return name;
         }
 
-        if (TO_LINE.get()) {
-            Pattern humpPattern = Pattern.compile("[A-Z]");
-            Matcher matcher = humpPattern.matcher(camelCase);
-            StringBuffer sb = new StringBuffer();
-            while (matcher.find()) {
-                matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
-            }
-            matcher.appendTail(sb);
-            return sb.toString();
+        if (Boolean.TRUE.equals(TO_LINE.get())) {
+            return toLine(camelCase);
         }
         return camelCase;
     }

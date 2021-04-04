@@ -73,7 +73,10 @@ public class MyBatisProUtil {
         allResources.addAll(asList(ofNullable(xmlResources).orElseGet(() -> new Resource[0])));
 
         // 缓存属性别名
-        allResources.stream().map(MyBatisProUtil::getNamespaceFromXmlResource).map(cn.hutool.core.util.ClassUtil::getTypeArgument).forEach(MyBatisProUtil::cacheAlias);
+        allResources.stream()
+                .map(MyBatisProUtil::getNamespaceFromXmlResource)
+                .map(cn.hutool.core.util.ClassUtil::getTypeArgument)
+                .forEach(entityCls -> FIELDS_ALIAS_CACHE.computeIfAbsent(entityCls, MyBatisProUtil::cacheAlias));
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
@@ -136,6 +139,10 @@ public class MyBatisProUtil {
 
                 String tableName = getAnnotationValue(entityCls, Table.class);
                 Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
+
+                // 将findBy方法的返回值的别名进行缓存
+                cacheAlias(name2Type);
+
                 specialMethods.forEach(specialMethodName -> {
                     String conditions = null;
                     String sql = null;
@@ -165,7 +172,16 @@ public class MyBatisProUtil {
         }).collect(toSet());
     }
 
-    private static void cacheAlias(Class<?> cls) {
+    private static void cacheAlias(Map<String, String> returnTypeMap) {
+        returnTypeMap.forEach((k, v) -> {
+            if (isFindByMethod(k)) {
+                Class<?> returnType = loadClass(v);
+                FIELDS_ALIAS_CACHE.computeIfAbsent(returnType, MyBatisProUtil::cacheAlias);
+            }
+        });
+    }
+
+    private static Map<String, String> cacheAlias(Class<?> cls) {
         Set<Field> allFields = ClassUtil.getAllFields(cls);
         Map<String, String> result = ofNullable(allFields).orElseGet(HashSet::new)
                 .stream()
@@ -173,8 +189,7 @@ public class MyBatisProUtil {
                     String alias = getAnnotationValue(filed, Column.class);
                     return StringUtils.isEmpty(alias) ? "" : alias;
                 }));
-        result = Optional.ofNullable(result).orElseGet(HashMap::new);
-        FIELDS_ALIAS_CACHE.put(cls, result);
+        return Optional.ofNullable(result).orElseGet(HashMap::new);
     }
 
     /**
@@ -217,6 +232,10 @@ public class MyBatisProUtil {
      */
     private static String createCondition(String conditions, Map<String, String> alias) {
         return SqlUtil.createConditionFragment(conditions, alias);
+    }
+
+    public static boolean isFindByMethod(String methodName) {
+        return methodName.startsWith("findBy");
     }
 
 }
