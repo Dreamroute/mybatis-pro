@@ -72,7 +72,6 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 /**
  * @author w.dehai
  */
-@Configuration
 @ConditionalOnSingleCandidate(DataSource.class)
 @EnableConfigurationProperties({MybatisProperties.class})
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
