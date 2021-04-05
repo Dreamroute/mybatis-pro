@@ -13,7 +13,7 @@ public interface InsertMapper<T> {
     int insert(T entity);
 
     /**
-     * 单个新增（实体为空的属性不新增到数据）
+     * 单个新增（实体为空的属性不新增到数据，使用数据库默认值）
      */
     int insertExcludeNull(T entity);
 
