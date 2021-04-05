@@ -18,7 +18,7 @@ public interface InsertMapper<T> {
     int insertExcludeNull(T entity);
 
     /**
-     * 批量新增（实体为空的属性也更新到数据库）
+     * 批量新增（实体为空的属性也更新到数据库，目前还做不到insertListExclude）
      */
     int insertList(List<T> entityList);
 
