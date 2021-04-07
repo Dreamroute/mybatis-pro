@@ -14,6 +14,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -43,6 +44,7 @@ import static org.springframework.util.StringUtils.isEmpty;
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
 })
+@ConditionalOnBean(SqlSessionFactory.class)
 public class LimitColumnInterceptor implements Interceptor, ApplicationListener<ContextRefreshedEvent> {
 
     private static final String ASTERISK = "*";
