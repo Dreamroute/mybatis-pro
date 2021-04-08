@@ -13,7 +13,6 @@
 ## 文档
 
 - [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
-- [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
 ## 开发此框架的初衷
 - 让单表查询更加优雅
