@@ -12,7 +12,7 @@
 
 ## 文档
 
-- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
+- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
 - [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
 ## 开发此框架的初衷
@@ -103,7 +103,7 @@ void mapperTest() {
 
 ## 全部文档
 
-- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/)
+- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
 - [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
 ## 作者信息
