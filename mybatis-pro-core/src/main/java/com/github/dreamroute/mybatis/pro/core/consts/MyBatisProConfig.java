@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.autoconfiguration;
+package com.github.dreamroute.mybatis.pro.core.consts;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +65,18 @@ class UserServiceTest {
         assertNotNull(result.getId());
 
         userService.delete(user.getId());
+    }
+
+    @Test
+    void deleteListTest() {
+        List<User> users = newArrayList(
+                User.builder().name("w.dehai").version(1L).build(),
+                User.builder().name("w.dehai").version(2L).build()
+        );
+        userService.insertList(users);
+
+        int result = userService.delete(newArrayList(1L, 2L));
+        assertEquals(2, result);
     }
 
 }

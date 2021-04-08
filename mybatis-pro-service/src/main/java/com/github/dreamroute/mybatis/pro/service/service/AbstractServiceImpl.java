@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.service.service;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.DriverType;
@@ -8,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static com.github.dreamroute.mybatis.pro.core.consts.DriverType.SQLSERVER;
 import static com.github.dreamroute.mybatis.pro.core.util.DriverUtil.getDriver;
+import static java.util.Optional.ofNullable;
 
 /**
  * @author w.dehai
@@ -24,6 +27,13 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     private BaseMapper<T, ID> mapper;
     @Autowired
     private DataSource dataSource;
+
+    @Value("${mybatis.pro.delete-use-update:true}")
+    private boolean deleteUseUpdate;
+    @Value("${mybatis.pro.state-column:commonStatus}")
+    private String stateColumn;
+    @Value("${mybatis.pro.del-mark:-999}")
+    private Integer markDelete;
 
     @Value("${mybatis.pro.backup-table:backup_table}")
     private String backupTable;
@@ -53,8 +63,14 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Override
     public int delete(ID id) {
-        backup(id);
-        return this.deleteDanger(id);
+        if (deleteUseUpdate) {
+            T t = select(id);
+            ReflectUtil.setFieldValue(t, stateColumn, markDelete);
+            return updateExcludeNull(t);
+        } else {
+            backup(id);
+            return this.deleteDanger(id);
+        }
     }
 
     @Override
@@ -64,8 +80,13 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
 
     @Override
     public int delete(List<ID> ids) {
-        ids.forEach(this::backup);
-        return this.deleteDanger(ids);
+        if (deleteUseUpdate) {
+            ofNullable(ids).orElseGet(ArrayList::new).forEach(this::delete);
+            return ids == null ? 0 : ids.size();
+        } else {
+            ids.forEach(this::backup);
+            return this.deleteDanger(ids);
+        }
     }
 
     @Override

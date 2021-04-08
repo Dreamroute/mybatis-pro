@@ -1,6 +1,7 @@
 package com.github.dreamroute.mybatis.pro.core.interceptor;
 
 import cn.hutool.core.io.FileUtil;
+import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import com.github.dreamroute.mybatis.pro.sdk.SelectMapper;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -15,6 +16,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -31,6 +33,7 @@ import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.isFindByMethod;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static java.util.Arrays.stream;
+import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -45,11 +48,11 @@ import static org.springframework.util.StringUtils.isEmpty;
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
 })
 @ConditionalOnBean(SqlSessionFactory.class)
+@EnableConfigurationProperties(MyBatisProProperties.class)
 public class LimitColumnInterceptor implements Interceptor, ApplicationListener<ContextRefreshedEvent> {
 
     private static final String ASTERISK = "*";
     private static final String COLS = "cols";
-
 
     private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
     private static final List<String> BASE_MAPPER_SELECT_METHODS;
@@ -61,9 +64,15 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     }
 
     private Configuration configuration;
+    private final MyBatisProProperties props;
 
     @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
     private boolean underscoreToCamel;
+
+    public LimitColumnInterceptor(MyBatisProProperties props) {
+        this.props = props;
+    }
+
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -93,7 +102,18 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
         String sql = boundSql.getSql();
 
+        // 替换星号
         sql = sql.replace(ASTERISK, cols);
+        // 增加逻辑删除
+        if (props.isDeleteUseUpdate()) {
+            String condition = props.getMarkColumn() + " = " + props.getMarkExist();
+            if (id.toUpperCase(ENGLISH).endsWith("SELECTALL")) {
+                sql = sql + " WHERE " + condition;
+            } else {
+                sql = sql + " AND " + condition;
+            }
+        }
+
         configuration.newMetaObject(boundSql).setValue("sql", sql);
         return invocation.proceed();
     }
