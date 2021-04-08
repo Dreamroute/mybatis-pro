@@ -103,7 +103,6 @@ void mapperTest() {
 ## 全部文档
 
 - [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
-- [English Document](https://github.com/Dreamroute/mybatis-pro/wiki/English-Document/)
 
 ## 作者信息
 Email: 342252328@qq.com
