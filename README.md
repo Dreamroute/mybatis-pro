@@ -35,6 +35,7 @@
   
 ## 版本要求
   - JDK 1.8+
+  - maven-compiler-plugin编译插件不要关闭`<arg>-parameters</arg>`，因为需要通过反射获取参数名称（这是jdk8的特性）
 
 ## 使用方式
 - SpringBoot
