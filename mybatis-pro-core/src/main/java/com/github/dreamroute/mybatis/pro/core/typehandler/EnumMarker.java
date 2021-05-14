@@ -2,6 +2,9 @@ package com.github.dreamroute.mybatis.pro.core.typehandler;
 
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * 枚举类型标记接口，实现此接口的枚举类型会被mybatis自动进行转型
  *
@@ -31,6 +34,7 @@ public interface EnumMarker {
             if (e.getValue() == value)
                 return e;
         }
-        throw new MyBatisProException("您传入的枚举值[" + value + "]不在" + enumCls.getName() + "的值域之内");
+        String range = Arrays.stream(enumConstants).map(EnumMarker::getValue).map(String::valueOf).collect(Collectors.joining(", "));
+        throw new MyBatisProException("您传入的枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的值域之内, 必须在: " + range + "之内");
     }
 }
