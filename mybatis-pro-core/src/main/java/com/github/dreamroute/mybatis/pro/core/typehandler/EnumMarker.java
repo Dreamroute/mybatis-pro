@@ -34,7 +34,12 @@ public interface EnumMarker {
             if (e.getValue() == value)
                 return e;
         }
-        String range = Arrays.stream(enumConstants).map(EnumMarker::getValue).map(String::valueOf).collect(Collectors.joining(", "));
+        String range = null;
+        try {
+            range = Arrays.stream(enumConstants).map(EnumMarker::getValue).map(String::valueOf).collect(Collectors.joining(", "));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         throw new MyBatisProException("您传入的枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的值域之内, 必须在: " + range + "之内");
     }
 }
