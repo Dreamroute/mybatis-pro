@@ -11,7 +11,6 @@ import com.ninja_squad.dbsetup.operation.Insert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -36,18 +35,13 @@ class LimitColumnTest {
     @Resource
     private DataSource dataSource;
 
-    @Value("${phone-no}")
-    private String phoneNo;
-    @Value("${cn-name}")
-    private String cnName;
-
     @BeforeEach
     void init() {
 
         // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", phoneNo, "version")
+                .columns("name", "password", "phone_no", "version")
                 .values("w.dehai", "123456", "1306006", 1L)
                 .values("Jaedong", "123", "1306006", 1L)
                 .values("w.dehai", "123", "1306006", 2L)
@@ -57,7 +51,7 @@ class LimitColumnTest {
         // init smat_dict
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_dict")).launch();
         Insert insert2 = insertInto("smart_dict")
-                .columns("value", cnName)
+                .columns("value", "cn_name")
                 .values(1, "有效")
                 .values(0, "无效")
                 .build();

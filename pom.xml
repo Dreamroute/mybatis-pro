@@ -37,7 +37,7 @@
         <url>https://github.com/Dreamroute/mybatis-pro</url>
     </scm>
 
-<!--    <distributionManagement>
+    <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -45,13 +45,6 @@
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>-->
-
-    <distributionManagement>
-        <repository>
-            <id>jc</id>
-            <url>http://nexus.yzw.cn/repository/jc/</url>
         </repository>
     </distributionManagement>
 
@@ -149,6 +142,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <charset>UTF-8</charset>
@@ -194,6 +188,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.2.4</version>
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <flattenMode>oss</flattenMode>

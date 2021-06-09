@@ -32,7 +32,7 @@
 
     <build>
         <plugins>
-<!--            <plugin>
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.8</version>
@@ -42,7 +42,8 @@
                     <nexusUrl>https://oss.sonatype.org</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-            </plugin>-->
+            </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -50,6 +51,7 @@
                     <skip>false</skip>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>

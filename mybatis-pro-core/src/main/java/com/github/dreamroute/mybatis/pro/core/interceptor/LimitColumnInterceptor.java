@@ -56,7 +56,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
     private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
     private static final List<String> BASE_MAPPER_SELECT_METHODS;
-    private static final Map<String, String> COLS_ALIAS = new HashMap();
+    private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
     static {
         Method[] selectMethods = SelectMapper.class.getDeclaredMethods();
@@ -66,7 +66,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private Configuration configuration;
     private final MyBatisProProperties props;
 
-    @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
+    @Value("${mybatis.configuration.map-underscore-to-camel-case:true}")
     private boolean underscoreToCamel;
 
     public LimitColumnInterceptor(MyBatisProProperties props) {

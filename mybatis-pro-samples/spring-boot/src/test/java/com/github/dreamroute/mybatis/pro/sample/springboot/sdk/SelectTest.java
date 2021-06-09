@@ -34,10 +34,10 @@ class SelectTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "state")
-                .values("w.dehai", 1)
-                .values("Jaedong", 1)
-                .values("Dreamroute", 1)
+                .columns("name")
+                .values("w.dehai")
+                .values("Jaedong")
+                .values("Dreamroute")
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }

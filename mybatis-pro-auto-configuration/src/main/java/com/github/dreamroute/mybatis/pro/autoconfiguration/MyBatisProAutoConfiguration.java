@@ -91,7 +91,7 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
 
     @Autowired
     private ApplicationContext context;
-    @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
+    @Value("${mybatis.configuration.map-underscore-to-camel-case:true}")
     private boolean toLine;
 
     public MyBatisProAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,

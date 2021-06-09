@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
 import com.github.dreamroute.pager.starter.anno.Pager;
@@ -98,7 +97,6 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     @Data
     class FindByIdLTDto {
-        @Column("sysNo")
         private Long id;
         private String name;
     }

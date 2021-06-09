@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
-import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;
@@ -17,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 public class User {
 
     @Id
-    @Column("sysNo")
     private Long id;
     private String name;
     private String password;
@@ -25,6 +23,4 @@ public class User {
     @Transient
     private Integer gender;
     private String phoneNo;
-
-    private Integer state;
 }
