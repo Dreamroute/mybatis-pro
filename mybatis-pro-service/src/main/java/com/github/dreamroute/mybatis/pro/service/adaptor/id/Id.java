@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 前端请求中只只有1个id参数
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotNull;
  * @author w.dehai
  */
 @Data
-public class Id {
+public class Id implements Serializable {
 
     @NotNull
     @Min(value = Long.MIN_VALUE)
