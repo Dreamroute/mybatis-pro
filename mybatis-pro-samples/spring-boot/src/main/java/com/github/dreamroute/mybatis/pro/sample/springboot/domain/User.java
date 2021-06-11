@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
+import com.github.dreamroute.mybatis.pro.core.annotations.Column;
 import com.github.dreamroute.mybatis.pro.core.annotations.Id;
 import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.annotations.Transient;

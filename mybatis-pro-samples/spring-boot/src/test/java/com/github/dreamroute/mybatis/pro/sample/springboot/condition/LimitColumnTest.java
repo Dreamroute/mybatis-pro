@@ -78,10 +78,10 @@ class LimitColumnTest {
      */
     @Test
     void selectByIdTest() {
-        User user = userMapper.selectById(1L, "id", "name");
-        assertEquals("w.dehai", user.getName());
         Dict dict = dictMapper.selectById(1L, "id", "value", "cnName");
         assertEquals("有效", dict.getCnName());
+        User user = userMapper.selectById(1L, "id", "name");
+        assertEquals("w.dehai", user.getName());
         List<User> all = userMapper.selectAll("id");
         assertEquals(3, all.size());
         List<User> users = userMapper.selectByIds(newArrayList(1L, 2L), "id", "phoneNo");

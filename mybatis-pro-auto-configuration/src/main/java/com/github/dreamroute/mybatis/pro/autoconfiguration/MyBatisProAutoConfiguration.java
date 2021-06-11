@@ -284,7 +284,6 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
     /**
      * 获取mapper接口的包路径集合
      */
-
     private Set<String> getMapperPackages() {
         Set<String> mapperPackages = new HashSet<>();
         Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
