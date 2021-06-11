@@ -58,7 +58,7 @@ public class MyBatisProUtil {
 
     private MyBatisProUtil() {}
 
-    // Map<Class, <fieldName, alias>>
+    // Map<MapperClass, <fieldName, alias>>
     public static final Map<Class<?>, Map<String, String>> FIELDS_ALIAS_CACHE = new HashMap<>();
 
     public static Resource[] processMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
