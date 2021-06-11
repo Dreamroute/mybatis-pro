@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
@@ -183,13 +182,11 @@ public class MyBatisProUtil {
 
     private static Map<String, String> cacheAlias(Class<?> cls) {
         Set<Field> allFields = ClassUtil.getAllFields(cls);
-        Map<String, String> result = ofNullable(allFields).orElseGet(HashSet::new)
-                .stream()
+        return ofNullable(allFields).orElseGet(HashSet::new).stream()
                 .collect(toMap(Field::getName, filed -> {
                     String alias = getAnnotationValue(filed, Column.class);
                     return StringUtils.isEmpty(alias) ? "" : alias;
                 }));
-        return Optional.ofNullable(result).orElseGet(HashMap::new);
     }
 
     /**
