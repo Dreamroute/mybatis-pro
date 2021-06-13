@@ -33,7 +33,6 @@ import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.isFindByMethod;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static java.util.Arrays.stream;
-import static java.util.Locale.ENGLISH;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -104,17 +103,6 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
         // 替换星号
         sql = sql.replace(ASTERISK, cols);
-        // 增加逻辑删除
-        if (props.isLogicalDelete()) {
-            String condition = props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteActive();
-            // 特殊处理只有列名作为参数的方法
-            if (id.toUpperCase(ENGLISH).endsWith("SELECTALL")) {
-                sql = sql + " WHERE " + condition;
-            } else {
-                sql = sql + " AND " + condition;
-            }
-        }
-
         configuration.newMetaObject(boundSql).setValue("sql", sql);
         return invocation.proceed();
     }
