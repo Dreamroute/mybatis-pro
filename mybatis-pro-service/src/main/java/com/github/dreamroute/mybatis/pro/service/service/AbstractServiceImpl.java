@@ -25,10 +25,12 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     @Autowired
     private DataSource dataSource;
 
-    @Value("${mybatis.pro.delete-use-update:true}")
+    @Value("${mybatis.pro.delete-use-update:false}")
     private boolean deleteUseUpdate;
+
     @Value("${mybatis.pro.state-column:commonStatus}")
     private String stateColumn;
+
     @Value("${mybatis.pro.del-mark:-999}")
     private Integer markDelete;
 

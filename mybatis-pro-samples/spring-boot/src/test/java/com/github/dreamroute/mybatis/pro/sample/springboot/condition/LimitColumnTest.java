@@ -41,10 +41,10 @@ class LimitColumnTest {
         // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no", "version")
-                .values("w.dehai", "123456", "1306006", 1L)
-                .values("Jaedong", "123", "1306006", 1L)
-                .values("w.dehai", "123", "1306006", 2L)
+                .columns("name", "password", "phone_no", "version", "addr_info")
+                .values("w.dehai", "123456", "1306006", 1L, "成都")
+                .values("Jaedong", "123", "1306006", 1L, "北京")
+                .values("w.dehai", "123", "1306006", 2L, "美国")
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
 
@@ -69,7 +69,7 @@ class LimitColumnTest {
 
     @Test
     void findByIdLTETest() {
-        List<User> users =  userMapper.findByIdLTE(2L, new String[] {"id", "name", "password", "version"});
+        List<User> users =  userMapper.findByIdLTE(2L, new String[] {"id", "name", "password", "version", "phoneNo", "addr"});
         assertEquals(2, users.size());
     }
 

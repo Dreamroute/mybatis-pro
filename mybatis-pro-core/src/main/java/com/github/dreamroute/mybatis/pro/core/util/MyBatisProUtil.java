@@ -75,7 +75,7 @@ public class MyBatisProUtil {
         allResources.stream()
                 .map(MyBatisProUtil::getNamespaceFromXmlResource)
                 .map(cn.hutool.core.util.ClassUtil::getTypeArgument)
-                .forEach(entityCls -> FIELDS_ALIAS_CACHE.computeIfAbsent(entityCls, MyBatisProUtil::cacheAlias));
+                .forEach(entityCls -> FIELDS_ALIAS_CACHE.computeIfAbsent(entityCls, MyBatisProUtil::getFieldAliasMap));
 
         // 处理findBy, deleteBy, countBy, existBy方法
         Set<Resource> all = processSpecialMethods(allResources);
@@ -133,13 +133,11 @@ public class MyBatisProUtil {
             if (!isEmpty(specialMethods)) {
                 Class<?> entityCls = getTypeArgument(mapperCls);
                 if (!hasAnnotation(entityCls, Table.class)) {
-                    throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@com.github.dreamroute.mybatis.pro.core.annotations.Table注解");
+                    throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@" + Table.class.getName() + "注解");
                 }
 
-                String tableName = getAnnotationValue(entityCls, Table.class);
-                Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
-
                 // 将findBy方法的返回值的别名进行缓存
+                Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
                 cacheAlias(name2Type);
 
                 specialMethods.forEach(specialMethodName -> {
@@ -160,7 +158,7 @@ public class MyBatisProUtil {
                         conditions = specialMethodName.substring(7);
                         sql = "select (case when count(*)=0 then 'false' ELSE 'true' end) from ";
                     }
-                    sql += tableName + " <where> " + createCondition(conditions, FIELDS_ALIAS_CACHE.get(entityCls));
+                    sql += getAnnotationValue(entityCls, Table.class) + " <where> " + createCondition(conditions, FIELDS_ALIAS_CACHE.get(entityCls));
 
                     //  对于delete需要特殊处理，delete不需要设置resultType
                     String resultType = mapperLabel == DELETE ? null : name2Type.get(specialMethodName);
@@ -175,12 +173,12 @@ public class MyBatisProUtil {
         returnTypeMap.forEach((k, v) -> {
             if (isFindByMethod(k)) {
                 Class<?> returnType = loadClass(v);
-                FIELDS_ALIAS_CACHE.computeIfAbsent(returnType, MyBatisProUtil::cacheAlias);
+                FIELDS_ALIAS_CACHE.computeIfAbsent(returnType, MyBatisProUtil::getFieldAliasMap);
             }
         });
     }
 
-    private static Map<String, String> cacheAlias(Class<?> cls) {
+    private static Map<String, String> getFieldAliasMap(Class<?> cls) {
         Set<Field> allFields = ClassUtil.getAllFields(cls);
         return ofNullable(allFields).orElseGet(HashSet::new).stream()
                 .collect(toMap(Field::getName, filed -> {

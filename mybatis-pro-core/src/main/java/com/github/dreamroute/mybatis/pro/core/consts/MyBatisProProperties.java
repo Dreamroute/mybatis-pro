@@ -9,6 +9,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "mybatis.pro")
 public class MyBatisProProperties {
+
+    /**
+     * 是否开启逻辑删除，true-开启，false-关闭，默认开启
+     */
+    private boolean enableLogicalDelete = true;
+
     /**
      * 逻辑删除备份表名，deleteUseUpdate为false时此属性才有意义
      */
@@ -17,20 +23,15 @@ public class MyBatisProProperties {
     /**
      * 逻辑删除，使用更改状态的方式
      */
-    private boolean deleteUseUpdate = true;
+    private boolean logicalDelete = false;
 
     /**
      * 逻辑删除状态列，deleteUseUpdate为true时此属性才有意义
      */
-    private String markColumn = "commonStatus";
+    private String logicalDeleteColumn = "status";
 
     /**
-     * 数据被删除
+     * 逻辑删除数据有效状态，单表查询时会在sql的where条件上自动加上[AND ${logicalDeleteColumn} = ${logicalDeleteActive}]
      */
-    private Integer markDelete = -999;
-
-    /**
-     * 数据有效
-     */
-    private Integer markExist = 1;
+    private Integer logicalDeleteActive = 1;
 }

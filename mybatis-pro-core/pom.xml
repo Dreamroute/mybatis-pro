@@ -14,7 +14,12 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-sdk</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dreamroute</groupId>
+            <artifactId>mybatis-pro-base</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

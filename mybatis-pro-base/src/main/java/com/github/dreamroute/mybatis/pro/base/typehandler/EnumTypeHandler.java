@@ -1,6 +1,5 @@
-package com.github.dreamroute.mybatis.pro.core.typehandler;
+package com.github.dreamroute.mybatis.pro.base.typehandler;
 
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
@@ -62,6 +61,6 @@ public class EnumTypeHandler<E extends Enum<?> & EnumMarker> extends BaseTypeHan
 
     @Override
     public E getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        throw new MyBatisProException("禁止使用存储过程");
+        throw new IllegalArgumentException("MyBatisPro enum typehandler not support CallableStatement.");
     }
 }

@@ -1,7 +1,5 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.github.dreamroute.mybatis.pro.core.typehandler.EnumTypeHandler;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -153,10 +151,6 @@ public class MyBatisProAutoConfiguration implements InitializingBean {
         }
 
         Resource[] resources = this.properties.resolveMapperLocations();
-
-        // 注册枚举type-handler
-        org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration) ReflectUtil.getFieldValue(factory, "configuration");
-        configuration.getTypeHandlerRegistry().register(new EnumTypeHandler());
 
         // -- mybatis-pro begin.
         logger.info("织入mybatis-pro开始 ......");

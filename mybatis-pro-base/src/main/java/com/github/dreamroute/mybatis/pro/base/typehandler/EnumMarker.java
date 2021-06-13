@@ -1,6 +1,4 @@
-package com.github.dreamroute.mybatis.pro.core.typehandler;
-
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+package com.github.dreamroute.mybatis.pro.base.typehandler;
 
 /**
  * 枚举类型标记接口，实现此接口的枚举类型会被mybatis自动进行转型
@@ -18,6 +16,11 @@ public interface EnumMarker {
      * 返回枚举的描述信息
      */
     String getDesc();
+
+    /**
+     * 返回枚举的顺序
+     */
+    Integer getSort();
 
     /**
      * 根据value字段的值返回对应的枚举类型
@@ -39,6 +42,6 @@ public interface EnumMarker {
             }
         }
         range.append("]");
-        throw new MyBatisProException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + range + "之内");
+        throw new IllegalArgumentException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + range + "之内");
     }
 }

@@ -24,4 +24,7 @@ public class User {
     @Transient
     private Integer gender;
     private String phoneNo;
+
+    @Column("addr_info")
+    private String addr;
 }

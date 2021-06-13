@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import com.github.dreamroute.mybatis.pro.core.typehandler.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.typehandler.EnumMarker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,12 @@ class EnumTest {
     @AllArgsConstructor
     enum Gender implements EnumMarker {
 
-        MALE("男", 1),
-        FEMALE("女", 2);
+        MALE(1, "男", 1),
+        FEMALE(2, "女", 2);
 
-        private final String desc;
         private final Integer value;
+        private final String desc;
+        private final Integer sort;
 
     }
 

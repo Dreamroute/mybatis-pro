@@ -39,8 +39,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
 
 /**
- * 处理findBy限制列拦截器，findBy方法的最后1个参数如果是列名数组，那么将列名替换掉之前的星号，
- * 由于同一个方法名可能传入的限制列不同，如果将列写死在ms的sql中，那么会有并发问题，所以这里必须使用插件的方式每次进行动态替换列
+ * 拦截mybatis-pro内置查询方法(也就是：SelectMapper接口的方法)以及findBy打头的方法，如果这些方法传参数有指定列名，那么将指定列名替换掉[select * from]中的"*"号，
+ * 特殊说明：由于同一个方法名可能传入的限制列不同，如果将列写死在ms的sql中，处出现冲突（只有第一个会生效），所以这里必须使用插件的方式每次进行动态替换列
  *
  * @author : w.dehai.2021.04.01
  */
@@ -55,12 +55,12 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private static final String COLS = "cols";
 
     private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
-    private static final List<String> BASE_MAPPER_SELECT_METHODS;
+    private static final List<String> SELECT_MAPPER_METHOD_NAMES;
     private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
     static {
         Method[] selectMethods = SelectMapper.class.getDeclaredMethods();
-        BASE_MAPPER_SELECT_METHODS = stream(selectMethods).map(Method::getName).collect(toList());
+        SELECT_MAPPER_METHOD_NAMES = stream(selectMethods).map(Method::getName).collect(toList());
     }
 
     private Configuration configuration;
@@ -88,7 +88,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         String id = ms.getId();
         Boolean cached = ID_CACHE.computeIfAbsent(id, k -> {
             String methodName = FileUtil.getSuffix(k);
-            return isFindByMethod(methodName) || BASE_MAPPER_SELECT_METHODS.contains(methodName);
+            return isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
         });
         if (Boolean.FALSE.equals(cached))
             return invocation.proceed();
@@ -97,7 +97,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         Map<String, String> alias = FIELDS_ALIAS_CACHE.get(returnType);
 
         BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
-        String cols = existCols(id, boundSql, alias);
+        String cols = getCols(id, boundSql, alias);
         cols = cols == null ? toColumns(alias.keySet(), alias) : cols;
 
         String sql = boundSql.getSql();
@@ -105,8 +105,9 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         // 替换星号
         sql = sql.replace(ASTERISK, cols);
         // 增加逻辑删除
-        if (props.isDeleteUseUpdate()) {
-            String condition = props.getMarkColumn() + " = " + props.getMarkExist();
+        if (props.isLogicalDelete()) {
+            String condition = props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteActive();
+            // 特殊处理只有列名作为参数的方法
             if (id.toUpperCase(ENGLISH).endsWith("SELECTALL")) {
                 sql = sql + " WHERE " + condition;
             } else {
@@ -118,14 +119,14 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         return invocation.proceed();
     }
 
-    private String existCols(String id, BoundSql boundSql, Map<String, String> alias) {
+    private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject instanceof ParamMap) {
             ParamMap<Object> params = (ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
                 String[] cols = (String[]) params.get(COLS);
                 if (cols != null && cols.length > 0) {
-                    String cl = String.join(",", cols);
+                    String cl = String.join(", ", cols);
                     return COLS_ALIAS.computeIfAbsent(id + "#" + cl, k -> toColumns(Arrays.asList(cols), alias));
                 }
             }
