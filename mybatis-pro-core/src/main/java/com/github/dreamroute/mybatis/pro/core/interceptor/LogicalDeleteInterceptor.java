@@ -35,7 +35,10 @@ public class LogicalDeleteInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
-        MappedStatement ms = (MappedStatement) args[0];
+        if (args[0] instanceof MappedStatement) {
+            MappedStatement ms = (MappedStatement) args[0];
+            System.err.println(ms);
+        }
         Object parameter = args[1];
         List<String> methodNames = asList(DeleteMapper.class.getDeclaredMethods()).stream().map(Method::getName).collect(toList());
 
