@@ -42,7 +42,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
         Object parameter = args[1];
         List<String> methodNames = asList(DeleteMapper.class.getDeclaredMethods()).stream().map(Method::getName).collect(toList());
 
-        if (props.getLogicalDeleteType().equals(DEFAULT_LOGICAL_DELETE_TYPE)) {
+        if (props.getLogicalDeleteType().equalsIgnoreCase(DEFAULT_LOGICAL_DELETE_TYPE)) {
 
         } else {
             Statement stmt = CCJSqlParserUtil.parse("SELECT * FROM tab1");
