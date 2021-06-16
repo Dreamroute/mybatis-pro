@@ -3,7 +3,6 @@ package com.github.dreamroute.mybatis.pro.core.interceptor;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import com.github.dreamroute.mybatis.pro.sdk.DeleteMapper;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.ibatis.executor.Executor;
@@ -26,19 +25,15 @@ import static java.util.stream.Collectors.toList;
  * @author w.dehai
  */
 @AllArgsConstructor
-@NoArgsConstructor
 @Intercepts(@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}))
 public class LogicalDeleteInterceptor implements Interceptor {
 
-    private MyBatisProProperties props;
+    private final MyBatisProProperties props;
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
-        if (args[0] instanceof MappedStatement) {
-            MappedStatement ms = (MappedStatement) args[0];
-            System.err.println(ms);
-        }
+        MappedStatement ms = (MappedStatement) args[0];
         Object parameter = args[1];
         List<String> methodNames = asList(DeleteMapper.class.getDeclaredMethods()).stream().map(Method::getName).collect(toList());
 
