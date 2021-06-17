@@ -56,7 +56,7 @@ class ClassUtilTest {
 
     @Test
     void getInnerMethodNamesTest() {
-        Set<String> methodNames = ClassUtil.getInnerMethodNames();
+        Set<String> methodNames = ClassUtil.getBaseMethodNames();
         Assertions.assertNotNull(methodNames);
     }
 
