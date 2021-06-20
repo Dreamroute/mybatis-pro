@@ -20,6 +20,10 @@ public class MyBatisProProperties {
     public static final Integer DEFAULT_LOGICAL_DELETE_ACTIVE = 1;
     public static final Integer DEFAULT_LOGICAL_DELETE_IN_ACTIVE = 0;
 
+    /**
+     * 是否使用{@link com.github.dreamroute.mybatis.pro.base.typehandler.EnumTypeHandler}这个枚举转换器
+     */
+    private boolean enableEnumTypeHandler = false;
 
     /**
      * 是否开启逻辑删除，true-开启，false-关闭，默认开启

@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
+import com.github.dreamroute.mybatis.pro.base.typehandler.EnumTypeHandler;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import com.github.dreamroute.mybatis.pro.core.interceptor.LogicalDeleteInterceptor;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -47,10 +48,8 @@ import java.util.stream.Stream;
 
 import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -112,17 +111,16 @@ public class MyBatisProAutoConfiguration {
 
         // 如果逻辑删除开启，这里将逻辑删除插件加入到插件列表
         if (props.isEnableLogicalDelete()) {
-            LogicalDeleteInterceptor logicalDeleteInterceptor = new LogicalDeleteInterceptor(props);
-            Interceptor[] inters = ofNullable(this.interceptors).orElseGet(() -> new Interceptor[0]);
-            List<Interceptor> ins = newArrayList(inters);
-            ins.add(logicalDeleteInterceptor);
-            factory.setPlugins(ins.toArray(new Interceptor[0]));
-        } else {
-            if (!ObjectUtils.isEmpty(this.interceptors)) {
-                factory.setPlugins(this.interceptors);
-            }
+            properties.getConfiguration().addInterceptor(new LogicalDeleteInterceptor(props));
+        }
+        // 如果枚举处理器开启，那么加入到configuratin中
+        if (props.isEnableEnumTypeHandler()) {
+            properties.getConfiguration().getTypeHandlerRegistry().register(new EnumTypeHandler<>());
         }
 
+        if (!ObjectUtils.isEmpty(this.interceptors)) {
+            factory.setPlugins(this.interceptors);
+        }
         if (this.databaseIdProvider != null) {
             factory.setDatabaseIdProvider(this.databaseIdProvider);
         }
@@ -136,7 +134,6 @@ public class MyBatisProAutoConfiguration {
             factory.setTypeHandlersPackage(this.properties.getTypeHandlersPackage());
         }
         if (!ObjectUtils.isEmpty(this.typeHandlers)) {
-
             factory.setTypeHandlers(this.typeHandlers);
         }
 
