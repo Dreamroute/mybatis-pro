@@ -18,11 +18,6 @@ public interface EnumMarker {
     String getDesc();
 
     /**
-     * 返回枚举的顺序
-     */
-    Integer getSort();
-
-    /**
      * 根据value字段的值返回对应的枚举类型
      *
      * @param enumCls 枚举类型
