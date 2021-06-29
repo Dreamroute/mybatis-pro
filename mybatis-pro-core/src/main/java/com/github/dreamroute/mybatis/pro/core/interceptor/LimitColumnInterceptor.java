@@ -14,7 +14,7 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
@@ -38,8 +38,9 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.isEmpty;
 
 /**
- * 拦截mybatis-pro内置查询方法(也就是：SelectMapper接口的方法)以及findBy打头的方法，如果这些方法传参数有指定列名，那么将指定列名替换掉[select * from]中的"*"号，
- * 特殊说明：由于同一个方法名可能传入的限制列不同，如果将列写死在ms的sql中，处出现冲突（只有第一个会生效），所以这里必须使用插件的方式每次进行动态替换列
+ * 插件功能：
+ * 拦截mybatis-pro内置查询方法(也就是：SelectMapper接口的方法)以及findBy打头的方法，如果这些方法传参数有指定列名，那么将指定列名替换掉[select * from]中的"*"号，如果没有指定列名，那么用全部列替换星号。
+ * 特殊说明：由于同一个方法名可能传入的限制列不同，如果将列写死在ms的sql中，处出现冲突（只有第一个会生效），所以这里必须使用插件的方式将每个不同的方法（方法名+参数列表）进行缓存
  *
  * @author : w.dehai.2021.04.01
  */
@@ -47,29 +48,21 @@ import static org.springframework.util.StringUtils.isEmpty;
         @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})
 })
 @ConditionalOnBean(SqlSessionFactory.class)
-@EnableConfigurationProperties(MyBatisProProperties.class)
+@EnableConfigurationProperties({MybatisProperties.class, MyBatisProProperties.class})
 public class LimitColumnInterceptor implements Interceptor, ApplicationListener<ContextRefreshedEvent> {
 
     private static final String ASTERISK = "*";
     private static final String COLS = "cols";
 
+    private static final List<String> SELECT_MAPPER_METHOD_NAMES = stream(SelectMapper.class.getDeclaredMethods()).map(Method::getName).collect(toList());
     private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
-    private static final List<String> SELECT_MAPPER_METHOD_NAMES;
     private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
-    static {
-        Method[] selectMethods = SelectMapper.class.getDeclaredMethods();
-        SELECT_MAPPER_METHOD_NAMES = stream(selectMethods).map(Method::getName).collect(toList());
-    }
-
     private Configuration configuration;
-    private final MyBatisProProperties props;
+    private final MybatisProperties properties;
 
-    @Value("${mybatis.configuration.map-underscore-to-camel-case:true}")
-    private boolean underscoreToCamel;
-
-    public LimitColumnInterceptor(MyBatisProProperties props) {
-        this.props = props;
+    public LimitColumnInterceptor(MybatisProperties properties) {
+        this.properties = properties;
     }
 
 
@@ -89,6 +82,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
             String methodName = FileUtil.getSuffix(k);
             return isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
         });
+
         if (Boolean.FALSE.equals(cached))
             return invocation.proceed();
 
@@ -123,9 +117,11 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     }
 
     private String toColumns(Collection<String> cols, Map<String, String> alias) {
-        return cols.stream().map(filedName -> underscoreToCamel ? toLine(filedName) : filedName).map(fieldName -> {
+        return cols.stream().map(fieldName -> {
             String as = alias.get(fieldName);
-            return isEmpty(as) ? fieldName : (as + " AS " + fieldName);
+            boolean mapUnderscoreToCamelCase = this.properties.getConfiguration().isMapUnderscoreToCamelCase();
+            String toLine = mapUnderscoreToCamelCase ? toLine(fieldName) : fieldName;
+            return isEmpty(as) ? toLine : (as + " AS " + fieldName);
         }).collect(joining(", "));
     }
 
