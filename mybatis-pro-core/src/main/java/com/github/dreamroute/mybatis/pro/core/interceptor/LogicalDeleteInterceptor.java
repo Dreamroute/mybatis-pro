@@ -19,6 +19,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -70,7 +71,10 @@ public class LogicalDeleteInterceptor implements Interceptor {
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             BoundSql selectBoundSql = new BoundSql(config, selectSql, parameterMappings, parameter);
             StatementHandler handler = config.newStatementHandler(executor, ms, parameter, RowBounds.DEFAULT, null, selectBoundSql);
-            Statement stmt = prepareStatement(transaction, handler);
+            Connection connection = transaction.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(selectSql);
+            handler.parameterize(stmt);
+//            Statement stmt = prepareStatement(transaction, handler);
             ((PreparedStatement) stmt).execute();
             ResultSet rs = stmt.getResultSet();
             ResultSetMetaData md = rs.getMetaData();
