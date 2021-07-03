@@ -19,7 +19,6 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -30,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.alibaba.fastjson.JSON.toJSONString;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_BACKUP;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_UPDATE;
 import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
@@ -67,14 +67,12 @@ public class LogicalDeleteInterceptor implements Interceptor {
         String tableName = table.getName();
 
         if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_BACKUP)) {
+            // 原理：1、查询出需要删除的数据；2、将此数据存入备份表；3、物理删除对应数据
             String selectSql = "SELECT * FROM " + tableName + " WHERE " + delete.getWhere().toString();
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             BoundSql selectBoundSql = new BoundSql(config, selectSql, parameterMappings, parameter);
             StatementHandler handler = config.newStatementHandler(executor, ms, parameter, RowBounds.DEFAULT, null, selectBoundSql);
-            Connection connection = transaction.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(selectSql);
-            handler.parameterize(stmt);
-//            Statement stmt = prepareStatement(transaction, handler);
+            Statement stmt = prepareStatement(transaction, handler);
             ((PreparedStatement) stmt).execute();
             ResultSet rs = stmt.getResultSet();
             ResultSetMetaData md = rs.getMetaData();
