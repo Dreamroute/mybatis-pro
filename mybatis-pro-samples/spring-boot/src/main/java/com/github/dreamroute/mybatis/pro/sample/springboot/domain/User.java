@@ -27,4 +27,6 @@ public class User {
 
     @Column("addr_info")
     private String addr;
+
+    private Integer status;
 }

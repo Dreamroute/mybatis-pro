@@ -42,22 +42,14 @@ class DeleteByTest {
 
     @Test
     void deleteByNameOrPasswordTest() {
-        List<User> users = userMapper.selectAll();
-        assertEquals(2, users.size());
-
-        userMapper.deleteByNameOrPassword("w.dehai", "123");
-        users = userMapper.selectAll();
-        assertEquals(0, users.size());
+        int result = userMapper.deleteByNameOrPassword("w.dehai", "123");
+        assertEquals(2, result);
     }
 
     @Test
     void deleteByNameOrPasswordOptTest() {
-        List<User> users = userMapper.selectAll();
-        assertEquals(2, users.size());
-
-        userMapper.deleteByNameOrPasswordOpt("w.dehai", null);
-        users = userMapper.selectAll();
-        assertEquals(1, users.size());
+        int result = userMapper.deleteByNameOrPasswordOpt("w.dehai", null);
+        assertEquals(1, result);
     }
 
 }

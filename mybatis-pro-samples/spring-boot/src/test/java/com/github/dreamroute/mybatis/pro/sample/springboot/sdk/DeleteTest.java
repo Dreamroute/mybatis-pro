@@ -1,6 +1,5 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.sdk;
 
-import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.destination.DataSourceDestination;
@@ -12,12 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
-import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author w.dehai
@@ -43,16 +40,14 @@ class DeleteTest {
 
     @Test
     void deleteByIdTest() {
-        userMapper.deleteById(1L);
-        User user = userMapper.selectById(1L);
-        assertNull(user);
+        int result = userMapper.deleteById(1L);
+        assertEquals(1, result);
     }
 
     @Test
     void deleteByIdsTest() {
-        userMapper.deleteByIds(Arrays.asList(1L, 2L));
-        List<User> users = userMapper.selectAll();
-        assertEquals(0, users.size());
+        int result = userMapper.deleteByIds(Arrays.asList(1L, 2L));
+        assertEquals(2, result);
     }
 
 }

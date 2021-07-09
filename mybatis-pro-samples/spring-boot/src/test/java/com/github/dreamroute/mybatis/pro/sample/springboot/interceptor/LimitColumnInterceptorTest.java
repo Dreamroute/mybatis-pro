@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.sample.springboot.condition;
+package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.Dict;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author : w.dehai.2021.04.01
  */
 @SpringBootTest
-class LimitColumnTest {
+class LimitColumnInterceptorTest {
     @Resource
     private UserMapper userMapper;
     @Resource

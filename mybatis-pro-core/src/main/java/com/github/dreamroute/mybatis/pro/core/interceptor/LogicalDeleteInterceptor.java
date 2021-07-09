@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.alibaba.fastjson.JSON.toJSONString;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_BACKUP;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_UPDATE;
 import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
@@ -52,8 +51,9 @@ public class LogicalDeleteInterceptor implements Interceptor {
         Object[] args = invocation.getArgs();
         MappedStatement ms = (MappedStatement) args[0];
         SqlCommandType sqlCommandType = ms.getSqlCommandType();
-        if (!Objects.equals(sqlCommandType, DELETE))
+        if (!(Objects.equals(sqlCommandType, DELETE) && props.isEnableLogicalDelete())) {
             return invocation.proceed();
+        }
 
         Executor executor = (Executor) (getOriginObj(invocation.getTarget()));
         Transaction transaction = executor.getTransaction();
@@ -87,12 +87,21 @@ public class LogicalDeleteInterceptor implements Interceptor {
             }
             stmt.close();
 
-        } else if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_UPDATE)) {
+            
 
+            return invocation.proceed();
+        } else if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_UPDATE)) {
+            String updateSql = "UPDATE " + tableName + " SET " + props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteInActive() + " WHERE " + delete.getWhere().toString();
+            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+            BoundSql updateBoundSql = new BoundSql(config, updateSql, parameterMappings, parameter);
+            StatementHandler handler = config.newStatementHandler(executor, ms, parameter, RowBounds.DEFAULT, null, updateBoundSql);
+            PreparedStatement stmt = (PreparedStatement) prepareStatement(transaction, handler);
+            int result = stmt.executeUpdate();
+            stmt.close();
+            return result;
         }
 
-        Object proceed = invocation.proceed();
-        return proceed;
+        throw new IllegalArgumentException("配置文件mybatis.pro.logical-delete-type取值只能是: [backup, update]之一，默认是: backup");
     }
 
     private Statement prepareStatement(Transaction transaction, StatementHandler handler) throws SQLException {

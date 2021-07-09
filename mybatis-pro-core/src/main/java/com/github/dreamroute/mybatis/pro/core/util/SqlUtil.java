@@ -118,11 +118,11 @@ public class SqlUtil {
             } else if (statement.endsWith(KeyWord.IN) && !statement.endsWith(KeyWord.NOT_IN)) {
                 variableName = firstLower(removeKeyWord(statement, KeyWord.IN));
                 column = toLine(variableName, alias);
-                condition.append(column).append(" in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
+                condition.append(column).append(" in ").append("<foreach collection='list' index='index' open='(' close=')' separator=','>#{list[${index}]}</foreach>");
             } else if (statement.endsWith(KeyWord.NOT_IN)) {
                 variableName = firstLower(removeKeyWord(statement, KeyWord.NOT_IN));
                 column = toLine(variableName, alias);
-                condition.append(column).append(" not in ").append("<foreach collection='list' item='id' index='index' open='(' close=')' separator=','>#{id}</foreach>");
+                condition.append(column).append(" not in ").append("<foreach collection='list' index='index' open='(' close=')' separator=','>#{list[${index}]}</foreach>");
             } else {
 
                 // 这里处理两类：1.处理等号的条件，2.处理最后一个条件（可能包含OrderBy和DESC和opt）

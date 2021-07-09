@@ -88,7 +88,7 @@ public class MapperUtil {
         String updateByIdPrefix = "update " + tableName;
 
         String commonWhereIdIs = WHERE + idColumn + " = #{" + idName + "}";
-        String commonWhereIdIn = WHERE + idColumn + " in <foreach collection='list' item='" + idName + "' index='index' open='(' close=')' separator=','>#{list[${index}]}</foreach>";
+        String commonWhereIdIn = WHERE + idColumn + " in <foreach collection='list' index='index' open='(' close=')' separator=','>#{list[${index}]}</foreach>";
 
         String selectById = selectPrefix + commonWhereIdIs;
         String selectByIds = selectPrefix + commonWhereIdIn;
