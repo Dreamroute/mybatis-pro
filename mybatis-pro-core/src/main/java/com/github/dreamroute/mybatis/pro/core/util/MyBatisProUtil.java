@@ -98,7 +98,7 @@ public class MyBatisProUtil {
             String namespace = mapperNode.getStringAttribute(NAMESPACE.getCode());
             return loadClass(namespace);
         } catch (Exception e) {
-            throw new MyBatisProException();
+            throw new MyBatisProException("解析出错mapper.xml文件出错", e);
         }
     }
 

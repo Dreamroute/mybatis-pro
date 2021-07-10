@@ -21,7 +21,7 @@ public class MyBatisProProperties {
     // 逻辑删除方式: 默认
     public static final String DEFAULT_LOGICAL_DELETE_TYPE = LOGICAL_DELETE_TYPE_BACKUP;
     // 逻辑删除备份表名:
-    public static final String LOGICAL_DELETE_TABLE_NAME = "logical_delete_table";
+    public static final String LOGICAL_DELETE_TABLE_NAME = "logical_delete";
     // 逻辑删除状态列名
     public static final String LOGICAL_DELETE_STATUS_COLUMN = "status";
     // 逻辑删除状态列有效值

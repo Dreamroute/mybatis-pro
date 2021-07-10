@@ -87,7 +87,8 @@ public class LogicalDeleteInterceptor implements Interceptor {
             }
             stmt.close();
 
-            
+            // TODO 检查insert的长度
+
 
             return invocation.proceed();
         } else if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_UPDATE)) {
