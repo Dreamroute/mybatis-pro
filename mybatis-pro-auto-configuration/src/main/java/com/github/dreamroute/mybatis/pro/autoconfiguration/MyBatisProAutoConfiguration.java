@@ -1,11 +1,8 @@
 package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.github.dreamroute.mybatis.pro.base.typehandler.EnumTypeHandler;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import com.github.dreamroute.mybatis.pro.core.interceptor.LogicalDeleteInterceptor;
-import com.github.dreamroute.mybatis.pro.core.interceptor.LogicalDeleteMapper;
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.scripting.LanguageDriver;
@@ -34,7 +31,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.CollectionUtils;
@@ -44,15 +40,12 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_BACKUP;
 import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
 import static java.util.Arrays.asList;
@@ -154,38 +147,6 @@ public class MyBatisProAutoConfiguration {
         TO_LINE.set(toLine);
 
         Set<String> mapperPackages = getMapperPackages();
-
-        // 如果是backup风格的逻辑删除，那么注入LogicalDeleteMapper
-        if (props.isEnableLogicalDelete() && Objects.equals(props.getLogicalDeleteType(), LOGICAL_DELETE_TYPE_BACKUP)) {
-//            PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver();
-//            org.springframework.core.io.ClassPathResource classPathResource = new org.springframework.core.io.ClassPathResource("/logical/delete/mapper/LogicalDelete.xml");
-//            ClassPathResourc r = new ClassPathResource("/logical/delete/mapper/LogicalDelete.xml");
-//            String absolutePath = FileUtil.getAbsolutePath(r.getFile());
-//            Resource[] logicalDeleteResource = pathMatchingResourcePatternResolver.getResources(absolutePath);
-//            ClassPathResource r = new ClassPathResource("");
-//            String path = FileUtil.getAbsolutePath(r.getFile());
-//            Resource[] logicalDeleteResource = pathMatchingResourcePatternResolver.getResources(path);
-//            String absolutePath = FileUtil.getAbsolutePath("/logical/delete/mapper/LogicalDelete.xml");
-//            FileSystemResource fsr = new FileSystemResource("/logical/delete/mapper/LogicalDelete.xml");
-//            String path = fsr.getFile().getAbsolutePath();
-//            fsr = new FileSystemResource(path);
-//            String mapperPath = "/com/github/dreamroute/mybatis/pro/core/interceptor/LogicalDelete/LogicalDelete.xml";
-//            String mapperPath = "classpath:/logical/delete/mapper/LogicalDelete.xml";
-//            ClassPathResource cpr = new ClassPathResource(mapperPath);
-//            ClassPathResource classPathResource = new ClassPathResource(mapperPath);
-
-//            resources = ArrayUtil.addAll(resources, new Resource[] {fsr});
-//            String path = Resources.getResourceAsFile(mapperPath).getAbsolutePath();
-
-            String mapperPath = "interceptor/LogicalDelete.xml";
-            File resourceAsFile = Resources.getResourceAsFile(mapperPath);
-            String absolutePath = resourceAsFile.getAbsolutePath();
-            Resource r = new FileSystemResource(absolutePath);
-            resources = ArrayUtil.addAll(resources, new Resource[] {r});
-
-            mapperPackages.add(LogicalDeleteMapper.class.getPackage().getName());
-        }
-
         if (!isEmpty(resources) || !isEmpty(mapperPackages)) {
             Resource[] rs = processMyBatisPro(resources, mapperPackages);
             factory.setMapperLocations(rs);
