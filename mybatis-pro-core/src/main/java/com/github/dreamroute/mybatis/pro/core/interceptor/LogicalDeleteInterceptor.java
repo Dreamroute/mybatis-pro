@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.core.interceptor;
 
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -18,21 +19,27 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
+import org.springframework.util.CollectionUtils;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_BACKUP;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_UPDATE;
 import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.System.currentTimeMillis;
 import static org.apache.ibatis.mapping.SqlCommandType.DELETE;
 
 /**
@@ -40,6 +47,7 @@ import static org.apache.ibatis.mapping.SqlCommandType.DELETE;
  *
  * @author w.dehai
  */
+@Slf4j
 @AllArgsConstructor
 @Intercepts(@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}))
 public class LogicalDeleteInterceptor implements Interceptor {
@@ -88,7 +96,23 @@ public class LogicalDeleteInterceptor implements Interceptor {
             stmt.close();
 
             // TODO 检查insert的长度
-
+            // TODO sqlpirnter插件重构
+            // TODO Locker插件重构，增加更新失败异常
+            if (!CollectionUtils.isEmpty(result)) {
+                String insert = "INSERT INTO " + LOGICAL_DELETE_TABLE_NAME + "(table_name, data, delete_time) VALUES (?, ?, ?)";
+                Connection conn = transaction.getConnection();
+                PreparedStatement ps = conn.prepareStatement(insert);
+                for (Map<String, Object> data : result) {
+                    ps.setObject(1, tableName);
+                    ps.setObject(2, toJSONString(data));
+                    ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
+                    log.info("逻辑删除插件执行删除前的备份SQL: " + ps.toString());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+                ps.clearBatch();
+                ps.close();
+            }
 
             return invocation.proceed();
         } else if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_UPDATE)) {
