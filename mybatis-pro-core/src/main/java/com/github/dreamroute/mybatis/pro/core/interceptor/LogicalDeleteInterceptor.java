@@ -96,7 +96,6 @@ public class LogicalDeleteInterceptor implements Interceptor {
             stmt.close();
 
             // TODO 检查insert的长度
-            // TODO sqlpirnter插件重构
             // TODO Locker插件重构，增加更新失败异常
             if (!CollectionUtils.isEmpty(result)) {
                 String insert = "INSERT INTO " + LOGICAL_DELETE_TABLE_NAME + "(table_name, data, delete_time) VALUES (?, ?, ?)";
