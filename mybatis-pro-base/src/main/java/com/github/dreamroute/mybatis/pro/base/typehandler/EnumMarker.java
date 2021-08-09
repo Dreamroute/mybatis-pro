@@ -1,11 +1,13 @@
 package com.github.dreamroute.mybatis.pro.base.typehandler;
 
+import java.io.Serializable;
+
 /**
  * 枚举类型标记接口，实现此接口的枚举类型会被mybatis自动进行转型
  *
  * @author w.dehai
  */
-public interface EnumMarker {
+public interface EnumMarker extends Serializable {
 
     /**
      * 返回枚举的value字段的值
