@@ -1,4 +1,6 @@
-package com.github.dreamroute.mybatis.pro.base.typehandler;
+package com.github.dreamroute.mybatis.pro.base;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
 
@@ -7,15 +9,20 @@ import java.io.Serializable;
  *
  * @author w.dehai
  */
+@JsonDeserialize(using = EnumCodec.class)
 public interface EnumMarker extends Serializable {
 
     /**
      * 返回枚举的value字段的值
+     *
+     * @return 返回枚举的value字段的值
      */
     Integer getValue();
 
     /**
-     * 返回枚举的描述信息
+     * 返回枚举描述信息
+     *
+     * @return 返回描述信息
      */
     String getDesc();
 
@@ -24,12 +31,14 @@ public interface EnumMarker extends Serializable {
      *
      * @param enumCls 枚举类型
      * @param value Integer类型的值
+     * @return 返回具体的枚举类型
      */
     static <E extends EnumMarker> E valueOf(Class<E> enumCls, int value) {
         E[] enumConstants = enumCls.getEnumConstants();
         for (E e : enumConstants) {
-            if (e.getValue() == value)
+            if (e.getValue() == value) {
                 return e;
+            }
         }
         StringBuilder range = new StringBuilder("[");
         for (int i = 0; i < enumConstants.length; i++) {

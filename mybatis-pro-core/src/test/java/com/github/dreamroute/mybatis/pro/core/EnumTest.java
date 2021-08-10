@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core;
 
-import com.github.dreamroute.mybatis.pro.base.typehandler.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.EnumMarker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
