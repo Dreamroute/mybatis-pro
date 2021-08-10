@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import java.io.IOException;
 
 /**
+ * 参考：https://www.geek-share.com/detail/2789979246.html
  * jackson反序列化时候全局处理EnumMarker类型的枚举
  *
  * @author w.dehai.2021/8/10.14:43
