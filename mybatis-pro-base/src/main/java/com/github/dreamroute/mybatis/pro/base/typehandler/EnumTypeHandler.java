@@ -13,7 +13,7 @@ import java.sql.SQLException;
  *
  * @author w.dehai
  */
-public class EnumTypeHandler<E extends Enum<?> & EnumMarker> extends BaseTypeHandler<EnumMarker> {
+public class EnumTypeHandler<E extends EnumMarker> extends BaseTypeHandler<EnumMarker> {
 
     private Class<E> type;
 

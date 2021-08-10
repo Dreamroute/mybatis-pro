@@ -25,7 +25,7 @@ public interface EnumMarker extends Serializable {
      * @param enumCls 枚举类型
      * @param value Integer类型的值
      */
-    static <E extends Enum<?> & EnumMarker> E valueOf(Class<E> enumCls, int value) {
+    static <E extends EnumMarker> E valueOf(Class<E> enumCls, int value) {
         E[] enumConstants = enumCls.getEnumConstants();
         for (E e : enumConstants) {
             if (e.getValue() == value)
