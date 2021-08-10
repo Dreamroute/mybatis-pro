@@ -1,13 +1,16 @@
 package com.github.dreamroute.mybatis.pro.core.typehandler;
 
-import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.io.Serializable;
 
 /**
  * 枚举类型标记接口，实现此接口的枚举类型会被mybatis自动进行转型
  *
  * @author w.dehai
  */
-public interface EnumMarker {
+@JsonDeserialize(using = EnumDec.class)
+public interface EnumMarker extends Serializable {
 
     /**
      * 返回枚举的value字段的值
@@ -39,6 +42,6 @@ public interface EnumMarker {
             }
         }
         range.append("]");
-        throw new MyBatisProException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + range + "之内");
+        throw new IllegalArgumentException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + range + "之内");
     }
 }
