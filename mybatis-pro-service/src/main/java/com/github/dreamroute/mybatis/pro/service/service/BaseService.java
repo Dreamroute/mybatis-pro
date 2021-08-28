@@ -13,7 +13,7 @@ public interface BaseService<T, ID> {
     T insert(T entity);
 
     /**
-     * 单个新增（实体为空的属性不新增到数据）
+     * 单个新增（实体为空的属性不新增到数据库）
      */
     T insertExcludeNull(T entity);
 
