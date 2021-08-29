@@ -59,12 +59,6 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
     private Configuration configuration;
-    private final MybatisProperties properties;
-
-    public LimitColumnInterceptor(MybatisProperties properties) {
-        this.properties = properties;
-    }
-
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -83,8 +77,9 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
             return isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
         });
 
-        if (Boolean.FALSE.equals(cached))
+        if (Boolean.FALSE.equals(cached)) {
             return invocation.proceed();
+        }
 
         Class<?> returnType = ms.getResultMaps().get(0).getType();
         Map<String, String> alias = FIELDS_ALIAS_CACHE.get(returnType);
@@ -119,7 +114,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private String toColumns(Collection<String> cols, Map<String, String> alias) {
         return cols.stream().map(fieldName -> {
             String as = alias.get(fieldName);
-            boolean mapUnderscoreToCamelCase = this.properties.getConfiguration().isMapUnderscoreToCamelCase();
+            boolean mapUnderscoreToCamelCase = this.configuration.isMapUnderscoreToCamelCase();
             String toLine = mapUnderscoreToCamelCase ? toLine(fieldName) : fieldName;
             return isEmpty(as) ? toLine : (as + " AS " + fieldName);
         }).collect(joining(", "));
