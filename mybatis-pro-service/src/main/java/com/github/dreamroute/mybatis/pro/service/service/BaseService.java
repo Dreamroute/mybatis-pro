@@ -23,24 +23,14 @@ public interface BaseService<T, ID> {
     List<T> insertList(List<T> entityList);
 
     /**
-     * 根据id删除单个（逻辑删除，被删除的记录会保存在备份表）
+     * 根据id删除单个
      */
     int delete(ID id);
 
     /**
-     * 根据id删除单个（物理删除）
-     */
-    int deleteDanger(ID id);
-
-    /**
-     * 根据id批量删除（逻辑删除，被删除的记录会保存在备份表）
+     * 根据id批量删除
      */
     int delete(List<ID> ids);
-
-    /**
-     * 批量删除（物理删除）
-     */
-    int deleteDanger(List<ID> ids);
 
     /**
      * 根据id更新（实体属性为空的列也将更新到数据）
