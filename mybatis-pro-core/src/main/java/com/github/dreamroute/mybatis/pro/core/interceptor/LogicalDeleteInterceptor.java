@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.core.interceptor;
 
+import com.github.dreamroute.mybatis.pro.core.consts.LogicalDeleteType;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,6 @@ import java.util.Objects;
 
 import static com.alibaba.fastjson.JSON.toJSONString;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
-import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_BACKUP;
-import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TYPE_UPDATE;
 import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.currentTimeMillis;
@@ -74,7 +73,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
         Table table = delete.getTable();
         String tableName = table.getName();
 
-        if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_BACKUP)) {
+        if (props.getLogicalDeleteType().equals(LogicalDeleteType.BACKUP)) {
             // 原理：1、查询出需要删除的数据；2、将此数据存入备份表；3、物理删除对应数据
             String selectSql = "SELECT * FROM " + tableName + " WHERE " + delete.getWhere().toString();
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
@@ -95,26 +94,24 @@ public class LogicalDeleteInterceptor implements Interceptor {
             }
             stmt.close();
 
-            // TODO 检查insert的长度
-            // TODO Locker插件重构，增加更新失败异常
             if (!CollectionUtils.isEmpty(result)) {
                 String insert = "INSERT INTO " + LOGICAL_DELETE_TABLE_NAME + "(table_name, data, delete_time) VALUES (?, ?, ?)";
                 Connection conn = transaction.getConnection();
-                PreparedStatement ps = conn.prepareStatement(insert);
-                for (Map<String, Object> data : result) {
-                    ps.setObject(1, tableName);
-                    ps.setObject(2, toJSONString(data));
-                    ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
-                    log.info("逻辑删除插件执行删除前的备份SQL: " + ps.toString());
-                    ps.addBatch();
+                try (PreparedStatement ps = conn.prepareStatement(insert)) {
+                    for (Map<String, Object> data : result) {
+                        ps.setObject(1, tableName);
+                        ps.setObject(2, toJSONString(data));
+                        ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
+                        log.info("逻辑删除插件执行删除前的备份SQL: " + ps.toString());
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                    ps.clearBatch();
                 }
-                ps.executeBatch();
-                ps.clearBatch();
-                ps.close();
             }
 
             return invocation.proceed();
-        } else if (props.getLogicalDeleteType().equalsIgnoreCase(LOGICAL_DELETE_TYPE_UPDATE)) {
+        } else if (props.getLogicalDeleteType().equals(LogicalDeleteType.UPDATE)) {
             String updateSql = "UPDATE " + tableName + " SET " + props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteInActive() + " WHERE " + delete.getWhere().toString();
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             BoundSql updateBoundSql = new BoundSql(config, updateSql, parameterMappings, parameter);

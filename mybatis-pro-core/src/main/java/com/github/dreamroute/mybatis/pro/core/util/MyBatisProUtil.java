@@ -5,6 +5,8 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Table;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.Mapper;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
@@ -43,7 +45,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -206,15 +207,15 @@ public class MyBatisProUtil {
         methods.addAll(insertMethods);
         methods.addAll(updateMethods);
         methods.addAll(deleteMethods);
-        List<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(ID.getCode())).collect(toList());
+        Set<String> xmlMethodNames = methods.stream().map(node -> node.getStringAttribute(ID.getCode())).collect(toSet());
 
         // BaseMapper的方法 + xxxBy方法
         Set<String> innerMethodNames = getBaseMethodNames();
         List<String> specialMethods = getSpecialMethods(mapperCls);
         innerMethodNames.addAll(specialMethods);
 
-        innerMethodNames.retainAll(xmlMethodNames);
-        if (!isEmpty(innerMethodNames)) {
+        SetView<String> intersection = Sets.intersection(xmlMethodNames, innerMethodNames);
+        if (!isEmpty(intersection)) {
             throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(innerMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
         }
     }

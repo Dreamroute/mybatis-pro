@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.DEFAULT_MYBATIS_PRO_PREFIX;
 
 /**
+ * mybatis-pro的配置信息
+ *
  * @author w.dehai
  */
 @Data
@@ -14,19 +16,21 @@ public class MyBatisProProperties {
 
     public static final String DEFAULT_MYBATIS_PRO_PREFIX = "mybatis.pro";
 
-    // 逻辑删除方式: backup
-    public static final String LOGICAL_DELETE_TYPE_BACKUP = "backup";
-    // 逻辑删除方式: update
-    public static final String LOGICAL_DELETE_TYPE_UPDATE = "update";
-    // 逻辑删除方式: 默认
-    public static final String DEFAULT_LOGICAL_DELETE_TYPE = LOGICAL_DELETE_TYPE_BACKUP;
-    // 逻辑删除备份表名:
+    /**
+     * 逻辑删除备份表名:
+     */
     public static final String LOGICAL_DELETE_TABLE_NAME = "logical_delete";
-    // 逻辑删除状态列名
+    /**
+     * 逻辑删除状态列名
+     */
     public static final String LOGICAL_DELETE_STATUS_COLUMN = "status";
-    // 逻辑删除状态列有效值
+    /**
+     * 逻辑删除状态列有效值
+     */
     public static final Integer LOGICAL_DELETE_STATUS_ACTIVE = 1;
-    // 逻辑删除状态列无效值
+    /**
+     * 逻辑删除状态列无效值
+     */
     public static final Integer LOGICAL_DELETE_STATUS_IN_ACTIVE = 0;
 
     /**
@@ -42,7 +46,7 @@ public class MyBatisProProperties {
     /**
      * 逻辑删除的方式：backup，update；backup：物理删除 + 备份；update：删除动作实际上是执行update操作，将状态位修改成为无效状态，默认是backup方式
      */
-    private String logicalDeleteType = DEFAULT_LOGICAL_DELETE_TYPE;
+    private LogicalDeleteType logicalDeleteType = LogicalDeleteType.BACKUP;
 
     /**
      * 逻辑删除备份表名，只有当logical-delete-type为backup时此属性才有意义

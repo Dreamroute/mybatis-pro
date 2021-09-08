@@ -74,7 +74,7 @@ public class MyBatisProAutoConfiguration {
 
     @Autowired
     private ApplicationContext context;
-    @Value("${mybatis.configuration.map-underscore-to-camel-case:true}")
+    @Value("${mybatis.configuration.map-underscore-to-camel-case:false}")
     private boolean toLine;
 
     public MyBatisProAutoConfiguration(

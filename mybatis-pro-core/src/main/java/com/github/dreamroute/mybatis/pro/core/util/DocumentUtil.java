@@ -63,7 +63,6 @@ public class DocumentUtil {
      */
     public static Document createDocumentFromResource(Resource resource) {
         try {
-            // 改写resource，加入xxxBy方法的标签
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             documentBuilderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");

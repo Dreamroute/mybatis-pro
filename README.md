@@ -48,10 +48,6 @@
     </dependency>
 ```
 ### 最新版本：[点击查看](https://search.maven.org/artifact/com.github.dreamroute/mybatis-pro-boot-starter)
-- Spring MVC
-```$xslt
-    
-```
 
 ## 功能展示
 
@@ -59,7 +55,7 @@
 ```$xslt
 public interface UserMapper {
 
-    // 这是一个根据用户名、密码查询单个用户的查询，方法名只需要以findBy打头
+    // 这是一个根据用户名、密码查询单个用户的查询，方法名只需要以findBy打头，接着方法名为: NameAndPassword
     User findByNameAndPassword(String name, String password);
 
 }
@@ -71,7 +67,7 @@ public interface UserMapper {
 `select * from user where name = #{name} and password = #{password}`
 
 ## 对比（mybatis-plus、通用mapper）
-> **需求：查询字段version在2~4之间，并且根据id反向排序**
+> **需求：查询字段version字段大小在2~4之间，并且根据id反向排序**
 
 - mybatis-pro：
 ```
