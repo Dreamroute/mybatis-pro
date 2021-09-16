@@ -37,6 +37,7 @@
         <url>https://github.com/Dreamroute/mybatis-pro</url>
     </scm>
 
+    <!--
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -46,6 +47,19 @@
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+    </distributionManagement>
+    -->
+
+    <distributionManagement>
+        <repository>
+            <id>jc</id>
+            <url>http://nexus.yzw.cn/repository/jc/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Snapshots repository</name>
+            <url>http://nexus.yzw.cn/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
