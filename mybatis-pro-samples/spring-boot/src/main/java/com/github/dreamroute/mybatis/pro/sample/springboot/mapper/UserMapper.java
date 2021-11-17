@@ -2,8 +2,6 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.mapper;
 
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
-import com.github.dreamroute.pager.starter.anno.Pager;
-import com.github.dreamroute.pager.starter.api.PageRequest;
 import lombok.Data;
 import org.apache.ibatis.annotations.Select;
 
@@ -77,10 +75,6 @@ public interface UserMapper extends BaseMapper<User, Long> {
     List<User> selectByNameAndPasssword(String name, String password);
 
     List<User> selectAllPage(User pageRequest);
-
-    @Pager
-    @Select("select * from smart_user")
-    List<User> selectByPage(PageRequest<User> pr);
 
     List<User> findByNameAndPasswordOpt(String name, String password);
 
