@@ -54,12 +54,13 @@ import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 /**
+ *
  * @author w.dehai
  */
 @ConditionalOnSingleCandidate(DataSource.class)
-@EnableConfigurationProperties({MybatisProperties.class, MyBatisProProperties.class})
-@ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @AutoConfigureBefore({MybatisAutoConfiguration.class})
+@ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
+@EnableConfigurationProperties({MybatisProperties.class, MyBatisProProperties.class})
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class})
 public class MyBatisProAutoConfiguration {
 
