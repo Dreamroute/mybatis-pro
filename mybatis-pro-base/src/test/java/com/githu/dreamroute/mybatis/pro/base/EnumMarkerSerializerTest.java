@@ -3,8 +3,8 @@ package com.githu.dreamroute.mybatis.pro.base;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.dreamroute.mybatis.pro.base.EnumCodec;
 import com.github.dreamroute.mybatis.pro.base.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.EnumMarkerSerializer;
 import org.junit.jupiter.api.Test;
 
 import static com.githu.dreamroute.mybatis.pro.base.Gender.FEMALE;
@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author w.dehai.2021/8/10.14:51
  */
-class EnumCodecTest {
+class EnumMarkerSerializerTest {
 
     @Test
     void baseTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(EnumMarker.class, new EnumCodec());
+        module.addDeserializer(EnumMarker.class, new EnumMarkerSerializer());
         mapper.registerModule(module);
 
         User male = mapper.readValue("{\"gender\":1,\"id\":100}", User.class);

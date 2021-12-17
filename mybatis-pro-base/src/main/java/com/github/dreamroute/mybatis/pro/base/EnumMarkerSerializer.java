@@ -13,7 +13,7 @@ import java.io.IOException;
  *
  * @author w.dehai.2021/8/10.14:43
  */
-public class EnumCodec extends JsonDeserializer<EnumMarker> {
+public class EnumMarkerSerializer extends JsonDeserializer<EnumMarker> {
     @Override
     public EnumMarker deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.currentName();

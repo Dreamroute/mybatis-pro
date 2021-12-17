@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author w.dehai
  */
-@JsonDeserialize(using = EnumCodec.class)
+@JsonDeserialize(using = EnumMarkerSerializer.class)
 public interface EnumMarker extends Serializable {
 
     /**
