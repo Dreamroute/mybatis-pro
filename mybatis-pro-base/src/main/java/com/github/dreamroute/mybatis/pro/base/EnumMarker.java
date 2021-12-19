@@ -1,7 +1,5 @@
 package com.github.dreamroute.mybatis.pro.base;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.io.Serializable;
 
 /**
@@ -9,7 +7,6 @@ import java.io.Serializable;
  *
  * @author w.dehai
  */
-@JsonDeserialize(using = EnumMarkerSerializer.class)
 public interface EnumMarker extends Serializable {
 
     /**
