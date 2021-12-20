@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerDeserializer;
+import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerSerializerForWeb;
 import com.github.dreamroute.mybatis.pro.base.enums.JsonUtil;
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +72,25 @@ class JacksonCodecTest {
         List<User> us = JsonUtil.parseArr(str, User.class);
         assertEquals(MALE, us.get(0).getGender());
         assertEquals(FEMALE, us.get(1).getGender());
+    }
+
+    @Test
+    void serializerForWebTest() throws Exception {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(module);
+
+        User user = new User();
+        user.setId(100L);
+        user.setGender(MALE);
+        String male = mapper.writeValueAsString(user);
+        assertEquals("{\"id\":100,\"gender\":{\"value\":1,\"desc\":\"男\"}}", male);
+
+        user.setGender(FEMALE);
+        String female = mapper.writeValueAsString(user);
+        assertEquals("{\"id\":100,\"gender\":{\"value\":2,\"desc\":\"女\"}}", female);
     }
 
 }

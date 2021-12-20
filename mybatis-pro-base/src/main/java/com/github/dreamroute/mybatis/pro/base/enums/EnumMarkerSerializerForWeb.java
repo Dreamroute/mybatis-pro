@@ -4,29 +4,42 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.dreamroute.mybatis.pro.base.EnumMarker;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.IOException;
 
 /**
- * 描述：EnumMarker Jackson序列化，将EnumMarkder序列化成getValue()方式：
+ * 描述：EnumMarker Jackson序列化，将EnumMarkder序列化成对象方式，用途是返回给前端页面使用:
  * <pre>
  *     {
  *         "name": "w.dehi",
- *         "gender": EnumMarkder.getValue()
+ *         "gender": {
+ *             "value": EnumMarker.getValue(),
+ *             "desc": EnumMarker.getDesc()
+ *         }
  *     }
  * </pre>
  *
  * @author w.dehi.2021-12-19
  */
 @SuppressWarnings("rawtypes")
-public class EnumMarkerSerializer extends JsonSerializer<Enum> {
+public class EnumMarkerSerializerForWeb extends JsonSerializer<Enum> {
     @Override
     public void serialize(Enum value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value instanceof EnumMarker) {
             EnumMarker v = (EnumMarker) value;
-            gen.writeObject(v.getValue());
+            EnumObj eo = new EnumObj(v.getValue(), v.getDesc());
+            gen.writeObject(eo);
         } else {
             gen.writeObject(value);
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class EnumObj implements EnumMarker {
+        private final Integer value;
+        private final String desc;
     }
 }
