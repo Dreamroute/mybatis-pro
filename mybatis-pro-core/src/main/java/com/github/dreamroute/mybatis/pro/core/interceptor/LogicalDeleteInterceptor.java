@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
 import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
 import static com.google.common.collect.Lists.newArrayList;
@@ -100,7 +100,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
                 try (PreparedStatement ps = conn.prepareStatement(insert)) {
                     for (Map<String, Object> data : result) {
                         ps.setObject(1, tableName);
-                        ps.setObject(2, toJSONString(data));
+                        ps.setObject(2, toJsonStr(data));
                         ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
                         log.info("逻辑删除插件执行删除前的备份SQL: " + ps.toString());
                         ps.addBatch();

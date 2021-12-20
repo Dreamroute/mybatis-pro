@@ -35,11 +35,11 @@ public class EnumMarkerSerializerForWeb extends JsonSerializer<Enum> {
         }
     }
 
+    @Getter
+    @AllArgsConstructor
+    public static class EnumObj implements EnumMarker {
+        private final Integer value;
+        private final String desc;
+    }
 }
 
-@Getter
-@AllArgsConstructor
-class EnumObj implements EnumMarker {
-    private final Integer value;
-    private final String desc;
-}

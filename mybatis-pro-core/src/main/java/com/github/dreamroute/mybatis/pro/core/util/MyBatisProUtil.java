@@ -28,7 +28,7 @@ import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static cn.hutool.core.util.ClassUtil.loadClass;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.DELETE;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.MAPPER;
@@ -216,7 +216,7 @@ public class MyBatisProUtil {
 
         SetView<String> intersection = Sets.intersection(xmlMethodNames, innerMethodNames);
         if (!isEmpty(intersection)) {
-            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJSONString(innerMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
+            throw new MyBatisProException("不允许接口" + mapperCls.getName() + "的方法" + toJsonStr(innerMethodNames) + "与" + resource.getFilename() + "文件中的方法重名");
         }
     }
 

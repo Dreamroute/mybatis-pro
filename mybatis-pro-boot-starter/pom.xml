@@ -6,8 +6,8 @@
 		<version>${revision}</version>
 	</parent>
 	<artifactId>mybatis-pro-boot-starter</artifactId>
+	<name>${project.artifactId}</name>
 
-	<name>mybatis-pro</name>
 	<url>https://github.com/Dreamroute/${project.name}</url>
 	<scm>
 		<connection>${project.url}</connection>

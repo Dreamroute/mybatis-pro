@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
-import static com.alibaba.fastjson.JSON.toJSONString;
+import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
@@ -52,8 +52,9 @@ public class ClassUtil {
         Class<?> returnType = method.getReturnType();
 
         // 普通类型
-        if (returnType != List.class)
+        if (returnType != List.class) {
             return returnType.getName();
+        }
 
         // List类型
         Type genericReturnType = method.getGenericReturnType();
@@ -111,7 +112,7 @@ public class ClassUtil {
         Map<String, Long> methodCount = stream(ms).map(Method::getName).collect(groupingBy(identity(), counting()));
         Map<String, Long> duplicateMethods = methodCount.entrySet().stream().filter(count -> count.getValue() != 1L).collect(toMap(Entry::getKey, Entry::getValue));
         if (!isEmpty(duplicateMethods)) {
-            throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJSONString(duplicateMethods.keySet()) + "存在重复的方法名，MyBatis-Pro不允许Mapper存在同名方法");
+            throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJsonStr(duplicateMethods.keySet()) + "存在重复的方法名，MyBatis-Pro不允许Mapper存在同名方法");
         }
         return stream(ms).collect(toMap(Method::getName, ClassUtil::getReturnType));
     }

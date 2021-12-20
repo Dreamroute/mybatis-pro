@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.domain;
 
-import com.github.dreamroute.mybatis.pro.base.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.enums.EnumMarker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
