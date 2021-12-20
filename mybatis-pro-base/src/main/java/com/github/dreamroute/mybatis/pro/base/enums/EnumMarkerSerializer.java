@@ -3,7 +3,6 @@ package com.github.dreamroute.mybatis.pro.base.enums;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.github.dreamroute.mybatis.pro.base.EnumMarker;
 
 import java.io.IOException;
 

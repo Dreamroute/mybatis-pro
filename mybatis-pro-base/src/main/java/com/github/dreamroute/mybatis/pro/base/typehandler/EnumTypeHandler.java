@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.base.typehandler;
 
-import com.github.dreamroute.mybatis.pro.base.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.enums.EnumMarker;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 

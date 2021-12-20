@@ -3,7 +3,6 @@ package com.github.dreamroute.mybatis.pro.base.enums;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.github.dreamroute.mybatis.pro.base.EnumMarker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -36,10 +35,11 @@ public class EnumMarkerSerializerForWeb extends JsonSerializer<Enum> {
         }
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class EnumObj implements EnumMarker {
-        private final Integer value;
-        private final String desc;
-    }
+}
+
+@Getter
+@AllArgsConstructor
+class EnumObj implements EnumMarker {
+    private final Integer value;
+    private final String desc;
 }

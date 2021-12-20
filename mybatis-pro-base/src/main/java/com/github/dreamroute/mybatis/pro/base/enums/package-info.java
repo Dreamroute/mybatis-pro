@@ -21,8 +21,10 @@
  *
  *         ObjectMapper om = new ObjectMapper();
  *         om.registerModule(module);
+ *
  *         MappingJackson2HttpMessageConverter c = new MappingJackson2HttpMessageConverter(om);
  *         c.setObjectMapper(om);
+ *
  *         converters.add(0, c);
  *     }
  * }

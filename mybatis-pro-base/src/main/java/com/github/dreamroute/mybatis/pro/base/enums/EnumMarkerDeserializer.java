@@ -3,7 +3,6 @@ package com.github.dreamroute.mybatis.pro.base.enums;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.github.dreamroute.mybatis.pro.base.EnumMarker;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;

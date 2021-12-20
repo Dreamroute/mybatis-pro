@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.base;
+package com.github.dreamroute.mybatis.pro.base.enums;
 
 import java.io.Serializable;
 

@@ -17,17 +17,29 @@ public class JsonUtil {
     private JsonUtil() {}
 
     private static final ObjectMapper MAPPER = new JsonMapper();
+    private static final ObjectMapper MAPPER_FOR_WEB = new JsonMapper();
 
     static {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Enum.class, new EnumMarkerSerializer());
         module.addDeserializer(Enum.class, new EnumMarkerDeserializer());
-
         MAPPER.registerModule(module);
+
+        SimpleModule moduleForWeb = new SimpleModule();
+        moduleForWeb.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
+        moduleForWeb.addDeserializer(Enum.class, new EnumMarkerDeserializer());
+        MAPPER_FOR_WEB.registerModule(moduleForWeb);
     }
 
     /**
      * 序列化对象：将对象转换成json字符串
+     *
+     * <pre>
+     *      {
+     *          "name": "w.dehi",
+     *          "gender": EnumMarkder.getValue()
+     *      }
+     *  </pre>
      *
      * @param object pojo对象
      * @return 返回json字符串
@@ -35,6 +47,29 @@ public class JsonUtil {
     public static String toJsonStr(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("序列化失败: ", e);
+        }
+    }
+
+    /**
+     * 序列化对象：将对象转换成json字符串
+     * <pre>
+     *       {
+     *           "name": "w.dehi",
+     *           "gender": {
+     *               "value": EnumMarker.getValue(),
+     *               "desc": EnumMarker.getDesc()
+     *           }
+     *       }
+     *   </pre>
+     *
+     * @param object pojo对象
+     * @return 返回json字符串
+     */
+    public static String toJsonStrForWeb(Object object) {
+        try {
+            return MAPPER_FOR_WEB.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("序列化失败: ", e);
         }
