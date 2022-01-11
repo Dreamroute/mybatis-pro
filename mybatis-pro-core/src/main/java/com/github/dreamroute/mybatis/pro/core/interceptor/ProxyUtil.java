@@ -28,6 +28,11 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.lang.reflect.Proxy;
 
+/**
+ * 获取代理对象的原始对象
+ *
+ * @author w.dehai
+ */
 public final class ProxyUtil {
 
     private ProxyUtil() {} // private constructor
@@ -43,6 +48,7 @@ public final class ProxyUtil {
     public static <T> T getOriginObj(T target) {
         if(Proxy.isProxyClass(target.getClass())) {
             MetaObject mo = SystemMetaObject.forObject(target);
+            //noinspection unchecked
             return (T) getOriginObj(mo.getValue("h.target"));
         }
         return target;

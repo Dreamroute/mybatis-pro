@@ -5,13 +5,13 @@ import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
+import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.mapping.MappedStatement.Builder;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
@@ -58,7 +59,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
         Object[] args = invocation.getArgs();
         MappedStatement ms = (MappedStatement) args[0];
         SqlCommandType sqlCommandType = ms.getSqlCommandType();
-        if (!(Objects.equals(sqlCommandType, DELETE) && props.isEnableLogicalDelete())) {
+        if (!(props.isEnableLogicalDelete() && Objects.equals(sqlCommandType, DELETE))) {
             return invocation.proceed();
         }
 
@@ -70,15 +71,19 @@ public class LogicalDeleteInterceptor implements Interceptor {
         BoundSql boundSql = ms.getBoundSql(parameter);
         String sql = boundSql.getSql();
         Delete delete = (Delete) CCJSqlParserUtil.parse(sql);
-        Table table = delete.getTable();
-        String tableName = table.getName();
+        String tableName = delete.getTable().getName();
 
-        if (props.getLogicalDeleteType().equals(LogicalDeleteType.BACKUP)) {
-            // 原理：1、查询出需要删除的数据；2、将此数据存入备份表；3、物理删除对应数据
-            String selectSql = "SELECT * FROM " + tableName + " WHERE " + delete.getWhere().toString();
-            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-            BoundSql selectBoundSql = new BoundSql(config, selectSql, parameterMappings, parameter);
-            StatementHandler handler = config.newStatementHandler(executor, ms, parameter, RowBounds.DEFAULT, null, selectBoundSql);
+        if (props.getLogicalDeleteType() == LogicalDeleteType.BACKUP) {
+            /*
+             * 原理：
+             * 1. 查询出需要删除的数据；
+             * 2. 将此数据存入备份表；
+             * 3. 物理删除对应数据
+             */
+            String selectSql = new StringJoiner(" ").add("SELECT").add("*").add("FROM").add(tableName).add("WHERE").add(delete.getWhere().toString()).toString();
+            BoundSql selectBoundSql = new BoundSql(config, selectSql, boundSql.getParameterMappings(), parameter);
+            MappedStatement m = new Builder(config, "com.[plugin]mybatis_pro_backup._inner_select", new StaticSqlSource(config, selectSql), SqlCommandType.SELECT).build();
+            StatementHandler handler = config.newStatementHandler(executor, m, parameter, RowBounds.DEFAULT, null, selectBoundSql);
             Statement stmt = prepareStatement(transaction, handler);
             ((PreparedStatement) stmt).execute();
             ResultSet rs = stmt.getResultSet();
@@ -95,26 +100,27 @@ public class LogicalDeleteInterceptor implements Interceptor {
             stmt.close();
 
             if (!CollectionUtils.isEmpty(result)) {
-                String insert = "INSERT INTO " + LOGICAL_DELETE_TABLE_NAME + "(table_name, data, delete_time) VALUES (?, ?, ?)";
+                String insert = new StringJoiner(" ").add("INSERT INTO").add(LOGICAL_DELETE_TABLE_NAME).add("(table_name, data, delete_time) VALUES (?, ?, ?)").toString();
                 Connection conn = transaction.getConnection();
                 try (PreparedStatement ps = conn.prepareStatement(insert)) {
                     for (Map<String, Object> data : result) {
                         ps.setObject(1, tableName);
                         ps.setObject(2, toJsonStr(data));
                         ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
-                        log.info("逻辑删除插件执行删除前的备份SQL: " + ps.toString());
+                        log.info("逻辑删除数据备份SQL: " + ps.toString());
                         ps.addBatch();
                     }
                     ps.executeBatch();
                     ps.clearBatch();
                 }
             }
-
             return invocation.proceed();
-        } else if (props.getLogicalDeleteType().equals(LogicalDeleteType.UPDATE)) {
+        } else if (props.getLogicalDeleteType() == LogicalDeleteType.UPDATE) {
+            /**
+             * 原理：将delete改成update
+             */
             String updateSql = "UPDATE " + tableName + " SET " + props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteInActive() + " WHERE " + delete.getWhere().toString();
-            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-            BoundSql updateBoundSql = new BoundSql(config, updateSql, parameterMappings, parameter);
+            BoundSql updateBoundSql = new BoundSql(config, updateSql, boundSql.getParameterMappings(), parameter);
             StatementHandler handler = config.newStatementHandler(executor, ms, parameter, RowBounds.DEFAULT, null, updateBoundSql);
             PreparedStatement stmt = (PreparedStatement) prepareStatement(transaction, handler);
             int result = stmt.executeUpdate();
@@ -126,8 +132,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
     }
 
     private Statement prepareStatement(Transaction transaction, StatementHandler handler) throws SQLException {
-        Statement stmt;
-        stmt = handler.prepare(transaction.getConnection(), transaction.getTimeout());
+        Statement stmt = handler.prepare(transaction.getConnection(), transaction.getTimeout());
         handler.parameterize(stmt);
         return stmt;
     }

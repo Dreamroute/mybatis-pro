@@ -69,7 +69,7 @@ class LimitColumnInterceptorTest {
 
     @Test
     void findByIdLTETest() {
-        List<User> users =  userMapper.findByIdLTE(2L, new String[] {"id", "name", "password", "version", "phoneNo", "addr"});
+        List<User> users =  userMapper.findByIdLTE(2L, "id", "name", "password", "version", "phoneNo", "addr");
         assertEquals(2, users.size());
     }
 
