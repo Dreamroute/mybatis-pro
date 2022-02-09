@@ -2,7 +2,7 @@ package com.github.dreamroute.mybatis.pro.autoconfiguration;
 
 import com.github.dreamroute.mybatis.pro.base.typehandler.EnumTypeHandler;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
-import com.github.dreamroute.mybatis.pro.core.interceptor.LogicalDeleteInterceptor;
+import com.github.dreamroute.mybatis.pro.interceptor.LogicalDeleteInterceptor;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.scripting.LanguageDriver;

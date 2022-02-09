@@ -1,9 +1,11 @@
-package com.github.dreamroute.mybatis.pro.core.interceptor;
+package com.github.dreamroute.mybatis.pro.interceptor;
 
 import cn.hutool.core.io.FileUtil;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
+import com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil;
+import com.github.dreamroute.mybatis.pro.core.util.SqlUtil;
 import com.github.dreamroute.mybatis.pro.sdk.SelectMapper;
-import org.apache.ibatis.binding.MapperMethod.ParamMap;
+import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -29,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
-import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.isFindByMethod;
-import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -55,7 +54,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private static final String COLS = "cols";
 
     private static final List<String> SELECT_MAPPER_METHOD_NAMES = stream(SelectMapper.class.getDeclaredMethods()).map(Method::getName).collect(toList());
-    private static final ConcurrentHashMap<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
     private Configuration configuration;
@@ -74,32 +73,32 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         String id = ms.getId();
         Boolean cached = ID_CACHE.computeIfAbsent(id, k -> {
             String methodName = FileUtil.getSuffix(k);
-            return isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
+            // start with findBy or base select methods.
+            return MyBatisProUtil.isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
         });
 
-        if (Boolean.FALSE.equals(cached)) {
-            return invocation.proceed();
+        if (Boolean.TRUE.equals(cached)) {
+            Class<?> returnType = ms.getResultMaps().get(0).getType();
+            Map<String, String> alias = MyBatisProUtil.FIELDS_ALIAS_CACHE.get(returnType);
+
+            BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
+            String cols = getCols(id, boundSql, alias);
+            cols = cols == null ? toColumns(alias.keySet(), alias) : cols;
+
+            String sql = boundSql.getSql();
+
+            // 替换星号
+            sql = sql.replace(ASTERISK, cols);
+            configuration.newMetaObject(boundSql).setValue("sql", sql);
         }
 
-        Class<?> returnType = ms.getResultMaps().get(0).getType();
-        Map<String, String> alias = FIELDS_ALIAS_CACHE.get(returnType);
-
-        BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
-        String cols = getCols(id, boundSql, alias);
-        cols = cols == null ? toColumns(alias.keySet(), alias) : cols;
-
-        String sql = boundSql.getSql();
-
-        // 替换星号
-        sql = sql.replace(ASTERISK, cols);
-        configuration.newMetaObject(boundSql).setValue("sql", sql);
         return invocation.proceed();
     }
 
     private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {
         Object parameterObject = boundSql.getParameterObject();
-        if (parameterObject instanceof ParamMap) {
-            ParamMap<Object> params = (ParamMap<Object>) parameterObject;
+        if (parameterObject instanceof MapperMethod.ParamMap) {
+            MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
                 String[] cols = (String[]) params.get(COLS);
                 if (cols != null && cols.length > 0) {
@@ -115,7 +114,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
         return cols.stream().map(fieldName -> {
             String as = alias.get(fieldName);
             boolean mapUnderscoreToCamelCase = this.configuration.isMapUnderscoreToCamelCase();
-            String toLine = mapUnderscoreToCamelCase ? toLine(fieldName) : fieldName;
+            String toLine = mapUnderscoreToCamelCase ? SqlUtil.toLine(fieldName) : fieldName;
             return isEmpty(as) ? toLine : (as + " AS " + fieldName);
         }).collect(joining(", "));
     }

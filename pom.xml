@@ -239,5 +239,6 @@
         <module>mybatis-pro-auto-configuration</module>
         <module>mybatis-pro-service</module>
         <module>mybatis-pro-base</module>
+        <module>mybatis-pro-interceptor</module>
     </modules>
 </project>

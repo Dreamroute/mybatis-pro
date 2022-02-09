@@ -1,5 +1,6 @@
-package com.github.dreamroute.mybatis.pro.core.interceptor;
+package com.github.dreamroute.mybatis.pro.interceptor;
 
+import com.github.dreamroute.mybatis.pro.base.enums.JsonUtil;
 import com.github.dreamroute.mybatis.pro.core.consts.LogicalDeleteType;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,6 @@ import java.util.StringJoiner;
 
 import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
-import static com.github.dreamroute.mybatis.pro.core.interceptor.ProxyUtil.getOriginObj;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.ibatis.mapping.SqlCommandType.DELETE;
@@ -63,7 +63,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
             return invocation.proceed();
         }
 
-        Executor executor = (Executor) (getOriginObj(invocation.getTarget()));
+        Executor executor = (Executor) (ProxyUtil.getOriginObj(invocation.getTarget()));
         Transaction transaction = executor.getTransaction();
 
         Configuration config = ms.getConfiguration();
@@ -100,12 +100,12 @@ public class LogicalDeleteInterceptor implements Interceptor {
             stmt.close();
 
             if (!CollectionUtils.isEmpty(result)) {
-                String insert = new StringJoiner(" ").add("INSERT INTO").add(LOGICAL_DELETE_TABLE_NAME).add("(table_name, data, delete_time) VALUES (?, ?, ?)").toString();
+                String insert = new StringJoiner(" ").add("INSERT INTO").add(MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME).add("(table_name, data, delete_time) VALUES (?, ?, ?)").toString();
                 Connection conn = transaction.getConnection();
                 try (PreparedStatement ps = conn.prepareStatement(insert)) {
                     for (Map<String, Object> data : result) {
                         ps.setObject(1, tableName);
-                        ps.setObject(2, toJsonStr(data));
+                        ps.setObject(2, JsonUtil.toJsonStr(data));
                         ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
                         log.info("逻辑删除数据备份SQL: " + ps.toString());
                         ps.addBatch();

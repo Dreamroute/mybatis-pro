@@ -41,3 +41,4 @@ build/
 /mybatis-pro-boot-starter/.flattened-pom.xml
 /mybatis-pro-auto-configuration/.flattened-pom.xml
 /mybatis-pro-base/.flattened-pom.xml
+/mybatis-pro-interceptor/.flattened-pom.xml
