@@ -11,4 +11,15 @@
         select * from smart_user where name = #{name}
     </select>
 
+    <select id="dynamicSqlSourceTest" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
+        select * from smart_user where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="rawSqlSourceTest" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
+        select * from smart_user where id = #{id}
+    </select>
+
 </mapper>

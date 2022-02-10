@@ -94,4 +94,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
         private Long id;
         private String name;
     }
+
+    List<User> dynamicSqlSourceTest(List<Long> ids);
+
+    User rawSqlSourceTest(Long id);
 }

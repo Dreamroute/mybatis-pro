@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.stream;
@@ -97,6 +98,19 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
     private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {
         Object parameterObject = boundSql.getParameterObject();
+        /**
+         * mybatis封装参数的规则是：{@link MapperMethod#convertArgsToSqlCommandParam}
+         * 1. 如果只有1个参数，那么取出参数，然后使用wrapToMapIfCollection包裹
+         * 2. 如果多个参数，那么使用ParamMap来存，k就是参数的名称（jdk8+才支持的特性）：
+         * <pre>
+         *     {
+         *         "k1": v1,
+         *         "k2": v2,
+         *         "param1": v1,
+         *         "param2": v2
+         *     }
+         * </pre>
+         */
         if (parameterObject instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
