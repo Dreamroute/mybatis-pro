@@ -166,6 +166,14 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
          * 问题描述：由于上述方法构建的BoundSql中的sql是固定的，而带有foreach的sql语句中的问号个数是动态的，所有就无法缓存ms，原因是采用了固定的StaticSqlSource
          * 解决方案：在构建ms的时候使用原始的SqlSource，在拼接上需要的sql片段（针对dynamicsqlsource方式，raw方式不存在这个问题）
          *
+         * **重点：如果要修改（比如增加）List<ParameterMapping>的元素，一定要新建一个列表，例如：
+         *         List<ParameterMapping> pms = newArrayList(boundSql.getParameterMappings());
+         *         pms.add(vpm);
+         *         BoundSql newBoundSql = new BoundSql(config, newSql, pms, param);
+         *    一定不能直接这样：
+         *    List<ParameterMapping> pms = boundSql.getParameterMappings();
+         *    pms.add(xxx);
+         *    这样子对于同一个方法的多次操作会出现列表里面多次添加，可以参考Locker的做法
          */
         if (parameterObject instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
