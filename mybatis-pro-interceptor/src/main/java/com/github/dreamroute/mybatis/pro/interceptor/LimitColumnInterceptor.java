@@ -167,13 +167,12 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
          * 解决方案：在构建ms的时候使用原始的SqlSource，在拼接上需要的sql片段（针对dynamicsqlsource方式，raw方式不存在这个问题）
          *
          * **重点：如果要修改（比如增加）List<ParameterMapping>的元素，一定要新建一个列表，例如：
-         *         List<ParameterMapping> pms = newArrayList(boundSql.getParameterMappings());
-         *         pms.add(vpm);
-         *         BoundSql newBoundSql = new BoundSql(config, newSql, pms, param);
-         *    一定不能直接这样：
-         *    List<ParameterMapping> pms = boundSql.getParameterMappings();
-         *    pms.add(xxx);
-         *    这样子对于同一个方法的多次操作会出现列表里面多次添加，可以参考Locker的做法
+         * <pre>
+         *         // 不能使用下方这种方式，每次ms.getBoundSql(param)时会创建一个boundSql，而BoundSql里面的List<ParameterMapping>来自sqlSource（DynamicSqlSource，RawSqlSource调用getBoundSql是相同的原理）
+         *         // 而sqlSource是固化在ms里面的，所以如果直接用下方的方式add(vpm)，那么就相当于改变了sqlSource，也就是改变了ms，会出现并发问题
+         *         // List<ParameterMapping> pms = boundSql.getParameterMappings();
+         *         // pms.add(vpm);
+         * </pre>
          */
         if (parameterObject instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
