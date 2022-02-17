@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.interceptor;
 
+import com.github.dreamroute.locker.anno.EnableLocker;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.User;
 import com.github.dreamroute.mybatis.pro.sample.springboot.mapper.UserMapper;
 import com.ninja_squad.dbsetup.DbSetup;
@@ -17,12 +18,13 @@ import static com.ninja_squad.dbsetup.Operations.truncate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * 描述：// TODO
+ * 描述：乐观锁插件测试，测试时在启动类上添加@EnableLocker，观察SQL是否是带有乐观锁
  *
  * @author w.dehi.2022-02-17
  */
+@EnableLocker
 @SpringBootTest
-class LockerTest {
+class LockerInterceptorTest {
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -30,7 +32,6 @@ class LockerTest {
 
     @BeforeEach
     void init() {
-
         // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
