@@ -7,8 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * 被标记的字段不保存到数据
+ *
  * @author w.dehai
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Transient {}
+public @interface Transient {
+}

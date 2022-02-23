@@ -3,6 +3,8 @@ package com.github.dreamroute.mybatis.pro.sdk;
 import com.github.dreamroute.locker.anno.Locker;
 
 /**
+ * 更新接口
+ *
  * @author w.dehai
  */
 public interface UpdateMapper<T> {

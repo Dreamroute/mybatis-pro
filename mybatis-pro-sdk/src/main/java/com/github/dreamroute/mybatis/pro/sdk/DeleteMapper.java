@@ -3,6 +3,8 @@ package com.github.dreamroute.mybatis.pro.sdk;
 import java.util.List;
 
 /**
+ * 删除接口
+ *
  * @author w.dehai
  */
 public interface DeleteMapper<ID> {

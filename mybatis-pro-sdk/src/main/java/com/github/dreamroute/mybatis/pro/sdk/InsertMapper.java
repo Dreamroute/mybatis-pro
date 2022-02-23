@@ -3,6 +3,8 @@ package com.github.dreamroute.mybatis.pro.sdk;
 import java.util.List;
 
 /**
+ * 新增接口
+ *
  * @author w.dehai
  */
 public interface InsertMapper<T> {
