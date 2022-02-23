@@ -18,6 +18,7 @@ import static com.ninja_squad.dbsetup.Operations.truncate;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author w.dehai
@@ -77,6 +78,31 @@ class UserServiceTest {
 
         int result = userService.delete(newArrayList(1L, 2L));
         assertEquals(2, result);
+    }
+
+    @Test
+    void selectByIdTest() {
+        User user = new User();
+        user.setId(100L);
+        user.setName("w.dehai");
+        user.setPassword("123456");
+        userService.insert(user);
+        User u = userService.selectById(1L);
+        assertEquals("w.dehai", u.getName());
+        assertEquals("123456", u.getPassword());
+
+        User noPwd = userService.selectById(1L, "id", "name");
+        assertNull(noPwd.getPassword());
+    }
+
+    @Test
+    void selectByIdsTest() {
+        userService.selectByIds(newArrayList(1L, 2L));
+    }
+
+    @Test
+    void selectAllTest() {
+        userService.selectAll();
     }
 
 }

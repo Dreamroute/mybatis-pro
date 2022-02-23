@@ -61,18 +61,18 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     }
 
     @Override
-    public T select(ID id) {
-        return mapper.selectById(id);
+    public T selectById(ID id, String... cols) {
+        return mapper.selectById(id, cols);
     }
 
     @Override
-    public List<T> select(List<ID> ids) {
-        return mapper.selectByIds(ids);
+    public List<T> selectByIds(List<ID> ids, String... cols) {
+        return mapper.selectByIds(ids, cols);
     }
 
     @Override
-    public List<T> selectAll() {
-        return mapper.selectAll();
+    public List<T> selectAll(String... cols) {
+        return mapper.selectAll(cols);
     }
 
 }

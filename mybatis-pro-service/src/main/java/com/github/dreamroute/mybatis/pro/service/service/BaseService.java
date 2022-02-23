@@ -45,16 +45,16 @@ public interface BaseService<T, ID> {
     /**
      * 根据id单个查询
      */
-    T select(ID id);
+    T selectById(ID id, String... cols);
 
     /**
      * 根据id批量查询
      */
-    List<T> select(List<ID> ids);
+    List<T> selectByIds(List<ID> ids, String... cols);
 
     /**
      * 全表查询
      */
-    List<T> selectAll();
+    List<T> selectAll(String... cols);
 
 }
