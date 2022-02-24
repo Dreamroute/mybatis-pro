@@ -48,7 +48,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;
-import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
+import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.buildMyBatisPro;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
@@ -153,8 +153,8 @@ public class MyBatisProAutoConfiguration {
         TO_LINE.set(toLine);
 
         Set<String> mapperPackages = getMapperPackages();
-        if (!isEmpty(resources) || !isEmpty(mapperPackages)) {
-            Resource[] rs = processMyBatisPro(resources, mapperPackages);
+        if (!(isEmpty(resources) && isEmpty(mapperPackages))) {
+            Resource[] rs = buildMyBatisPro(resources, mapperPackages);
             factory.setMapperLocations(rs);
         }
 
@@ -203,22 +203,22 @@ public class MyBatisProAutoConfiguration {
      */
     private Set<String> getMapperPackages() {
         Set<String> mapperPackages = new HashSet<>();
-        Map<String, Object> mapperScan = context.getBeansWithAnnotation(MapperScan.class);
-        if (!mapperScan.isEmpty()) {
-            for (Object scan : mapperScan.values()) {
-                Class<?> scanCls = scan.getClass();
-                MapperScan ms = AnnotationUtils.findAnnotation(scanCls, MapperScan.class);
-                String[] value = ms != null ? ms.value() : new String[0];
-                String[] basePackages = ms != null ? ms.basePackages() : new String[0];
-                Class<?>[] basePackageClasses = ms != null ? ms.basePackageClasses() : new Class<?>[0];
+        // mapperScanMap如果为空会返回一个size = 0的Map
+        Map<String, Object> mapperScanMap = context.getBeansWithAnnotation(MapperScan.class);
+        mapperScanMap.values().forEach(scan -> {
+            Class<?> scanCls = scan.getClass();
+            MapperScan ms = AnnotationUtils.findAnnotation(scanCls, MapperScan.class);
+            if (ms != null) {
+                String[] value = ms.value() != null ? ms.value() : new String[0];
+                String[] basePackages = ms.basePackages() != null ? ms.basePackages() : new String[0];
+                Class<?>[] basePackageClasses = ms.basePackageClasses() != null ? ms.basePackageClasses() : new Class<?>[0];
 
                 mapperPackages.addAll(asList(value));
                 mapperPackages.addAll(asList(basePackages));
                 mapperPackages.addAll(stream(basePackageClasses).map(cls -> cls.getPackage().getName()).collect(toSet()));
             }
-
-            logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
-        }
+        });
+        logger.info("MyBatis-Pro检测出Mapper路径包括: {}", mapperPackages);
         return mapperPackages;
     }
 

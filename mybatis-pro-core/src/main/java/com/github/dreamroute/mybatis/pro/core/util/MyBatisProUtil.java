@@ -61,7 +61,7 @@ public class MyBatisProUtil {
     // Map<entity-class, <fieldName, alias>>
     public static final Map<Class<?>, Map<String, String>> FIELDS_ALIAS_CACHE = new HashMap<>();
 
-    public static Resource[] processMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
+    public static Resource[] buildMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
         Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> existXmlMapper = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(MyBatisProUtil::getNamespaceFromXmlResource).collect(toSet());
