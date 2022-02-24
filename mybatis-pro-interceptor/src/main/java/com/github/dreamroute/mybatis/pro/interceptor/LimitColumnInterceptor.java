@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.stream;
@@ -198,7 +199,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
             String as = alias.get(fieldName);
             boolean mapUnderscoreToCamelCase = this.configuration.isMapUnderscoreToCamelCase();
             String toLine = mapUnderscoreToCamelCase ? SqlUtil.toLine(fieldName) : fieldName;
-            return isEmpty(as) ? toLine : (as + " AS " + fieldName);
+            return Objects.equals(as, fieldName) ? toLine : (as + " AS " + fieldName);
         }).collect(joining(", "));
     }
 
