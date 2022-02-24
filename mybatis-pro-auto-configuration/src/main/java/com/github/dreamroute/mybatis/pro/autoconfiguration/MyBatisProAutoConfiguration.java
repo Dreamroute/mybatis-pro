@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.processMyBatisPro;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
@@ -67,7 +69,7 @@ public class MyBatisProAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MyBatisProAutoConfiguration.class);
     private final MybatisProperties properties;
-    private final Interceptor[] interceptors;
+    private final List<Interceptor> interceptors;
     private final TypeHandler[] typeHandlers;
     private final LanguageDriver[] languageDrivers;
     private final ResourceLoader resourceLoader;
@@ -82,19 +84,19 @@ public class MyBatisProAutoConfiguration {
     public MyBatisProAutoConfiguration(
             MybatisProperties properties,
             ResourceLoader resourceLoader,
-            ObjectProvider<Interceptor[]> interceptorsProvider,
+            ObjectProvider<List<Interceptor>> interceptorsProvider,
             ObjectProvider<TypeHandler[]> typeHandlersProvider,
             ObjectProvider<LanguageDriver[]> languageDriversProvider,
             ObjectProvider<DatabaseIdProvider> databaseIdProvider,
             ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
 
         this.properties = properties;
-        this.interceptors = interceptorsProvider.getIfAvailable();
-        this.typeHandlers = typeHandlersProvider.getIfAvailable();
-        this.languageDrivers = languageDriversProvider.getIfAvailable();
         this.resourceLoader = resourceLoader;
+        this.typeHandlers = typeHandlersProvider.getIfAvailable();
         this.databaseIdProvider = databaseIdProvider.getIfAvailable();
+        this.languageDrivers = languageDriversProvider.getIfAvailable();
         this.configurationCustomizers = configurationCustomizersProvider.getIfAvailable();
+        this.interceptors = ofNullable(interceptorsProvider.getIfAvailable()).orElseGet(ArrayList::new);
     }
 
     @Bean
@@ -111,18 +113,20 @@ public class MyBatisProAutoConfiguration {
             factory.setConfigurationProperties(this.properties.getConfigurationProperties());
         }
 
-        // 如果逻辑删除开启，这里将逻辑删除插件加入到插件列表
-        if (props.isEnableLogicalDelete()) {
-            properties.getConfiguration().addInterceptor(new LogicalDeleteInterceptor(props));
-        }
         // 如果枚举处理器开启，那么加入到configuratin中
         if (props.isEnableEnumTypeHandler()) {
             properties.getConfiguration().getTypeHandlerRegistry().register(new EnumTypeHandler<>());
         }
 
-        if (!ObjectUtils.isEmpty(this.interceptors)) {
-            factory.setPlugins(this.interceptors);
+        // 如果逻辑删除开启，这里将逻辑删除插件加入到插件列表
+        if (props.isEnableLogicalDelete()) {
+            interceptors.add(new LogicalDeleteInterceptor(props));
         }
+
+        if (!ObjectUtils.isEmpty(this.interceptors)) {
+            factory.setPlugins(this.interceptors.toArray(new Interceptor[0]));
+        }
+
         if (this.databaseIdProvider != null) {
             factory.setDatabaseIdProvider(this.databaseIdProvider);
         }
@@ -181,6 +185,7 @@ public class MyBatisProAutoConfiguration {
     }
 
     private void applyConfiguration(SqlSessionFactoryBean factory) {
+        // 这里特殊说明一下：configuration是properties的一个嵌套属性，如果application.properties里面配置了configuration的属性，那么就会被初始化，否则这里的configuration就是null
         org.apache.ibatis.session.Configuration configuration = this.properties.getConfiguration();
         if (configuration == null && !StringUtils.hasText(this.properties.getConfigLocation())) {
             configuration = new org.apache.ibatis.session.Configuration();
