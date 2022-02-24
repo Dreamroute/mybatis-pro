@@ -54,6 +54,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 /**
+ * mybatis启动类
  *
  * @author w.dehai
  */
