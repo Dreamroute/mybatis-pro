@@ -44,7 +44,6 @@ public class MapperUtil {
     private String tableName;
     private String idColumn;
     private String idName;
-    private Class<?> mapper;
     private com.github.dreamroute.mybatis.pro.core.annotations.Type type;
 
     // -- biz
@@ -63,7 +62,7 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = createDocumentFromResource(resource);
-        mapper = getNamespaceFromXmlResource(resource);
+        Class<?> mapper = getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
             this.entityCls = getTypeArgument(mapper);
@@ -171,7 +170,7 @@ public class MapperUtil {
             values.add(fieldName);
         });
 
-        this.insertColumns = columns.stream().map(column -> column).collect(Collectors.joining(",", "(", ")"));
+        this.insertColumns = columns.stream().collect(Collectors.joining(",", "(", ")"));
         this.insertValues = values.stream().map(column -> "#{" + column + "}").collect(Collectors.joining(",", "(", ")"));
         this.createInsertExcludeNullColumnsAndValues(columns, values);
         this.createUpdateByIdColumns(columns, values);
@@ -190,12 +189,12 @@ public class MapperUtil {
         StringBuilder insertExcludeNullCols = new StringBuilder();
         StringBuilder insertExcludeNullVals = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            insertExcludeNullCols.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + ",</if>");
-            insertExcludeNullVals.append("<if test = '" + values.get(i) + " != null'>#{" + values.get(i) + "},</if>");
+            insertExcludeNullCols.append("<if test = '").append(values.get(i)).append(" != null'>").append(columns.get(i)).append(",</if>");
+            insertExcludeNullVals.append("<if test = '").append(values.get(i)).append(" != null'>#{").append(values.get(i)).append("},</if>");
         }
 
-        this.insertExcludeNullColumns = TRIM_START + insertExcludeNullCols.toString() + TRIM_END;
-        this.insertExcludeNullValues = TRIM_START + insertExcludeNullVals.toString() + TRIM_END;
+        this.insertExcludeNullColumns = TRIM_START + insertExcludeNullCols + TRIM_END;
+        this.insertExcludeNullValues = TRIM_START + insertExcludeNullVals + TRIM_END;
     }
 
     private void createUpdateByIdColumns(List<String> columns, List<String> values) {
@@ -212,9 +211,9 @@ public class MapperUtil {
     private void createUpdateByIdExcludeNullColumns(List<String> columns, List<String> values) {
         StringBuilder result = new StringBuilder();
         for (int i=0; i<columns.size(); i++) {
-            result.append("<if test = '" + values.get(i) + " != null'>" + columns.get(i) + " = #{" + values.get(i) + "},</if>");
+            result.append("<if test = '").append(values.get(i)).append(" != null'>").append(columns.get(i)).append(" = #{").append(values.get(i)).append("},</if>");
         }
-        this.updateByIdExcludeNullColumns = TRIM_START + result.toString() + TRIM_END;
+        this.updateByIdExcludeNullColumns = TRIM_START + result + TRIM_END;
     }
 }
 

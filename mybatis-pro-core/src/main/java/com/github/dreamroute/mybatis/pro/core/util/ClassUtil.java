@@ -74,11 +74,11 @@ public class ClassUtil {
         List<String> names = new ArrayList<>();
         for (Method m : methods) {
             String name = m.getName();
-            boolean isBy = name.startsWith("findBy") || name.startsWith("updateBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy");
+            boolean isBy = name.startsWith("findBy") || name.startsWith("deleteBy") || name.startsWith("countBy") || name.startsWith("existBy");
             boolean isAnnoCrud = hasAnnotation(m, Select.class) || hasAnnotation(m, Update.class) || hasAnnotation(m, Insert.class) || hasAnnotation(m, Delete.class);
             if (isBy && isAnnoCrud) {
                 throw new MyBatisProException("接口方法" + interfaceCls.getName() + "." + name +
-                        "是[findBy, updateBy, deleteBy, countBy, existBy]之一, 会被MybatisPro框架自动创建SQL语句，不能使用[@Select, @Update, @Insert, @Delete]来自定义SQL，请对方法重新命名");
+                        "是[findBy, deleteBy, countBy, existBy]之一, 会被MybatisPro框架自动创建SQL语句，不能使用[@Select, @Update, @Insert, @Delete]来自定义SQL，请对方法重新命名");
             }
             if (isBy) {
                 names.add(name);
@@ -114,7 +114,10 @@ public class ClassUtil {
         if (!isEmpty(duplicateMethods)) {
             throw new MyBatisProException(interfaceCls.getName() + "的方法: " +  toJsonStr(duplicateMethods.keySet()) + "存在重复的方法名，MyBatis-Pro不允许Mapper存在同名方法");
         }
-        return stream(ms).collect(toMap(Method::getName, ClassUtil::getReturnType));
+        return stream(ms).filter(m -> {
+            String name = m.getName();
+            return name.startsWith("findBy") || name.startsWith("countBy") || name.startsWith("existBy") || name.startsWith("deleteBy");
+        }).collect(toMap(Method::getName, ClassUtil::getReturnType));
     }
 
     /**

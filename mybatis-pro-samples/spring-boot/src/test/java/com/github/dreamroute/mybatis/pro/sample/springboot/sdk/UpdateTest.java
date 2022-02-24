@@ -56,7 +56,8 @@ class UpdateTest {
         user.setName("Jaedong");
         user.setVersion(1L);
         user.setPassword(null);
-        userMapper.updateByIdExcludeNull(user);
+        int cols = userMapper.updateByIdExcludeNull(user);
+        assertEquals(1, cols);
 
         User result = userMapper.selectById(1L);
         assertEquals("Jaedong", result.getName());

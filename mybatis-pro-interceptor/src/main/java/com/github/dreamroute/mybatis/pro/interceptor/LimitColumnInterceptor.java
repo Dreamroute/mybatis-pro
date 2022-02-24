@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.stream;
@@ -97,7 +96,6 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     }
 
     private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {
-        Object parameterObject = boundSql.getParameterObject();
         /**
          * mybatis封装参数的规则是：{@link MapperMethod#convertArgsToSqlCommandParam}
          * 1. 如果只有1个参数，那么取出参数，然后使用wrapToMapIfCollection包裹
@@ -174,13 +172,20 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
          *         // pms.add(vpm);
          * </pre>
          */
+
+        Object parameterObject = boundSql.getParameterObject();
         if (parameterObject instanceof MapperMethod.ParamMap) {
             MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
                 String[] cols = (String[]) params.get(COLS);
                 if (cols != null && cols.length > 0) {
-                    String cl = String.join(", ", cols);
+                    String cl = String.join(",", cols);
                     return COLS_ALIAS.computeIfAbsent(id + "#" + cl, k -> toColumns(Arrays.asList(cols), alias));
+                } else {
+                    String k = id + "#" + String.join(",", alias.keySet());
+                    String v = toColumns(alias.keySet(), alias);
+                    COLS_ALIAS.put(k, v);
+                    return v;
                 }
             }
         }

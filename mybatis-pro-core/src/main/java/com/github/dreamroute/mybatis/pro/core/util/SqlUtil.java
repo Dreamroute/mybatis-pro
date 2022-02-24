@@ -157,7 +157,7 @@ public class SqlUtil {
 
             builder.append(key);
         }
-        builder.insert(0, "<trim suffixOverrides = 'and | AND | and | AND |or|OR| or | OR '>");
+        builder.insert(0, "<trim suffixOverrides = 'and|AND|or|OR'>");
         builder.append(" </trim>");
         builder.append(" </where>");
 

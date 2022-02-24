@@ -138,7 +138,7 @@ public class MyBatisProUtil {
                     throw new MyBatisProException("实体" + entityCls.getName() + "必须包含@" + Table.class.getName() + "注解");
                 }
 
-                // 将findBy方法的返回值的别名进行缓存
+                // 将findBy方法的返回值的别名进行缓存，这里将缓存里面没有的返回值进行缓存，实体部分已经在前面进行了缓存，这里缓存非实体返回类型
                 Map<String, String> name2Type = getMethodName2ReturnType(mapperCls);
                 cacheAlias(name2Type);
 
@@ -197,7 +197,7 @@ public class MyBatisProUtil {
         try {
             xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
         } catch (Exception e) {
-            throw new MyBatisProException("解析" + mapperCls.getName() + "失败!");
+            throw new MyBatisProException("解析" + mapperCls.getName() + "对应的mapper.xml文件失败!");
         }
         List<XNode> selectMethods = xPathParser.evalNodes("mapper/select");
         List<XNode> insertMethods = xPathParser.evalNodes("mapper/insert");
