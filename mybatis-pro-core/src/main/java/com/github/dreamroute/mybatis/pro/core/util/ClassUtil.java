@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.reflection.Reflector;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
@@ -20,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -135,20 +135,21 @@ public class ClassUtil {
     }
 
     /**
-     * 获取实体所有属性
+     * 获取实体所有属性：
+     * 1. 具有getter、setter方法
+     * 2. 非serialVersionUID属性
+     * 3. 未被@Transient标记
      */
     public static Set<Field> getAllFields(Class<?> cls) {
         Field[] fs = getFields(cls);
+        Reflector r = new Reflector(cls);
         return Arrays.stream(fs)
-                .filter(ClassUtil::isBeanProp)
+                .filter(f -> isJavaBeanProp(r, f))
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * 判断是否是普通属性，（serialVersionUID或者@Transient）除外
-     */
-    public static boolean isBeanProp(Field field) {
-        return !Objects.equals(field.getName(), "serialVersionUID") && !hasAnnotation(field, Transient.class);
+    public static boolean isJavaBeanProp(Reflector r, Field field) {
+        return r.hasGetter(field.getName()) && !hasAnnotation(field, Transient.class);
     }
 
     public static Field getIdField(Class<?> cls) {

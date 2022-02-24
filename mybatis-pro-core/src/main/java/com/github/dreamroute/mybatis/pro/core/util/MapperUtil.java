@@ -7,6 +7,7 @@ import com.github.dreamroute.mybatis.pro.core.annotations.Type;
 import com.github.dreamroute.mybatis.pro.core.consts.MapperLabel;
 import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.sdk.Mapper;
+import org.apache.ibatis.reflection.Reflector;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ReflectionUtils;
 import org.w3c.dom.Document;
@@ -26,6 +27,7 @@ import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getAllParentInterface;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.isJavaBeanProp;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getNamespaceFromXmlResource;
@@ -146,6 +148,7 @@ public class MapperUtil {
         IdType pkType = new IdType();
         PrimaryKey pk = new PrimaryKey();
 
+        Reflector r = new Reflector(entityCls);
         ReflectionUtils.doWithFields(entityCls, field -> {
             Column colAn = field.getAnnotation(Column.class);
             String column = Optional.ofNullable(colAn).map(Column::value).orElse(SqlUtil.toLine(field.getName(), FIELDS_ALIAS_CACHE.get(entityCls)));
@@ -156,7 +159,7 @@ public class MapperUtil {
                 pkType.type = idAn.type();
                 pk.name = field.getName();
             }
-        }, ClassUtil::isBeanProp);
+        }, f -> isJavaBeanProp(r, f));
 
         if (pkType.type == Type.IDENTITY) {
             values2Columns.remove(pk.name);

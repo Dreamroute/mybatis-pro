@@ -40,6 +40,7 @@ import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMe
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
+import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static com.google.common.collect.Sets.difference;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -63,8 +64,8 @@ public class MyBatisProUtil {
 
     public static Resource[] buildMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
-        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> existXmlMapper = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(MyBatisProUtil::getNamespaceFromXmlResource).collect(toSet());
+        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
         Set<Class<?>> extra = difference(mappers, existXmlMapper);
 
         Set<Resource> allResources = new HashSet<>();
@@ -99,7 +100,7 @@ public class MyBatisProUtil {
             String namespace = mapperNode.getStringAttribute(NAMESPACE.getCode());
             return loadClass(namespace);
         } catch (Exception e) {
-            throw new MyBatisProException("解析出错mapper.xml文件出错", e);
+            throw new MyBatisProException("解析mapper.xml文件获取namespace出错", e);
         }
     }
 
@@ -107,10 +108,10 @@ public class MyBatisProUtil {
         String namespace = mapper.getName();
         String xml =
                 "<?xml version='1.0' encoding='UTF-8' ?>\n" +
-                        "<!DOCTYPE mapper\n" +
-                        "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
-                        "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
-                        "<mapper namespace='" + namespace + "'></mapper>";
+                "<!DOCTYPE mapper\n" +
+                "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
+                "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
+                "<mapper namespace='" + namespace + "'></mapper>";
         return new ByteArrayResource(xml.getBytes(UTF_8));
     }
 
@@ -179,12 +180,12 @@ public class MyBatisProUtil {
         });
     }
 
-    private static Map<String, String> getFieldAliasMap(Class<?> cls) {
+    public static Map<String, String> getFieldAliasMap(Class<?> cls) {
         Set<Field> allFields = ClassUtil.getAllFields(cls);
         return ofNullable(allFields).orElseGet(HashSet::new).stream()
                 .collect(toMap(Field::getName, filed -> {
                     String alias = getAnnotationValue(filed, Column.class);
-                    return StringUtils.isEmpty(alias) ? "" : alias;
+                    return StringUtils.isEmpty(alias) ? toLine(filed.getName()) : alias;
                 }));
     }
 
