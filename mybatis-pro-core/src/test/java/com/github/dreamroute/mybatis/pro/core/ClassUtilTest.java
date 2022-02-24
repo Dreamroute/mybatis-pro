@@ -23,7 +23,7 @@ class ClassUtilTest {
     @Test
     void getName2TypeTest() {
         Map<String, String> name2Type = ClassUtil.getMethodName2ReturnType(DemoMapper.class);
-        assertEquals(13, name2Type.size());
+        assertEquals(5, name2Type.size());
     }
 
     @Test
