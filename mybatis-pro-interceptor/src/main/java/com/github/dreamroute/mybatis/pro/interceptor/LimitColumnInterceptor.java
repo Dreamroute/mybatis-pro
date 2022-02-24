@@ -181,15 +181,16 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
                 if (cols != null && cols.length > 0) {
                     String cl = String.join(",", cols);
                     return COLS_ALIAS.computeIfAbsent(id + "#" + cl, k -> toColumns(Arrays.asList(cols), alias));
-                } else {
-                    String k = id + "#" + String.join(",", alias.keySet());
-                    String v = toColumns(alias.keySet(), alias);
-                    COLS_ALIAS.put(k, v);
-                    return v;
                 }
             }
+            return getAllFields(id, alias);
+        } else {
+            return getAllFields(id, alias);
         }
-        return null;
+    }
+
+    private String getAllFields(String id, Map<String, String> alias) {
+        return COLS_ALIAS.computeIfAbsent(id + "#" + String.join(",", alias.keySet()), k -> toColumns(alias.keySet(), alias));
     }
 
     private String toColumns(Collection<String> cols, Map<String, String> alias) {

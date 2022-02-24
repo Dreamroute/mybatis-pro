@@ -59,7 +59,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <mapper-spring-boot-starter.version>2.1.5</mapper-spring-boot-starter.version>
         <mybatis-spring-boot-starter.version>2.1.3</mybatis-spring-boot-starter.version>
-        <locker-spring-boot-starter.version>3.3-RELEASE</locker-spring-boot-starter.version>
+        <locker-spring-boot-starter.version>3.4-RELEASE</locker-spring-boot-starter.version>
         <spring-boot-configuration-processor.version>1.3.0</spring-boot-configuration-processor.version>
     </properties>
 
