@@ -10,7 +10,7 @@
 - [Gitee](https://gitee.com/Dreamroute/mybatis-pro)
 
 
-## 文档
+## 使用文档
 
 - [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
 
