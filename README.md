@@ -97,7 +97,7 @@ void mapperTest() {
 
 ## 全部文档
 
-- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
+- [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki/MyBatis-Pro%EF%BC%8C%E6%8C%81%E4%B9%85%E5%8C%96%E6%A1%86%E6%9E%B6%E6%9C%80%E7%BB%88%E5%85%B5%E5%99%A8)
 
 ## 作者信息
 Email: 342252328@qq.com
