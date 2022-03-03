@@ -1,4 +1,4 @@
-# MyBatis Pro，持久化框架最终兵器
+# MyBatis-Pro，持久化框架最终兵器
 ![img](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/Wmeona977bbQnXxj/img/696fcaff-4228-45cd-9f1f-12573108eeb9.png)
 ### **大道至简，优雅解决MyBatis单表的一切问题**
 
