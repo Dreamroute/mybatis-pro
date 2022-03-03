@@ -1,37 +1,33 @@
-## MyBatis-Pro
-### [优雅的解决MyBatis单表的一切问题]
+# MyBatis Pro，持久化框架最终兵器
+![img](https://alidocs.oss-cn-zhangjiakou.aliyuncs.com/res/Wmeona977bbQnXxj/img/696fcaff-4228-45cd-9f1f-12573108eeb9.png)
+### **大道至简，优雅解决MyBatis单表的一切问题**
 
-<p align="left">
-    <img src="https://gitee.com/Dreamroute/mybatis-pro/raw/master/mybatis.png">
-</p>
-
-## 地址
-- [GitHub](https://github.com/Dreamroute/mybatis-pro)
-- [Gitee](https://gitee.com/Dreamroute/mybatis-pro)
-
+## **源码地址**
+- [GitHub](https://github.com/Dreamroute/mybatis-pro.git)
+- [码云](https://gitee.com/Dreamroute/mybatis-pro)
 
 ## 使用文档
 
 - [完整中文文档](https://github.com/Dreamroute/mybatis-pro/wiki)
 
-## 开发此框架的初衷
+## **开发此框架的初衷**
 - 让单表查询更加优雅
 - 基本告别单表SQL语句
-- 拥有JPA的单表查询优势
-- 只兼容mysql和H2
-- 规范造就无需重复造轮子
-- 万千钢铁直男的终极选择
+- 媲美JPA的单表查询优势
+- 拒绝重复造轮子
+- 钢铁直男的终极选择
 
-## 框架的功能
-- 包含单表增删改查方法
-- 根据Mapper方法名自动生成SQL，无需编写sql语句
+## 框架功能
+
+- 无需手动编写单表增删改查方法，框架自动生成
 - 与通用Mapper、MyBatis-Plus等三方框架兼容（三者选其一即可，功能类似）
-- 【可选】内置枚举类型处理器，自动优雅解决枚举类型的转换
-- 【可选】内置泛型Service，简化重复造轮子
-- 【可选】内置逻辑删除，可放心大胆的在生产环境进行delete操作
-- 【可选】[分页插件](https://github.com/Dreamroute/pager) 支持单表、多表关联查询
-- 【可选】[sql打印插件](https://github.com/Dreamroute/sqlprinter) 已经用实际参数替换了"?"占位符，可从控制台复制出来直接执行
-- 【可选】[乐观锁插件](https://github.com/Dreamroute/locker) 透明解决乐观锁问题
+- 【可选】内置枚举类型处理器，优雅解决枚举类型问题，无需手动转换
+- 【可选】内置泛型Service，避免重复造轮子编写大量类似的Service方法代码
+- 【可选】内置两种方式逻辑删除，可放心大胆的在生产环境进行delete操作，不用担心误删数据
+- 【可选】[分页插件](https://github.com/Dreamroute/pager)支持单表、多表关联查询、支持复杂的多表分页查询
+- 【可选】[sql打印插件](https://github.com/Dreamroute/sqlprinter)已经用实际参数替换了?占位符，可以从日志文件拷贝出来直接执行
+- 【可选】[乐观锁插件](https://github.com/Dreamroute/locker)透明解决乐观锁问题
+- 
 ## 设计原则
   框架本身依赖mybatis-spring，仅在应用启动时织入框架逻辑，不破坏任何mybatis核心，原则上可以兼容任何mybatis版本
   
