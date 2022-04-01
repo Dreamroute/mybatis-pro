@@ -11,7 +11,6 @@ import com.google.common.collect.Sets.SetView;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
@@ -33,8 +32,6 @@ import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
 import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.DELETE;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
-import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.MAPPER;
-import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.NAMESPACE;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.SELECT;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getBaseMethodNames;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getMethodName2ReturnType;
@@ -43,8 +40,8 @@ import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDoc
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
+import static com.github.dreamroute.mybatis.pro.core.util.XmlUtil.getNamespaceFromXmlResource;
 import static com.google.common.collect.Sets.difference;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
@@ -66,18 +63,18 @@ public class MyBatisProUtil {
 
     public static Resource[] buildMyBatisPro(Resource[] xmlResources, Set<String> mapperPackages) {
 
-        Set<Class<?>> existXmlMapper = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(MyBatisProUtil::getNamespaceFromXmlResource).collect(toSet());
-        Set<Class<?>> mappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(ClassPathUtil::resolvePackage).flatMap(Arrays::stream).map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
-        Set<Class<?>> extra = difference(mappers, existXmlMapper);
+        Set<Class<?>> presentXmlMappers = stream(ofNullable(xmlResources).orElse(new Resource[0])).map(XmlUtil::getNamespaceFromXmlResource).collect(toSet());
+        Set<Class<?>> allMappers = ofNullable(mapperPackages).orElseGet(HashSet::new).stream().map(ClassPathUtil::resolvePackage).flatMap(Arrays::stream).map(mapperPkgName -> scanPackageBySuper(mapperPkgName, Mapper.class)).flatMap(Set::stream).collect(toSet());
+        Set<Class<?>> absentXmlMappers = difference(allMappers, presentXmlMappers);
 
         Set<Resource> allResources = new HashSet<>();
-        Set<Resource> extraResource = extra.stream().map(MyBatisProUtil::createEmptyResource).collect(toSet());
-        allResources.addAll(extraResource);
+        Set<Resource> absentResources = absentXmlMappers.stream().map(XmlUtil::createEmptyResource).collect(toSet());
+        allResources.addAll(absentResources);
         allResources.addAll(asList(ofNullable(xmlResources).orElseGet(() -> new Resource[0])));
 
         // 缓存属性别名
         allResources.stream()
-                .map(MyBatisProUtil::getNamespaceFromXmlResource)
+                .map(XmlUtil::getNamespaceFromXmlResource)
                 .map(cn.hutool.core.util.ClassUtil::getTypeArgument)
                 .forEach(entityCls -> FIELDS_ALIAS_CACHE.computeIfAbsent(entityCls, MyBatisProUtil::getFieldAliasMap));
 
@@ -88,33 +85,6 @@ public class MyBatisProUtil {
         Set<Resource> result = processMapperMethods(all);
 
         return result.toArray(new Resource[0]);
-    }
-
-    /**
-     * 从mapper.xml文件中获取namespace
-     *
-     * @param resource mapper.xml数据流
-     */
-    public static Class<?> getNamespaceFromXmlResource(Resource resource) {
-        try {
-            XPathParser xPathParser = new XPathParser(resource.getInputStream(), true, null, new XMLMapperEntityResolver());
-            XNode mapperNode = xPathParser.evalNode(MAPPER.getCode());
-            String namespace = mapperNode.getStringAttribute(NAMESPACE.getCode());
-            return loadClass(namespace);
-        } catch (Exception e) {
-            throw new MyBatisProException("解析mapper.xml文件获取namespace出错", e);
-        }
-    }
-
-    private static Resource createEmptyResource(Class<?> mapper) {
-        String namespace = mapper.getName();
-        String xml =
-                "<?xml version='1.0' encoding='UTF-8' ?>\n" +
-                "<!DOCTYPE mapper\n" +
-                "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
-                "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
-                "<mapper namespace='" + namespace + "'></mapper>";
-        return new ByteArrayResource(xml.getBytes(UTF_8));
     }
 
     /**

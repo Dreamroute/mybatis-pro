@@ -30,7 +30,6 @@ import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getIdField;
 import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.isJavaBeanProp;
 import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
 import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.FIELDS_ALIAS_CACHE;
-import static com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil.getNamespaceFromXmlResource;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -62,7 +61,7 @@ public class MapperUtil {
 
     public MapperUtil(Resource resource) {
         this.document = createDocumentFromResource(resource);
-        Class<?> mapper = getNamespaceFromXmlResource(resource);
+        Class<?> mapper = XmlUtil.getNamespaceFromXmlResource(resource);
         Set<Class<?>> parentInters = getAllParentInterface(mapper);
         if (parentInters.contains(Mapper.class)) {
             this.entityCls = getTypeArgument(mapper);
