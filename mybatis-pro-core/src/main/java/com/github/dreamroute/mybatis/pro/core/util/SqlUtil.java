@@ -223,6 +223,12 @@ public class SqlUtil {
         return camelCase;
     }
 
+    /**
+     * 驼峰转下划线
+     *
+     * @param camelCase userName
+     * @return user_name
+     */
     public static String toLine(String camelCase) {
         Pattern humpPattern = Pattern.compile("[A-Z]");
         Matcher matcher = humpPattern.matcher(camelCase);

@@ -43,7 +43,7 @@ public class ClassUtil {
     private ClassUtil() {}
 
     /**
-     * 获取方法返回值类型
+     * 获取方法返回值类型，方法的返回值必须是List或者是单个类型
      *
      * @param method 方法
      * @return 返回值类型
@@ -138,10 +138,11 @@ public class ClassUtil {
     }
 
     /**
-     * 获取实体所有属性：
-     * 1. 具有getter、setter方法
-     * 2. 非serialVersionUID属性
-     * 3. 未被@Transient标记
+     * 获取实体所有JavaBean属性：
+     * <ol>
+     *     <li>JavaBean属性</li>
+     *     <li>未被@Transient标记</li>
+     * </ol>
      */
     public static Set<Field> getAllFields(Class<?> cls) {
         Field[] fs = getFields(cls);
@@ -152,7 +153,7 @@ public class ClassUtil {
     }
 
     public static boolean isJavaBeanProp(Reflector r, Field field) {
-        return r.hasGetter(field.getName()) && !hasAnnotation(field, Transient.class);
+        return r.hasGetter(field.getName()) && r.hasSetter(field.getName()) && !hasAnnotation(field, Transient.class);
     }
 
     public static Field getIdField(Class<?> cls) {

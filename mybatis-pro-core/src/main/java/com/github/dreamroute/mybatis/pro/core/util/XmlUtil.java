@@ -36,14 +36,20 @@ public class XmlUtil {
         }
     }
 
+    /**
+     * create a new and empty xml file of mapper.
+     *
+     * @param mapper namespace
+     * @return return an empty xml file
+     */
     public static Resource createEmptyResource(Class<?> mapper) {
         String namespace = mapper.getName();
         String xml =
                 "<?xml version='1.0' encoding='UTF-8' ?>\n" +
-                        "<!DOCTYPE mapper\n" +
-                        "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
-                        "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
-                        "<mapper namespace='" + namespace + "'></mapper>";
+                "<!DOCTYPE mapper\n" +
+                "        PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'\n" +
+                "        'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>\n" +
+                "<mapper namespace='" + namespace + "'></mapper>";
         return new ByteArrayResource(xml.getBytes(UTF_8));
     }
 }
