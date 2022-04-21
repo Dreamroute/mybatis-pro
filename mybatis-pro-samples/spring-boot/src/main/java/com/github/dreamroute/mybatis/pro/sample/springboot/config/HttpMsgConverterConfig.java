@@ -21,24 +21,22 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // 移除默认
-        converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
 
-        // 定义枚举序列化、反序列化
+        // 注册自定义module，处理枚举序列化、反序列化
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
         simpleModule.addDeserializer(Enum.class, new EnumMarkerDeserializer());
-
-        // 注册自定义module
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(simpleModule);
 
         // 自定义Converter
-        MappingJackson2HttpMessageConverter c = new MappingJackson2HttpMessageConverter();
-        c.setObjectMapper(mapper);
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(mapper);
 
+        // 移除默认
+        converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
         // 将自定义Converter添加到列表的第一个
-        converters.add(0, c);
+        converters.add(0, converter);
     }
 
 }

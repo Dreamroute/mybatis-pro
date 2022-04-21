@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * 插件功能：
@@ -97,7 +96,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     }
 
     private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {
-        /**
+        /*
          * mybatis封装参数的规则是：{@link MapperMethod#convertArgsToSqlCommandParam}
          * 1. 如果只有1个参数，那么取出参数，然后使用wrapToMapIfCollection包裹
          * 2. 如果多个参数，那么使用ParamMap来存，k就是参数的名称（jdk8+才支持的特性）：
@@ -176,7 +175,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject instanceof MapperMethod.ParamMap) {
-            MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
+            @SuppressWarnings("unchecked") MapperMethod.ParamMap<Object> params = (MapperMethod.ParamMap<Object>) parameterObject;
             if (params.containsKey(COLS)) {
                 String[] cols = (String[]) params.get(COLS);
                 if (cols != null && cols.length > 0) {

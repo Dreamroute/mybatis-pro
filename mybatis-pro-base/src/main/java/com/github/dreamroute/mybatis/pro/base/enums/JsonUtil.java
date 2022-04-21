@@ -9,7 +9,28 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import java.util.List;
 
 /**
- * 描述：序列化、反序列化工具类，默认将EnumMaker序列化成EnumMarker.getValue()，根据value反序列化成为EnumMarker
+ * 描述：枚举类型的序列化、反序列化工具类，将EnumMaker的实现类（枚举类型）进行如下操作：
+ * <ol>
+ *     <li>序列化：EnumMarker.getValue()</li>
+ *     <li>反序列化：EnumMarker.valueOf(value)</li>
+ * </ol>
+ * 举例：
+ * <pre>
+ *     // 性别（Gender）枚举类型
+ *     public enum Gender implements EnumMarker {
+ *         MALE(1, "男"),
+ *         FEMALE(2, "女");
+ *         private final Integer value;
+ *         private final String desc;
+ *     }
+ *
+ *     // Java实体类
+ *     public class User {
+ *         private String name;
+ *         private Gender gender;
+ *     }
+ *
+ * </pre>
  *
  * @author w.dehi.2021-12-19
  */
@@ -35,18 +56,18 @@ public class JsonUtil {
      * 序列化对象：将对象转换成json字符串
      *
      * <pre>
-     *      {
-     *          "name": "w.dehi",
-     *          "gender": EnumMarkder.getValue()
-     *      }
+     *     {
+     *         "name": "w.dehi",
+     *         "gender": EnumMarkder.getValue()
+     *     }
      *  </pre>
      *
-     * @param object pojo对象
+     * @param target pojo对象
      * @return 返回json字符串
      */
-    public static String toJsonStr(Object object) {
+    public static String toJsonStr(Object target) {
         try {
-            return MAPPER.writeValueAsString(object);
+            return MAPPER.writeValueAsString(target);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("序列化失败: ", e);
         }
@@ -64,12 +85,12 @@ public class JsonUtil {
      *       }
      *   </pre>
      *
-     * @param object pojo对象
+     * @param target pojo对象
      * @return 返回json字符串
      */
-    public static String toJsonStrForWeb(Object object) {
+    public static String toJsonStrForWeb(Object target) {
         try {
-            return MAPPER_FOR_WEB.writeValueAsString(object);
+            return MAPPER_FOR_WEB.writeValueAsString(target);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("序列化失败: ", e);
         }
@@ -77,30 +98,38 @@ public class JsonUtil {
 
     /**
      * 反序列化对象：将字符串转换成pojo对象
+     * <pre>
+     *     Json字符串：
+     *     {
+     *         "name": "w.deahi",
+     *         "gender": 1
+     *     }
      *
-     * @param input json字符串
+     * </pre>
+     *
+     * @param inputJson json字符串
      * @param clazz pojo类型
      */
-    public static <T> T parseObj(String input, Class<T> clazz) {
+    public static <T> T parseObj(String inputJson, Class<T> clazz) {
         try {
-            return MAPPER.readValue(input, clazz);
+            return MAPPER.readValue(inputJson, clazz);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("反序列化失败, 需要被反序列化的字符串: " + input, e);
+            throw new IllegalArgumentException("反序列化失败, 需要被反序列化的字符串: " + inputJson, e);
         }
     }
 
     /**
      * 反序列化列表：将字符串转换成pojo列表
      *
-     * @param input json字符串
+     * @param inputJson json字符串
      * @param clazz pojo类型
      */
-    public static <T> List<T> parseArr(String input, Class<T> clazz) {
+    public static <T> List<T> parseArr(String inputJson, Class<T> clazz) {
         try {
             CollectionType javaType = MAPPER.getTypeFactory().constructCollectionType(List.class, clazz);
-            return MAPPER.readValue(input, javaType);
+            return MAPPER.readValue(inputJson, javaType);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("反序列化失败, 需要被反序列化的字符串: " + input, e);
+            throw new IllegalArgumentException("反序列化失败, 需要被反序列化的字符串: " + inputJson, e);
         }
     }
 }

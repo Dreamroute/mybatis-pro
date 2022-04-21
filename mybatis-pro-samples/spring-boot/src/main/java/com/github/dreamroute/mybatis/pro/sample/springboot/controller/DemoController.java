@@ -6,13 +6,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 /**
  * 描述：测试枚举类型的HttpMessageConverter
  *
  * @author w.dehi.2021-12-20
  */
 @RestController
-@RequestMapping(produces = {"application/json;charset=UTF-8"})
+@RequestMapping(produces = {APPLICATION_JSON_VALUE})
 public class DemoController {
 
     /**

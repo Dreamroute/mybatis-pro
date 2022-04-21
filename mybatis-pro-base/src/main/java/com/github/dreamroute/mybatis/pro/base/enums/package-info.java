@@ -31,7 +31,7 @@
  * </pre>
  * 2. 也可以不自定义HttpMessageConverter，直接在EnumMarker头顶上加上序列化和反序列化的注解，例如：
  * <pre>
- *@JsonSerialize(using = JacksonSerializer.class)
+ * @JsonSerialize(using = JacksonSerializer.class)
  * @JsonDeserialize(using = JacksonDeserializer.class)
  * public interface EnumMarker extends Serializable {}
  * </pre>
