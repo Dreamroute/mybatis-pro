@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.base.time;
+package com.github.dreamroute.mybatis.pro.base.codec.date;
 
 import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.core.JsonGenerator;

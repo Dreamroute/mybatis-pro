@@ -1,6 +1,6 @@
 package com.github.dreamroute.mybatis.pro.interceptor;
 
-import com.github.dreamroute.mybatis.pro.base.enums.JsonUtil;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.JsonUtil;
 import com.github.dreamroute.mybatis.pro.core.consts.LogicalDeleteType;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
 import lombok.AllArgsConstructor;
@@ -36,8 +36,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
-import static com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties.LOGICAL_DELETE_TABLE_NAME;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.currentTimeMillis;
 import static org.apache.ibatis.mapping.SqlCommandType.DELETE;

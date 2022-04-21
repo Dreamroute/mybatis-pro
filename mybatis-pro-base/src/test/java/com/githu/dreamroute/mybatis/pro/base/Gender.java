@@ -1,6 +1,6 @@
 package com.githu.dreamroute.mybatis.pro.base;
 
-import com.github.dreamroute.mybatis.pro.base.enums.EnumMarker;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

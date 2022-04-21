@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.base.time;
+package com.github.dreamroute.mybatis.pro.base.codec.date;
 
 import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.core.JsonParser;
@@ -9,7 +9,7 @@ import org.springframework.beans.BeanUtils;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.github.dreamroute.mybatis.pro.base.time.DateSerializer.FORMAT;
+import static com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer.FORMAT;
 
 /**
  * 描述：日期反序列化，将'yyyy-MM-dd HH:mm:ss.SSS'反序列化成{@link java.util.Date}类型

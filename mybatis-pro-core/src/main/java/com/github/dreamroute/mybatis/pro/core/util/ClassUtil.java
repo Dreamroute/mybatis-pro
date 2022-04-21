@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
-import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
+import static com.github.dreamroute.mybatis.pro.base.codec.enums.JsonUtil.toJsonStr;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;

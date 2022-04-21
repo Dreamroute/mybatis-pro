@@ -2,10 +2,10 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerDeserializer;
-import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerSerializerForWeb;
-import com.github.dreamroute.mybatis.pro.base.time.DateDeserializer;
-import com.github.dreamroute.mybatis.pro.base.time.DateSerializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.DateDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerSerializerForWeb;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;

@@ -38,4 +38,4 @@
  *
  * @author w.dehi.2021-12-19
  */
-package com.github.dreamroute.mybatis.pro.base.enums;
+package com.github.dreamroute.mybatis.pro.base.codec.enums;

@@ -29,7 +29,7 @@ import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ClassUtil.getTypeArgument;
 import static cn.hutool.core.util.ClassUtil.loadClass;
 import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
-import static com.github.dreamroute.mybatis.pro.base.enums.JsonUtil.toJsonStr;
+import static com.github.dreamroute.mybatis.pro.base.codec.enums.JsonUtil.toJsonStr;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.DELETE;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
 import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.SELECT;

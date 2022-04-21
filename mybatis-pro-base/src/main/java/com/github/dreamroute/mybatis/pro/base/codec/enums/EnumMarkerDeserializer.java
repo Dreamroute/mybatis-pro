@@ -1,4 +1,4 @@
-package com.github.dreamroute.mybatis.pro.base.enums;
+package com.github.dreamroute.mybatis.pro.base.codec.enums;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
