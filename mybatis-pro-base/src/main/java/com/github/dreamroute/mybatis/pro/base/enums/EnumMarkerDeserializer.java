@@ -16,8 +16,8 @@ public class EnumMarkerDeserializer extends JsonDeserializer<Enum<?>> {
     @Override
     public Enum<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.currentName();
-        Object value = p.getCurrentValue();
-        Class<?> propertyType = BeanUtils.findPropertyType(name, value.getClass());
+        Object obj = p.getCurrentValue();
+        Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
         if (EnumMarker.class.isAssignableFrom(propertyType)) {
             int intValue = p.getIntValue();
             @SuppressWarnings("unchecked") Class<EnumMarker> c = (Class<EnumMarker>) propertyType;

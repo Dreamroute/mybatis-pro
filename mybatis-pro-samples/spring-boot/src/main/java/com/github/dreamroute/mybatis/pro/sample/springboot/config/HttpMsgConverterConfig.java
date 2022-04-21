@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerDeserializer;
 import com.github.dreamroute.mybatis.pro.base.enums.EnumMarkerSerializerForWeb;
+import com.github.dreamroute.mybatis.pro.base.time.DateDeserializer;
+import com.github.dreamroute.mybatis.pro.base.time.DateSerializer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,10 +25,17 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 
-        // 注册自定义module，处理枚举序列化、反序列化
+        // 注册自定义module
         SimpleModule simpleModule = new SimpleModule();
+
+        // 枚举序列化、反序列化
         simpleModule.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
         simpleModule.addDeserializer(Enum.class, new EnumMarkerDeserializer());
+
+        // 日期序列化、反序列化
+        simpleModule.addSerializer(Date.class, new DateSerializer());
+        simpleModule.addDeserializer(Date.class, new DateDeserializer());
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(simpleModule);
 
@@ -33,9 +43,8 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(mapper);
 
-        // 移除默认
+        // 移除默认并且将自定义Converter添加到列表的第一个
         converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
-        // 将自定义Converter添加到列表的第一个
         converters.add(0, converter);
     }
 

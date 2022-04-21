@@ -24,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class DemoControllerTest {
 
+    private static final String BIRTHDAY_STR = "2022-05-05 15:05:12.333";
+
     @Resource
     private MockMvc mockMvc;
 
@@ -37,6 +39,32 @@ public class DemoControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.gender.desc").value("女"));
+    }
+
+    /**
+     * 数组类型的枚举和日期反序列化
+     */
+    @Test
+    void arrTest() throws Exception {
+        String request = "{\n" +
+                "    \"demos\": [\n" +
+                "        {\n" +
+                "            \"gender\": 1,\n" +
+                "            \"birthday\": \"2022-05-05 15:05:12.333\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"gender\": 2,\n" +
+                "            \"birthday\": \"2022-05-05 15:05:12.333\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+        mockMvc.perform(post("/demo/arrTest").content(request).contentType(APPLICATION_JSON_VALUE))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.demos[0].gender.desc").value("男"))
+                .andExpect(jsonPath("$.demos[1].gender.desc").value("女"))
+                .andExpect(jsonPath("$.demos[0].birthday").value("2022-05-05 15:05:12.333"))
+                .andExpect(jsonPath("$.demos[1].birthday").value("2022-05-05 15:05:12.333"));
     }
 
 }

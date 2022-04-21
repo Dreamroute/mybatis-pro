@@ -5,14 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.github.dreamroute.mybatis.pro.base.time.DateDeserializer;
+import com.github.dreamroute.mybatis.pro.base.time.DateSerializer;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * 描述：枚举类型的序列化、反序列化工具类，将EnumMaker的实现类（枚举类型）进行如下操作：
+ * 描述：Json工具类，枚举类型/日期类型的序列化、反序列化工具类，将EnumMaker的实现类（枚举类型）进行如下操作：
  * <ol>
- *     <li>序列化：EnumMarker.getValue()</li>
- *     <li>反序列化：EnumMarker.valueOf(value)</li>
+ *     <li>枚举序列化：EnumMarker.getValue()</li>
+ *     <li>枚举反序列化：EnumMarker.valueOf(value)</li>
+ *     <li>日期序列化：Date -> yyyy-MM-dd HH:mm:ss.SSS</li>
+ *     <li>日期反序列化：yyyy-MM-dd HH:mm:ss.SSS -> Date</li>
  * </ol>
  * 举例：
  * <pre>
@@ -41,14 +46,25 @@ public class JsonUtil {
     private static final ObjectMapper MAPPER_FOR_WEB = new JsonMapper();
 
     static {
+
+        EnumMarkerDeserializer emd = new EnumMarkerDeserializer();
+        DateSerializer ds = new DateSerializer();
+        DateDeserializer dd = new DateDeserializer();
+
         SimpleModule module = new SimpleModule();
         module.addSerializer(Enum.class, new EnumMarkerSerializer());
-        module.addDeserializer(Enum.class, new EnumMarkerDeserializer());
+        module.addDeserializer(Enum.class, emd);
+
+        module.addSerializer(Date.class, ds);
+        module.addDeserializer(Date.class, dd);
         MAPPER.registerModule(module);
 
         SimpleModule moduleForWeb = new SimpleModule();
         moduleForWeb.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
-        moduleForWeb.addDeserializer(Enum.class, new EnumMarkerDeserializer());
+        moduleForWeb.addDeserializer(Enum.class, emd);
+
+        moduleForWeb.addSerializer(Date.class, ds);
+        moduleForWeb.addDeserializer(Date.class, dd);
         MAPPER_FOR_WEB.registerModule(moduleForWeb);
     }
 
