@@ -22,6 +22,7 @@
  *         SimpleModule module = new SimpleModule();
  *         module.addSerializer(Enum.class, new JacksonSerializer());
  *         module.addDeserializer(Enum.class, new JacksonDeserializer());
+ *         simpleModule.addDeserializer(Collection.class, new EnumMarkerDeserializerForCollection());
  *
  *         ObjectMapper om = new ObjectMapper();
  *         om.registerModule(module);
@@ -39,6 +40,17 @@
  * &#64;JsonDeserialize(using = JacksonDeserializer.class)
  * public interface EnumMarker extends Serializable {}
  * </pre>
+ *
+ * 3. 对于枚举类型fastjson和jackson选型问题，fastjson存在的问题：
+ * 1. 列表方式的枚举反序列化会oom；
+ * 2. 枚举类型传<code>null</code>会有默认认知0造成业务出错，业务中如果允许Gender为空，前端传{"gender": null}，那么gender就是0对应的枚举，而jackson就不会
+ * <pre>
+ *     public class Demo {
+ *         private Gender gender;
+ *     }
+ * </pre>
+ * 3. 并且通过{@link com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializerForCollection}能够解决列表方式的枚举问题，而fastjson的oom就不太好解决
+ *
  *
  * @author w.dehi.2021-12-19
  */

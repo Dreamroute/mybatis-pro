@@ -36,16 +36,20 @@ public class ClassPathUtil {
         MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
         // 解析路径
         packagePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packagePath) + "/" + DEFAULT_RESOURCE_PATTERN;
-        Set<String> result = new HashSet<>(); // 别名包路径集合
+        // 别名包路径集合
+        Set<String> result = new HashSet<>();
         try {
-            Resource[] resources = resolver.getResources(packagePath); // 根据路径 读取所有的类资源
+            // 根据路径 读取所有的类资源
+            Resource[] resources = resolver.getResources(packagePath);
             if (resources != null && resources.length > 0) {
                 MetadataReader metadataReader;
                 for (Resource resource : resources) {
                     if (resource.isReadable()) {
-                        metadataReader = metadataReaderFactory.getMetadataReader(resource); // 读取类的信息，每个 Resource 都是一个类资源
+                        // 读取类的信息，每个 Resource 都是一个类资源
+                        metadataReader = metadataReaderFactory.getMetadataReader(resource);
                         try {
-                            result.add(Class.forName(metadataReader.getClassMetadata().getClassName()).getPackage().getName()); // 存储类对应的包路径
+                            // 存储类对应的包路径
+                            result.add(Class.forName(metadataReader.getClassMetadata().getClassName()).getPackage().getName());
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
