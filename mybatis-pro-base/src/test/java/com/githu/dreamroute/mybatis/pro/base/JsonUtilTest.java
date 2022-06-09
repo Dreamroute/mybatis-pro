@@ -63,7 +63,7 @@ class JsonUtilTest {
         user.setGender(FEMALE);
 
         String str = JsonUtil.toJsonStr(user);
-        assertEquals("{\"id\":100,\"gender\":2,\"birthday\":\"2022-05-05 15:05:12.333\"}", str);
+        assertEquals("{\"id\":100,\"gender\":2,\"birthday\":\"2022-05-05 15:05:12\"}", str);
 
         User u = JsonUtil.parseObj(str, User.class);
         assertEquals(100L, u.getId());

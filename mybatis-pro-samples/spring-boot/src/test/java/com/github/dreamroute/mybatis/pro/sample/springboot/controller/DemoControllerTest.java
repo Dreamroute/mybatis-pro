@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class DemoControllerTest {
 
-    private static final String BIRTHDAY_STR = "2022-05-05 15:05:12.333";
+    private static final String BIRTHDAY_STR = "2022-05-05 15:05:12";
 
     @Resource
     private MockMvc mockMvc;
@@ -50,11 +50,11 @@ public class DemoControllerTest {
                 "    \"demos\": [\n" +
                 "        {\n" +
                 "            \"gender\": 1,\n" +
-                "            \"birthday\": \"2022-05-05 15:05:12.333\"\n" +
+                "            \"birthday\": \"" + BIRTHDAY_STR + "\"\n" +
                 "        },\n" +
                 "        {\n" +
                 "            \"gender\": 2,\n" +
-                "            \"birthday\": \"2022-05-05 15:05:12.333\"\n" +
+                "            \"birthday\": \"" + BIRTHDAY_STR + "\"\n" +
                 "        }\n" +
                 "    ]\n" +
                 "}";
@@ -63,8 +63,8 @@ public class DemoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.demos[0].gender.desc").value("男"))
                 .andExpect(jsonPath("$.demos[1].gender.desc").value("女"))
-                .andExpect(jsonPath("$.demos[0].birthday").value("2022-05-05 15:05:12.333"))
-                .andExpect(jsonPath("$.demos[1].birthday").value("2022-05-05 15:05:12.333"));
+                .andExpect(jsonPath("$.demos[0].birthday").value(BIRTHDAY_STR))
+                .andExpect(jsonPath("$.demos[1].birthday").value(BIRTHDAY_STR));
     }
 
 }
