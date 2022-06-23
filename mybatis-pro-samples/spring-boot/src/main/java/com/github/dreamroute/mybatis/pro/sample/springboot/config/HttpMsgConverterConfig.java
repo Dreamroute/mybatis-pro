@@ -1,17 +1,18 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.config;
 
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializerForCollection;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerSerializerForWeb;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
         // 枚举序列化、反序列化
         simpleModule.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
         simpleModule.addDeserializer(Enum.class, new EnumMarkerDeserializer());
-//        simpleModule.addDeserializer(Collection.class, new EnumMarkerDeserializerForCollection());
+        simpleModule.addDeserializer(Collection.class, new EnumMarkerDeserializerForCollection());
 
         // 日期序列化、反序列化
         simpleModule.addSerializer(Date.class, new DateSerializer());
@@ -40,8 +41,6 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(simpleModule);
-
-        DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
 
         // 自定义Converter
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

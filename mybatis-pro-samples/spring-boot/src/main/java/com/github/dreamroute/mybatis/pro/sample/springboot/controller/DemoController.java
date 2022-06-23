@@ -53,7 +53,6 @@ public class DemoController {
 
     @Data
     public static class DeserializeEnumDTO implements Serializable {
-        private Sub sub;
         private Collection<Gender> genders;
         private List<String> names;
         private Gender gender;
