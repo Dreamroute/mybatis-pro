@@ -50,8 +50,14 @@
  *     }
  * </pre>
  * 3. 并且通过{@link com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializerForCollection}能够解决列表方式的枚举问题，而fastjson的oom就不太好解决
- *
- *
+ * 4. 使用Jackson方式反序列化需要与前端约定：对于空对象，要么不传，要么传<code>null</code>，不能传空括号，如下json请求不允许：
+ * <pre>
+ *     {
+ *         "user": {}
+ *         "birthday": "1990-05-03"
+ *     }
+ * </pre>
+ * 因为这样的话，在自定义反序列化对象中，比如EnumMarkerDeserializer、EnumMarkerDeserializerForCollection、DateDeserializer的<code>p.getCurrentValue()</code>会读取错位，birthday会读取到User.class
  * @author w.dehi.2021-12-19
  */
 package com.github.dreamroute.mybatis.pro.base.codec.enums;
