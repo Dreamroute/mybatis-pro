@@ -53,10 +53,10 @@ class InsertTest {
     void insertListTest() {
         int size = 3;
         List<User> users = new ArrayList<>(3);
-        for (int i = 0; i < size; i++) {
-            User user = User.builder().name("w.dehai").password("123456").version(1L).phoneNo("1306006").build();
-            users.add(user);
-        }
+//        for (int i = 0; i < size; i++) {
+//            User user = User.builder().name("w.dehai").password("123456").version(1L).phoneNo("1306006").build();
+//            users.add(user);
+//        }
         userMapper.insertList(users);
         List<Long> ids = users.stream().map(User::getId).filter(Objects::nonNull).collect(toList());
         assertEquals(size, ids.size());
