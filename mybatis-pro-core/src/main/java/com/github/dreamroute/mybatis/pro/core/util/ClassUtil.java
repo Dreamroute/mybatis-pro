@@ -9,12 +9,11 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.reflection.Reflector;
+import org.springframework.core.ResolvableType;
 import org.springframework.util.ObjectUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static com.github.dreamroute.mybatis.pro.base.codec.enums.JsonUtil.toJsonStr;
 import static java.util.Arrays.stream;
+import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -49,18 +49,13 @@ public class ClassUtil {
      * @return 返回值类型
      */
     public static String getReturnType(Method method) {
-        Class<?> returnType = method.getReturnType();
 
-        // 普通类型
-        if (returnType != List.class) {
-            return returnType.getName();
+        ResolvableType type = ResolvableType.forMethodReturnType(method);
+        Class<?> resolve = type.resolve();
+        if (resolve == List.class) {
+            resolve = type.getGeneric(0).resolve();
         }
-
-        // List类型
-        Type genericReturnType = method.getGenericReturnType();
-        ParameterizedType pt = (ParameterizedType) genericReturnType;
-        Type actualTypeArgument = pt.getActualTypeArguments()[0];
-        return actualTypeArgument.getTypeName();
+        return ofNullable(resolve).orElseThrow(() -> new MyBatisProException("返回值只能是单个对象或者是List类型")).getName();
     }
 
     /**
