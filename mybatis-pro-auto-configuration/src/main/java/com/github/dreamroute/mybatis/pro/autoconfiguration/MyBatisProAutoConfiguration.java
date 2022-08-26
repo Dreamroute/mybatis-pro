@@ -70,7 +70,7 @@ public class MyBatisProAutoConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(MyBatisProAutoConfiguration.class);
     private final MybatisProperties properties;
     private final List<Interceptor> interceptors;
-    private final TypeHandler<?>[] typeHandlers;
+    private final TypeHandler[] typeHandlers;
     private final LanguageDriver[] languageDrivers;
     private final ResourceLoader resourceLoader;
     private final DatabaseIdProvider databaseIdProvider;
@@ -85,7 +85,7 @@ public class MyBatisProAutoConfiguration {
             MybatisProperties properties,
             ResourceLoader resourceLoader,
             ObjectProvider<List<Interceptor>> interceptorsProvider,
-            ObjectProvider<TypeHandler<?>[]> typeHandlersProvider,
+            ObjectProvider<TypeHandler[]> typeHandlersProvider,
             ObjectProvider<LanguageDriver[]> languageDriversProvider,
             ObjectProvider<DatabaseIdProvider> databaseIdProvider,
             ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
