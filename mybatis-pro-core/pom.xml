@@ -5,7 +5,6 @@
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mybatis-pro-core</artifactId>
     <name>${project.artifactId}</name>
@@ -14,22 +13,18 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-sdk</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-base</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>4.0</version>
         </dependency>
 
     </dependencies>

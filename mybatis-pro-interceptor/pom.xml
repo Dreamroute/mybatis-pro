@@ -16,7 +16,6 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-core</artifactId>
-            <version>${revision}</version>
         </dependency>
     </dependencies>
 
