@@ -19,17 +19,14 @@
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-auto-configuration</artifactId>
-			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-core</artifactId>
-			<version>${revision}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.dreamroute</groupId>
 			<artifactId>mybatis-pro-service</artifactId>
-			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 

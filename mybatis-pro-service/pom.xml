@@ -7,7 +7,6 @@
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mybatis-pro-service</artifactId>
     <name>${project.artifactId}</name>
@@ -16,17 +15,14 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-core</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
         </dependency>
     </dependencies>
 

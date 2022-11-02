@@ -5,7 +5,6 @@
         <groupId>com.github.dreamroute</groupId>
         <artifactId>mybatis-pro</artifactId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>mybatis-pro-auto-configuration</artifactId>
     <name>${project.artifactId}</name>
@@ -14,12 +13,10 @@
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-core</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.github.dreamroute</groupId>
             <artifactId>mybatis-pro-interceptor</artifactId>
-            <version>${revision}</version>
         </dependency>
     </dependencies>
 
