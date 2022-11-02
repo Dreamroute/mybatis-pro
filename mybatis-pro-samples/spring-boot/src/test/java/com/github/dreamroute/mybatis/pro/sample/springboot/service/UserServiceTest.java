@@ -60,6 +60,19 @@ class UserServiceTest {
     }
 
     @Test
+    void insertListPartitionTest() {
+        int size = 5;
+        List<User> users = new ArrayList<>(22);
+        for (int i = 0; i < size; i++) {
+            User user = User.builder().name("w.dehai").password("123456").version(1L).phoneNo("1306006").build();
+            users.add(user);
+        }
+        userService.insertList(users, 2);
+        List<Long> ids = users.stream().map(User::getId).filter(Objects::nonNull).collect(toList());
+        assertEquals(size, ids.size());
+    }
+
+    @Test
     void deleteTest() {
         User user = User.builder().name("w.dehai").version(1L).build();
         User result = userService.insert(user);

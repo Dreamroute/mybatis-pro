@@ -23,6 +23,11 @@ public interface BaseService<T, ID> {
     List<T> insertList(List<T> entityList);
 
     /**
+     * 批量新增（实体为空的属性也更新到数据库）
+     */
+    List<T> insertList(List<T> entityList, int partition);
+
+    /**
      * 根据id删除单个
      */
     int delete(ID id);

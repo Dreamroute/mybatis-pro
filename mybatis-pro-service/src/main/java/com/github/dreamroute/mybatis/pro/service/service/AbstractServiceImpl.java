@@ -1,8 +1,10 @@
 package com.github.dreamroute.mybatis.pro.service.service;
 
 import com.github.dreamroute.mybatis.pro.service.mapper.BaseMapper;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -32,7 +34,15 @@ public class AbstractServiceImpl<T, ID> implements BaseService<T, ID> {
     @Override
     @Transactional
     public List<T> insertList(List<T> entityList) {
-        mapper.insertList(entityList);
+        return insertList(entityList, 10);
+    }
+
+    @Override
+    public List<T> insertList(List<T> entityList, int partition) {
+        if (!CollectionUtils.isEmpty(entityList)) {
+            List<List<T>> result = Lists.partition(entityList, partition);
+            result.forEach(mapper::insertList);
+        }
         return entityList;
     }
 
