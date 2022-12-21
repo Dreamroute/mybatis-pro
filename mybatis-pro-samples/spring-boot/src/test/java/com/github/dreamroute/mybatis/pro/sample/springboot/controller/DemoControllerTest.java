@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-public class DemoControllerTest {
+class DemoControllerTest {
 
     private static final String BIRTHDAY_STR = "2022-05-05 15:05:12";
 
