@@ -24,7 +24,6 @@ public class DateDeserializer extends JsonDeserializer<Date> {
         Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
         if (Date.class.isAssignableFrom(propertyType)) {
             String dateStr = p.getValueAsString();
-            @SuppressWarnings("unchecked") Class<Date> c = (Class<Date>) propertyType;
             return DateUtil.parse(dateStr, FORMAT);
         }
         return null;
