@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static com.github.dreamroute.mybatis.pro.core.EnumTest.Gender.FEMALE;
 import static com.github.dreamroute.mybatis.pro.core.EnumTest.Gender.MALE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EnumTest {
 
@@ -29,6 +30,9 @@ class EnumTest {
         assertEquals(MALE, male);
         Gender female = EnumMarker.valueOf(Gender.class, 2);
         assertEquals(FEMALE, female);
+
+        // 抛异常
+        assertThrows(IllegalArgumentException.class, () -> EnumMarker.valueOf(Gender.class, 3));
     }
 
 }

@@ -39,7 +39,7 @@
 
     <properties>
 
-        <revision>1.6.7</revision>
+        <revision>1.6.8</revision>
 
         <!-- 默认仓库地址 -->
         <repository.url>https://maven.aliyun.com/repository/public</repository.url>

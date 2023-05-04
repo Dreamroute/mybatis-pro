@@ -1,6 +1,8 @@
 package com.github.dreamroute.mybatis.pro.base.codec.enums;
 
 import java.io.Serializable;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 枚举类型标记接口，实现此接口的枚举类型会被mybatis自动进行转型
@@ -37,14 +39,7 @@ public interface EnumMarker extends Serializable {
                 return e;
             }
         }
-        StringBuilder range = new StringBuilder("[");
-        for (int i = 0; i < enumConstants.length; i++) {
-            range.append(enumConstants[i].getValue());
-            if (i != enumConstants.length - 1) {
-                range.append(", ");
-            }
-        }
-        range.append("]");
-        throw new IllegalArgumentException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + range + "之内");
+        String valueList = Stream.of(enumConstants).map(EnumMarker::getValue).map(String::valueOf).collect(Collectors.joining(", ", "[", "]"));
+        throw new IllegalArgumentException("枚举值[" + value + "]不在" + enumCls.getSimpleName() + "的取值范围" + valueList + "之内");
     }
 }
