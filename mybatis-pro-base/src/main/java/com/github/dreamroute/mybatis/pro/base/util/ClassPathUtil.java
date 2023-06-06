@@ -9,7 +9,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +20,7 @@ import java.util.Set;
  */
 @Slf4j
 public class ClassPathUtil {
+    private ClassPathUtil() {}
 
     public static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
@@ -35,29 +36,24 @@ public class ClassPathUtil {
         // 元数据读取
         MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory(resolver);
         // 解析路径
-        packagePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packagePath) + "/" + DEFAULT_RESOURCE_PATTERN;
+        packagePath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils.convertClassNameToResourcePath(packagePath) + File.separator + DEFAULT_RESOURCE_PATTERN;
         // 别名包路径集合
         Set<String> result = new HashSet<>();
         try {
             // 根据路径 读取所有的类资源
             Resource[] resources = resolver.getResources(packagePath);
-            if (resources != null && resources.length > 0) {
+            if (resources.length > 0) {
                 MetadataReader metadataReader;
                 for (Resource resource : resources) {
                     if (resource.isReadable()) {
                         // 读取类的信息，每个 Resource 都是一个类资源
                         metadataReader = metadataReaderFactory.getMetadataReader(resource);
-                        try {
-                            // 存储类对应的包路径
-                            result.add(Class.forName(metadataReader.getClassMetadata().getClassName()).getPackage().getName());
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
+                        result.add(Class.forName(metadataReader.getClassMetadata().getClassName()).getPackage().getName());
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("解析带有通配符的路径失败, 路径信息为: " + packagePath, e);
         }
         return result.toArray(new String[0]);
     }
