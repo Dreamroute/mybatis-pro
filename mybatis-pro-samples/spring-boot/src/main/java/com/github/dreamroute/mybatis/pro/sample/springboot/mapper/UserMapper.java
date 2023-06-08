@@ -98,4 +98,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
     List<User> dynamicSqlSourceTest(List<Long> ids);
 
     User rawSqlSourceTest(Long id);
+
+    User testWhere(String name, String password);
+
+    User testTrim(String name, String password);
 }

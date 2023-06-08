@@ -22,4 +22,21 @@
         select * from smart_user where id = #{id}
     </select>
 
+    <select id="testTrim" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
+        select *
+        from smart_user
+        <trim prefixOverrides="and" prefix="where">
+            <if test="name != null and name != ''">name = #{name}</if>
+            <if test="password != null and password != ''">and password = #{password}</if>
+        </trim>
+    </select>
+
+    <select id="testWhere" resultType="com.github.dreamroute.mybatis.pro.sample.springboot.domain.User">
+        select * from smart_user
+        <where>
+            <if test="name != null and name != ''">and name = #{name}</if>
+            <if test ="password != null and password != ''">and password = #{password}</if>
+        </where>
+    </select>
+
 </mapper>

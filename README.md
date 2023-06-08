@@ -82,7 +82,7 @@ void proTest() {
 }
 ```
 - mybatis-plus：
-```java
+```
 @Test
 void plusTest() {
     LambdaQueryWrapper<User> qw = new LambdaQueryWrapper<>();
@@ -93,7 +93,7 @@ void plusTest() {
 ```
 
 - 通用mapper
-```java
+```
 @Test
 void mapperTest() {
     Example e = new Example(User.class);
