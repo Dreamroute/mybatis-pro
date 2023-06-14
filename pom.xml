@@ -58,7 +58,7 @@
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
 
         <!-- version -->
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <jsqlparser.version>4.0</jsqlparser.version>
         <hutool-all.version>5.7.22</hutool-all.version>
         <commons-io.version>2.7</commons-io.version>
