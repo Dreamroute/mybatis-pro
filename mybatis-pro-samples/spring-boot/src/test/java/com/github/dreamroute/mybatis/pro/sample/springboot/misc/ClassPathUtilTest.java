@@ -23,5 +23,9 @@ class ClassPathUtilTest {
         HashSet<String> result = Sets.newHashSet(pkg);
         assertTrue(result.contains(a));
         assertTrue(result.contains(b));
+
+        String basePath = "com.github.dreamroute.mybatis.pro.sample.springboot";
+        String[] pkgs = resolvePackage(basePath);
+        System.err.println(pkgs);
     }
 }
