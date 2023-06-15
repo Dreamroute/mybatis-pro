@@ -2,6 +2,7 @@ package com.github.dreamroute.mybatis.pro.sample.springboot.misc;
 
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.ObjectUtils;
 
 import java.util.HashSet;
 
@@ -24,8 +25,12 @@ class ClassPathUtilTest {
         assertTrue(result.contains(a));
         assertTrue(result.contains(b));
 
-        String basePath = "com.github.dreamroute.mybatis.pro.sample.springboot";
+        String basePath = "com.github.dreamroute.mybatis.pro.sample.springboot.c";
         String[] pkgs = resolvePackage(basePath);
-        System.err.println(pkgs);
+        if (!ObjectUtils.isEmpty(pkgs)) {
+            for (String p : pkgs) {
+                System.err.println(p);
+            }
+        }
     }
 }
