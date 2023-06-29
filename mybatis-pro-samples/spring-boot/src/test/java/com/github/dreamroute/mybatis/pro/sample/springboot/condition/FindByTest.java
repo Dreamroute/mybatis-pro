@@ -38,10 +38,10 @@ class FindByTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no", "version")
-                .values("w.dehai", "123456", "1306006", 1L)
-                .values("Jaedong", "123", "1306006", 1L)
-                .values("w.dehai", "123", "1306006", 2L)
+                .columns("name", "password", "phone_no", "version", "status")
+                .values("w.dehai", "123456", "1306006", 1L, 1)
+                .values("Jaedong", "123", "1306006", 1L, 1)
+                .values("w.dehai", "123", "1306006", 2L, 1)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }

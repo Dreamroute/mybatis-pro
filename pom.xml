@@ -39,7 +39,7 @@
 
     <properties>
 
-        <revision>1.7.0</revision>
+        <revision>1.7.1</revision>
 
         <!-- 默认仓库地址 -->
         <repository.url>https://maven.aliyun.com/repository/public</repository.url>
@@ -203,7 +203,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <skipTests>true</skipTests>
+                    <skipTests>false</skipTests>
                 </configuration>
             </plugin>
 

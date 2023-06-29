@@ -35,10 +35,10 @@ class LockerInterceptorTest {
         // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no", "version", "addr_info")
-                .values("w.dehai", "123456", "1306006", 1L, "成都")
-                .values("Jaedong", "123", "1306006", 1L, "北京")
-                .values("w.dehai", "123", "1306006", 2L, "美国")
+                .columns("name", "password", "phone_no", "version", "addr_info", "status")
+                .values("w.dehai", "123456", "1306006", 1L, "成都", 1)
+                .values("Jaedong", "123", "1306006", 1L, "北京", 1)
+                .values("w.dehai", "123", "1306006", 2L, "美国", 1)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }

@@ -16,29 +16,15 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static cn.hutool.core.annotation.AnnotationUtil.getAnnotationValue;
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
-import static cn.hutool.core.util.ClassUtil.getTypeArgument;
-import static cn.hutool.core.util.ClassUtil.loadClass;
-import static cn.hutool.core.util.ClassUtil.scanPackageBySuper;
+import static cn.hutool.core.util.ClassUtil.*;
 import static com.github.dreamroute.mybatis.pro.base.codec.enums.JsonUtil.toJsonStr;
-import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.DELETE;
-import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.ID;
-import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.SELECT;
-import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getBaseMethodNames;
-import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getMethodName2ReturnType;
-import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.getSpecialMethods;
-import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createDocumentFromResource;
-import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.createResourceFromDocument;
-import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.fillSqlNode;
+import static com.github.dreamroute.mybatis.pro.core.consts.MapperLabel.*;
+import static com.github.dreamroute.mybatis.pro.core.util.ClassUtil.*;
+import static com.github.dreamroute.mybatis.pro.core.util.DocumentUtil.*;
 import static com.github.dreamroute.mybatis.pro.core.util.SqlUtil.toLine;
 import static com.github.dreamroute.mybatis.pro.core.util.XmlUtil.getNamespaceFromXmlResource;
 import static com.google.common.collect.Sets.difference;
@@ -145,7 +131,7 @@ public class MyBatisProUtil {
 
     private static void cacheAlias(Map<String, String> returnTypeMap) {
         returnTypeMap.forEach((k, v) -> {
-            if (isFindByMethod(k)) {
+            if (isFindBy(k)) {
                 Class<?> returnType = loadClass(v);
                 FIELDS_ALIAS_CACHE.computeIfAbsent(returnType, MyBatisProUtil::getFieldAliasMap);
             }
@@ -203,8 +189,12 @@ public class MyBatisProUtil {
         return SqlUtil.createConditionFragment(conditions, alias);
     }
 
-    public static boolean isFindByMethod(String methodName) {
+    public static boolean isFindBy(String methodName) {
         return methodName.startsWith("findBy");
+    }
+
+    public static boolean isExistByOrCountByMethod(String methodName) {
+        return methodName.startsWith("existBy") || methodName.startsWith("countBy");
     }
 
 }

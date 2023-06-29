@@ -36,14 +36,14 @@ class InsertTest {
 
     @Test
     void insertTest() {
-        User user = User.builder().name("w.dehai").password("123456").version(1L).phoneNo("1306006").build();
+        User user = User.builder().name("w.dehai").password("123456").version(1L).phoneNo("1306006").status(1).build();
         userMapper.insert(user);
         assertEquals(1, userMapper.selectAll().size());
     }
 
     @Test
     void insertExcludeNullTest() {
-        User user = User.builder().name("w.dehai").version(1L).build();
+        User user = User.builder().name("w.dehai").version(1L).status(1).build();
         userMapper.insertExcludeNull(user);
         List<User> users = userMapper.selectAll();
         assertEquals("123456", users.get(0).getPassword());

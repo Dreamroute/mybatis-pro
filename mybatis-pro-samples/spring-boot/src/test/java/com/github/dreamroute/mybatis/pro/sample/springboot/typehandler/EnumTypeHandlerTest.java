@@ -33,6 +33,7 @@ class EnumTypeHandlerTest {
     void insertTest() {
         EnumTypeHandler enumTypeHandler = new EnumTypeHandler();
         enumTypeHandler.setGender(MALE);
+        enumTypeHandler.setStatus(1);
         int result = enumTypeHandlerMapper.insert(enumTypeHandler);
         assertEquals(1, result);
     }
@@ -41,6 +42,7 @@ class EnumTypeHandlerTest {
     void selectTest() {
         EnumTypeHandler enumTypeHandler = new EnumTypeHandler();
         enumTypeHandler.setGender(MALE);
+        enumTypeHandler.setStatus(1);
         enumTypeHandlerMapper.insert(enumTypeHandler);
         List<EnumTypeHandler> all = enumTypeHandlerMapper.selectAll();
         assertEquals(1, all.size());

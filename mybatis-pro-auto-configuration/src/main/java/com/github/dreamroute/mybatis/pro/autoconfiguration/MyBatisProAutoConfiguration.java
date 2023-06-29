@@ -10,11 +10,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.TypeHandler;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
-import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
-import org.mybatis.spring.boot.autoconfigure.MybatisLanguageDriverAutoConfiguration;
-import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
-import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
+import org.mybatis.spring.boot.autoconfigure.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
@@ -40,11 +36,7 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.github.dreamroute.mybatis.pro.core.consts.ToLineThreadLocal.TO_LINE;

@@ -10,4 +10,5 @@ public class EnumTypeHandler {
     @Id
     private Long id;
     private Gender gender;
+    private Integer status;
 }

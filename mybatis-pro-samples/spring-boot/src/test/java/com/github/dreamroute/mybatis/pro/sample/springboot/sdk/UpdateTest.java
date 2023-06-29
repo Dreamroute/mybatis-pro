@@ -32,8 +32,8 @@ class UpdateTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name")
-                .values("w.dehai").build();
+                .columns("name", "status")
+                .values("w.dehai", 1).build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }
 

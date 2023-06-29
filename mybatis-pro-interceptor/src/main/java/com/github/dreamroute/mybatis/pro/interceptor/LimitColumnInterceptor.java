@@ -2,9 +2,20 @@ package com.github.dreamroute.mybatis.pro.interceptor;
 
 import cn.hutool.core.io.FileUtil;
 import com.github.dreamroute.mybatis.pro.core.consts.MyBatisProProperties;
+import com.github.dreamroute.mybatis.pro.core.exception.MyBatisProException;
 import com.github.dreamroute.mybatis.pro.core.util.MyBatisProUtil;
 import com.github.dreamroute.mybatis.pro.core.util.SqlUtil;
 import com.github.dreamroute.mybatis.pro.sdk.SelectMapper;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -22,24 +33,24 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.github.dreamroute.mybatis.pro.core.consts.LogicalDeleteType.UPDATE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 /**
  * 插件功能：
- * 拦截mybatis-pro内置查询方法(也就是：SelectMapper接口的方法)以及findBy打头的方法，如果这些方法传参数有指定列名，那么将指定列名替换掉[select * from]中的"*"号，如果没有指定列名，那么用全部列替换星号。
+ * 1、拦截mybatis-pro内置查询方法(也就是：SelectMapper接口的方法)以及findBy打头的方法，如果这些方法传参数有指定列名，那么将指定列名替换掉[select * from]中的"*"号，如果没有指定列名，那么用全部列替换星号。
  * 特殊说明：由于同一个方法名可能传入的限制列不同，如果将列写死在ms的sql中，处出现冲突（只有第一个会生效），所以这里必须使用插件的方式将每个不同的方法（方法名+参数列表）进行缓存
+ *
+ * 2、如果，使用update方式的逻辑删除，那么在特殊方法的sql末尾追加状态条件
  *
  * @author : w.dehai.2021.04.01
  */
@@ -54,10 +65,16 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
     private static final String COLS = "cols";
 
     private static final List<String> SELECT_MAPPER_METHOD_NAMES = stream(SelectMapper.class.getDeclaredMethods()).map(Method::getName).collect(toList());
-    private static final Map<String, Boolean> ID_CACHE = new ConcurrentHashMap<>();
+    // findBy + base，且不是existBy和countBy
+    private static final Map<String, Boolean> FIND_OR_BASE_ID_CACHE = new ConcurrentHashMap<>();
+    // findBy + existBy + countBy + base
+    private static final Map<String, Boolean> EXIST_OR_COUNT_BASE_ID_CACHE = new ConcurrentHashMap<>();
     private static final Map<String, String> COLS_ALIAS = new HashMap<>();
 
     private Configuration configuration;
+
+    @Resource
+    private MyBatisProProperties props;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -71,28 +88,71 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
 
         MappedStatement ms = (MappedStatement) mo.getValue("delegate.mappedStatement");
         String id = ms.getId();
-        Boolean cached = ID_CACHE.computeIfAbsent(id, k -> {
+
+        Boolean findByCache = FIND_OR_BASE_ID_CACHE.computeIfAbsent(id, k -> {
             String methodName = FileUtil.getSuffix(k);
-            // start with findBy or base select methods.
-            return MyBatisProUtil.isFindByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
+            // start with findBy or existBy base select methods.
+            return MyBatisProUtil.isFindBy(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
         });
 
-        if (Boolean.TRUE.equals(cached)) {
+        Boolean existByOrCountByCache = EXIST_OR_COUNT_BASE_ID_CACHE.computeIfAbsent(id, k -> {
+            String methodName = FileUtil.getSuffix(k);
+            // start with findBy or existBy base select methods.
+            return MyBatisProUtil.isExistByOrCountByMethod(methodName) || SELECT_MAPPER_METHOD_NAMES.contains(methodName);
+        });
+
+
+        BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
+        String sql = null;
+        if (Boolean.TRUE.equals(findByCache)) {
             Class<?> returnType = ms.getResultMaps().get(0).getType();
             Map<String, String> alias = MyBatisProUtil.FIELDS_ALIAS_CACHE.get(returnType);
 
-            BoundSql boundSql = (BoundSql) mo.getValue("delegate.boundSql");
             String cols = getCols(id, boundSql, alias);
             cols = cols == null ? toColumns(alias.keySet(), alias) : cols;
 
-            String sql = boundSql.getSql();
+            sql = boundSql.getSql();
 
             // 替换星号
             sql = sql.replace(ASTERISK, cols);
-            configuration.newMetaObject(boundSql).setValue("sql", sql);
+        } else if (TRUE.equals(existByOrCountByCache)) {
+            sql = boundSql.getSql();
+        }
+
+        if (findByCache || existByOrCountByCache) {
+            String resultSql = appendState(sql);
+            configuration.newMetaObject(boundSql).setValue("sql", resultSql);
         }
 
         return invocation.proceed();
+    }
+
+    // 追加逻辑删除的状态
+    private String appendState(String sql) {
+        // 如果逻辑删除是update方式，那么在sql结尾追加（状态 = 有效）
+        if (props.getLogicalDeleteType() == UPDATE) {
+            try {
+                Select select = (Select) CCJSqlParserUtil.parse(sql);
+                PlainSelect body = (PlainSelect) select.getSelectBody();
+                Expression where = body.getWhere();
+                // where为空时追加一个状态条件
+                EqualsTo state = new EqualsTo(new Column(props.getLogicalDeleteColumn()), new LongValue(props.getLogicalDeleteActive()));
+                if (where == null) {
+                    body.setWhere(state);
+                }
+                // where不为空时，由于存在多个组合查询条件，将状态条件放在任何地方都不合适，因为可能会改变原有sql的含义，所以需要将原有条件用小括号包含然后和状态做与运算
+                else {
+                    // (原) and state = xxx
+                    Parenthesis p = new Parenthesis(where);
+                    AndExpression newWhere = new AndExpression().withLeftExpression(p).withRightExpression(state);
+                    body.setWhere(newWhere);
+                }
+                return select.toString();
+            } catch (JSQLParserException e) {
+                throw new MyBatisProException("SQL: " + sql + "格式有误");
+            }
+        }
+        return sql;
     }
 
     private String getCols(String id, BoundSql boundSql, Map<String, String> alias) {

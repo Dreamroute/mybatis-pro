@@ -41,19 +41,19 @@ class LimitColumnInterceptorTest {
         // init smat_user
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no", "version", "addr_info")
-                .values("w.dehai", "123456", "1306006", 1L, "成都")
-                .values("Jaedong", "123", "1306006", 1L, "北京")
-                .values("w.dehai", "123", "1306006", 2L, "美国")
+                .columns("name", "password", "phone_no", "version", "addr_info", "status")
+                .values("w.dehai", "123456", "1306006", 1L, "成都", 1)
+                .values("Jaedong", "123", "1306006", 1L, "北京", 1)
+                .values("w.dehai", "123", "1306006", 2L, "美国", 1)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
 
         // init smat_dict
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_dict")).launch();
         Insert insert2 = insertInto("smart_dict")
-                .columns("value", "cn_name")
-                .values(1, "有效")
-                .values(0, "无效")
+                .columns("value", "cn_name", "status")
+                .values(1, "有效", 1)
+                .values(0, "无效", 1)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert2).launch();
     }
@@ -79,7 +79,7 @@ class LimitColumnInterceptorTest {
      */
     @Test
     void selectByIdTest() {
-        Dict dict = dictMapper.selectById(1L, "id", "value", "cnName");
+        Dict dict = dictMapper.selectById(1L, "id", "value", "cnName", "status");
         assertEquals("有效", dict.getCnName());
         User user = userMapper.selectById(1L, "id", "name");
         assertEquals("w.dehai", user.getName());
@@ -91,7 +91,8 @@ class LimitColumnInterceptorTest {
 
     @Test
     void cacheTest() {
-        userMapper.findByIdLT(2L);
+        FindByIdLTDto byIdLT = userMapper.findByIdLT(2L);
+        System.err.println(byIdLT);
         Assertions.assertTrue(FIELDS_ALIAS_CACHE.containsKey(FindByIdLTDto.class));
     }
 

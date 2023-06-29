@@ -30,10 +30,10 @@ class CountByTest {
     void init() {
         new DbSetup(new DataSourceDestination(dataSource), truncate("smart_user")).launch();
         Insert insert = insertInto("smart_user")
-                .columns("name", "password", "phone_no")
-                .values("w.dehai", "123456", "1306006")
-                .values("Jaedong", "123", "1306006")
-                .values("Jaedong", "123", "1352332")
+                .columns("name", "password", "phone_no", "status")
+                .values("w.dehai", "123456", "1306006", 1)
+                .values("Jaedong", "123", "1306006", 1)
+                .values("Jaedong", "123", "1352332", 1)
                 .build();
         new DbSetup(new DataSourceDestination(dataSource), insert).launch();
     }

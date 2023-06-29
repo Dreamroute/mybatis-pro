@@ -27,6 +27,7 @@ CREATE TABLE `smart_dict` (
   `en_name` varchar(50) DEFAULT NULL,
   `cn_name` varchar(50) DEFAULT NULL,
   `sort` int(11) DEFAULT NULL,
+  `status` tinyint null,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 

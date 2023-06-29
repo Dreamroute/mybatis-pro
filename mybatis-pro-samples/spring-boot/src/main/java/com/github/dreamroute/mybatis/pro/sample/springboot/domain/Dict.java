@@ -25,4 +25,5 @@ public class Dict extends IdEntity {
     private String enName;
     private String cnName;
     private Integer sort;
+    private Integer status;
 }

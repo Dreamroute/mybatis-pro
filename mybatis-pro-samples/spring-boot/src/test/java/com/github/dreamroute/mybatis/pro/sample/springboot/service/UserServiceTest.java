@@ -16,9 +16,7 @@ import java.util.Objects;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ninja_squad.dbsetup.Operations.truncate;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author w.dehai
@@ -38,7 +36,7 @@ class UserServiceTest {
 
     @Test
     void insertTest() {
-        User user = User.builder().name("w.dehai").version(1L).build();
+        User user = User.builder().name("w.dehai").version(1L).status(1).build();
         User result = userService.insert(user);
         assertNotNull(result.getId());
 
@@ -99,6 +97,7 @@ class UserServiceTest {
         user.setId(100L);
         user.setName("w.dehai");
         user.setPassword("123456");
+        user.setStatus(1);
         userService.insert(user);
         User u = userService.selectById(1L);
         assertEquals("w.dehai", u.getName());
