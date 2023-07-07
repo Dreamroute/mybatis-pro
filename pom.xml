@@ -60,7 +60,7 @@
         <!-- version -->
         <guava.version>31.1-jre</guava.version>
         <jsqlparser.version>4.0</jsqlparser.version>
-        <hutool-all.version>5.7.22</hutool-all.version>
+        <hutool-all.version>5.8.20</hutool-all.version>
         <commons-io.version>2.7</commons-io.version>
         <commons-lang3.version>3.11</commons-lang3.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
