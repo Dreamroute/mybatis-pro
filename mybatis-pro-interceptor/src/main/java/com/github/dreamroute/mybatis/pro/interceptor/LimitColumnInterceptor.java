@@ -142,7 +142,7 @@ public class LimitColumnInterceptor implements Interceptor, ApplicationListener<
                 }
                 // where不为空时，由于存在多个组合查询条件，将状态条件放在任何地方都不合适，因为可能会改变原有sql的含义，所以需要将原有条件用小括号包含然后和状态做与运算
                 else {
-                    // (原) and state = xxx
+                    // (原始条件) and state = xxx
                     Parenthesis p = new Parenthesis(where);
                     AndExpression newWhere = new AndExpression().withLeftExpression(p).withRightExpression(state);
                     body.setWhere(newWhere);

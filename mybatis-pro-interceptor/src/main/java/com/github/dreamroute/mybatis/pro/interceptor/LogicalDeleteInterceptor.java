@@ -105,7 +105,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
                         ps.setObject(1, tableName);
                         ps.setObject(2, JsonUtil.toJsonStr(data));
                         ps.setTimestamp(3, new Timestamp(currentTimeMillis()));
-                        log.info("逻辑删除数据备份SQL: " + ps.toString());
+                        log.info("逻辑删除数据备份SQL: " + ps);
                         ps.addBatch();
                     }
                     ps.executeBatch();
@@ -114,7 +114,7 @@ public class LogicalDeleteInterceptor implements Interceptor {
             }
             return invocation.proceed();
         } else if (props.getLogicalDeleteType() == LogicalDeleteType.UPDATE) {
-            /**
+            /*
              * 原理：将delete改成update
              */
             String updateSql = "UPDATE " + tableName + " SET " + props.getLogicalDeleteColumn() + " = " + props.getLogicalDeleteInActive() + " WHERE " + delete.getWhere().toString();
