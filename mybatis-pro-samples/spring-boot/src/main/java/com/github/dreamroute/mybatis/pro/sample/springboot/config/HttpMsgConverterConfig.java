@@ -6,7 +6,7 @@ import com.github.dreamroute.mybatis.pro.base.codec.date.DateDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializerForCollection;
-import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerSerializerForWeb;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerSerializerForExtra;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -31,7 +31,7 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
         SimpleModule simpleModule = new SimpleModule();
 
         // 枚举序列化、反序列化
-        simpleModule.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
+        simpleModule.addSerializer(Enum.class, new EnumMarkerSerializerForExtra());
         simpleModule.addDeserializer(Enum.class, new EnumMarkerDeserializer());
         simpleModule.addDeserializer(Collection.class, new EnumMarkerDeserializerForCollection());
 

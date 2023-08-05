@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -25,14 +26,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class DemoController {
 
     /**
-     * 测试枚举的序列化和反序列化
+     * 测试枚举的序列化和反序列化（包括嵌套类型）
      *
-     * @param demo 请求参数中带有枚举类型的反序列化
      * @return 返回值中带有枚举类型的序列化
      */
     @PostMapping("/demo/enumTest")
-    Demo dm(@RequestBody Demo demo) {
-        return demo;
+    EnumDto enumTest(@RequestBody @Valid EnumDto enumDto) {
+        return enumDto;
     }
 
     @PostMapping("/demo/arrTest")
@@ -68,5 +68,17 @@ public class DemoController {
         private Gender gender;
     }
 
+    @Data
+    public static class EnumDto implements Serializable {
+        private Long id;
+        private Gender gender;
+        private EnumNestDto enumNestDto;
+    }
+
+    @Data
+    public static class EnumNestDto implements Serializable {
+        private Long id;
+        private Gender gender;
+    }
 
 }
