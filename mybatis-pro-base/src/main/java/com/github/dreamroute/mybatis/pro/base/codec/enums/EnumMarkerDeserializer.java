@@ -12,17 +12,20 @@ import java.io.IOException;
  *
  * @author w.dehi.2021-12-19
  */
-public class EnumMarkerDeserializer extends JsonDeserializer<Enum<?>> {
+public class EnumMarkerDeserializer extends JsonDeserializer<Enum<? extends EnumMarker>> {
     @Override
-    public Enum<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public Enum<? extends EnumMarker> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.currentName();
         Object obj = p.getCurrentValue();
         Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
-        if (EnumMarker.class.isAssignableFrom(propertyType)) {
-            int intValue = p.getIntValue();
-            @SuppressWarnings("unchecked") Class<EnumMarker> c = (Class<EnumMarker>) propertyType;
-            return (Enum<?>) EnumMarker.valueOf(c, intValue);
-        }
-        return null;
+
+        int intValue = p.getIntValue();
+        @SuppressWarnings("unchecked")
+        Class<EnumMarker> c = (Class<EnumMarker>) propertyType;
+        EnumMarker enumMarker = EnumMarker.valueOf(c, intValue);
+
+        @SuppressWarnings("unchecked")
+        Enum<? extends EnumMarker> resp = (Enum<? extends EnumMarker>) enumMarker;
+        return resp;
     }
 }

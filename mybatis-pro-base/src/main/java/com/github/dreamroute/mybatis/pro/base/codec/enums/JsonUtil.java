@@ -60,7 +60,7 @@ public class JsonUtil {
         MAPPER.registerModule(module);
 
         SimpleModule moduleForWeb = new SimpleModule();
-        moduleForWeb.addSerializer(Enum.class, new EnumMarkerSerializerForWeb());
+        moduleForWeb.addSerializer(EnumMarker.class, new EnumMarkerSerializerForWeb());
         moduleForWeb.addDeserializer(Enum.class, emd);
 
         moduleForWeb.addSerializer(Date.class, ds);

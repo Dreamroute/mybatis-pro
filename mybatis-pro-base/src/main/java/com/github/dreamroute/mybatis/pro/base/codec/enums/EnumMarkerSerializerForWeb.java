@@ -22,32 +22,23 @@ import java.io.IOException;
  *
  * @author w.dehi.2021-12-19
  */
-@SuppressWarnings("rawtypes")
-public class EnumMarkerSerializerForWeb extends JsonSerializer<Enum> {
-    @Override
-    public void serialize(Enum value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if (value instanceof EnumMarker) {
-            EnumMarker v = (EnumMarker) value;
+public class EnumMarkerSerializerForWeb extends JsonSerializer<EnumMarker> {
+    public EnumMarkerSerializerForWeb() {
+    }
 
-            EnumObj eo = new EnumObj(v.getValue(), v.getDesc());
-            gen.writeObject(eo);
-
-            // -- 也可以使用下面方式输出给前端，效果一样
+    public void serialize(EnumMarker value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeObject(new EnumObj(value.getValue(), value.getDesc()));
+        // -- 也可以使用下面方式输出给前端，效果一样
 //            gen.writeStartObject();
 //            gen.writeNumberField("value", v.getValue());
 //            gen.writeStringField("desc", v.getDesc());
 //            gen.writeEndObject();
-
-        } else {
-            gen.writeObject(value);
-        }
     }
 
     @Getter
     @RequiredArgsConstructor
-    private static class EnumObj implements EnumMarker {
+    private static class EnumObj {
         private final Integer value;
         private final String desc;
     }
 }
-
