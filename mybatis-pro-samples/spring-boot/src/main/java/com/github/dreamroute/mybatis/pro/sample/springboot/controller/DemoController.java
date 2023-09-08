@@ -79,6 +79,7 @@ public class DemoController {
     public static class EnumNestDto implements Serializable {
         private Long id;
         private Gender gender;
+        private EnumNestDto inner;
     }
 
 }
