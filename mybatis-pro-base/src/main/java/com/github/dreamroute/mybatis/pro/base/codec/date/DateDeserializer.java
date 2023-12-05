@@ -1,6 +1,7 @@
 package com.github.dreamroute.mybatis.pro.base.codec.date;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -24,7 +25,9 @@ public class DateDeserializer extends JsonDeserializer<Date> {
         Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
         if (Date.class.isAssignableFrom(propertyType)) {
             String dateStr = p.getValueAsString();
-            return DateUtil.parse(dateStr, FORMAT);
+            if (StrUtil.isNotBlank(dateStr)) {
+                return DateUtil.parse(dateStr, FORMAT);
+            }
         }
         return null;
     }
