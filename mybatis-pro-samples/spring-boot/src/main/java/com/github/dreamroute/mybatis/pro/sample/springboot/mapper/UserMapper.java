@@ -10,6 +10,8 @@ import java.util.List;
 public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByName(String name);
+    
+    List<User> findByNameLimit(String name, Integer limit);
 
     User findByPassword(String password, String... cols);
 
@@ -88,6 +90,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
     List<User> findByIdLTE(long id, String... cols);
 
     FindByIdLTDto findByIdLT(Long id);
+
+    List<User> findByNameAndPasswordOrderByIdLimit(String name, String password, int limit);
 
     @Data
     class FindByIdLTDto {

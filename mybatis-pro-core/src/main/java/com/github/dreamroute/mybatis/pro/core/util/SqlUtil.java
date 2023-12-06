@@ -22,6 +22,7 @@ public class SqlUtil {
     private static final String AND = KeyWord.AND;
     private static final String OR = KeyWord.OR;
     private static final String OPT = "Opt";
+    private static final String LIMIT = "Limit";
 
     private static final String ANDING = " and ";
     private static final String ORING = " or ";
@@ -31,11 +32,20 @@ public class SqlUtil {
     public static String createConditionFragment(String conditions, Map<String, String> alias) {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         conditions = conditions.replace(KeyWord.ORDER_BY, OB);
+        
+        // 判断limit
+        boolean limit = false;
+        if (conditions.endsWith(LIMIT)) {
+            limit = true;
+            conditions = conditions.substring(0, conditions.length() - LIMIT.length());
+        }
+
         List<String> result = nameToken(conditions);
-        return fragment(result, conditions.endsWith(OPT), alias);
+        
+        return fragment(result, conditions.endsWith(OPT), limit, alias);
     }
 
-    private static String fragment(List<String> tokens, boolean opt, Map<String, String> alias) {
+    private static String fragment(List<String> tokens, boolean opt, boolean limit, Map<String, String> alias) {
         StringBuilder builder = new StringBuilder();
         StringBuilder condition = new StringBuilder();
         StringBuilder orderByStr = new StringBuilder();
@@ -164,6 +174,11 @@ public class SqlUtil {
         // 将order by放在最后处理
         if (orderByStr.length() > 0) {
             builder.append(orderByStr);
+        }
+        
+        // 最终处理limit
+        if (limit) {
+            builder.append("limit #{limit}");
         }
 
         return builder.toString();
