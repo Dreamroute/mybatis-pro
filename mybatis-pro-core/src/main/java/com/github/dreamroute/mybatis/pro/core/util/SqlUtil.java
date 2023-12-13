@@ -32,7 +32,7 @@ public class SqlUtil {
     public static String createConditionFragment(String conditions, Map<String, String> alias) {
         // 将OrderBy替换成ORDERBY，不然OrderBy的头两个字幕要和Or关键字冲突，造成分割错乱
         conditions = conditions.replace(KeyWord.ORDER_BY, OB);
-        
+
         // 判断limit
         boolean limit = false;
         if (conditions.endsWith(LIMIT)) {
@@ -41,7 +41,7 @@ public class SqlUtil {
         }
 
         List<String> result = nameToken(conditions);
-        
+
         return fragment(result, conditions.endsWith(OPT), limit, alias);
     }
 
@@ -175,7 +175,7 @@ public class SqlUtil {
         if (orderByStr.length() > 0) {
             builder.append(orderByStr);
         }
-        
+
         // 最终处理limit
         if (limit) {
             builder.append("limit #{limit}");
@@ -208,12 +208,25 @@ public class SqlUtil {
     private static String keyPos(String name) {
         int andIndex = name.indexOf(AND);
         int orIndex = name.indexOf(OR);
+
+        // and和or后一个字符如果是小写，那么说明and和or是字段的一部分，比如OrderId，这种就不能查分成Or + derId
+        char a = name.charAt(andIndex + AND.length());
+        char o = name.charAt(orIndex + OR.length());
+        boolean alower = Character.isUpperCase(a);
+        boolean olower = Character.isUpperCase(o);
+
         if (andIndex == -1 && orIndex == -1) {
             return "";
         } else if (andIndex == -1) {
-            return OR;
+            if (olower) {
+                return OR;
+            }
+            return "";
         } else if (orIndex == -1) {
-            return AND;
+            if (alower) {
+                return AND;
+            }
+            return "";
         } else {
             return andIndex < orIndex ? AND : OR;
         }

@@ -10,6 +10,7 @@ CREATE TABLE `smart_user` (
   `version` bigint(20) DEFAULT NULL,
   `phone_no` varchar(20) DEFAULT NULL,
   `addr_info` varchar(255) DEFAULT NULL,
+  `order_id` varchar(50) DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;

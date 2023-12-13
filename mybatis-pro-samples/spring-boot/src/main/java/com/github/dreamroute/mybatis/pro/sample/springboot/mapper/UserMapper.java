@@ -93,6 +93,8 @@ public interface UserMapper extends BaseMapper<User, Long> {
 
     List<User> findByNameAndPasswordOrderByIdLimit(String name, String password, int limit);
 
+    User findByOrderId(String orderId);
+
     @Data
     class FindByIdLTDto {
         private Long id;

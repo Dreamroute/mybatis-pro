@@ -17,11 +17,7 @@ import java.util.List;
 
 import static com.ninja_squad.dbsetup.Operations.insertInto;
 import static com.ninja_squad.dbsetup.Operations.truncate;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author w.dehai
@@ -212,6 +208,11 @@ class FindByTest {
     void findByVersionTest() {
         List<User> users = userMapper.findByVersionOpt(null);
         assertEquals(3, users.size());
+    }
+
+    @Test
+    void findByOrderIdTest() {
+        userMapper.findByOrderId("123");
     }
 
 }

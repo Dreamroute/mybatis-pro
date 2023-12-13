@@ -50,11 +50,11 @@ class LimitTest {
         List<User> result = userMapper.findByNameLimit("w.dehai", 2);
         assertEquals(2, result.size());
         assertTrue(appender.contains(
-                "SELECT password, name, id, addr_info AS addr, version\n" +
-                "\t, phone_no AS phoneNo, status\n" +
-                "FROM smart_user\n" +
-                "WHERE name = 'w.dehai'\n" +
-                "LIMIT 2")
+                "SELECT password, order_id AS orderId, name, id, addr_info AS addr\n" +
+                        "\t, version, phone_no AS phoneNo, status\n" +
+                        "FROM smart_user\n" +
+                        "WHERE name = 'w.dehai'\n" +
+                        "LIMIT 2")
         );
     }
 
@@ -64,13 +64,13 @@ class LimitTest {
         List<User> users = userMapper.findByNameAndPasswordOrderByIdLimit("w.dehai", "123", 2);
         assertEquals(2, users.size());
         assertTrue(appender.contains(
-                "SELECT password, name, id, addr_info AS addr, version\n" +
-                "\t, phone_no AS phoneNo, status\n" +
-                "FROM smart_user\n" +
-                "WHERE name = 'w.dehai'\n" +
-                "\tAND password = '123'\n" +
-                "ORDER BY id\n" +
-                "LIMIT 2"
+                "SELECT password, order_id AS orderId, name, id, addr_info AS addr\n" +
+                        "\t, version, phone_no AS phoneNo, status\n" +
+                        "FROM smart_user\n" +
+                        "WHERE name = 'w.dehai'\n" +
+                        "\tAND password = '123'\n" +
+                        "ORDER BY id\n" +
+                        "LIMIT 2"
         ));
     }
 }
