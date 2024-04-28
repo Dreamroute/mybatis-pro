@@ -20,19 +20,6 @@
     <profiles>
         <profile>
             <id>nexus</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <repository>
-                    <id>nexus</id>
-                    <url>${dist.nexus.release}</url>
-                </repository>
-                <snapshotRepository>
-                    <id>nexus</id>
-                    <url>${dist.nexus.snapshot}</url>
-                </snapshotRepository>
-            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -48,16 +35,6 @@
         </profile>
         <profile>
             <id>oss</id>
-            <distributionManagement>
-                <repository>
-                    <id>oss</id>
-                    <url>${dist.oss.release}</url>
-                </repository>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>${dist.oss.snapshot}</url>
-                </snapshotRepository>
-            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -88,7 +65,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar-no-fork</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
