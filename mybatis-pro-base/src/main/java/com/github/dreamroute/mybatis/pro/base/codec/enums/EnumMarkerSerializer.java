@@ -25,7 +25,7 @@ public class EnumMarkerSerializer extends JsonSerializer<Enum> {
             EnumMarker v = (EnumMarker) value;
             gen.writeObject(v.getValue());
         } else {
-            gen.writeObject(value);
+            gen.writeObject(value.toString());
         }
     }
 }

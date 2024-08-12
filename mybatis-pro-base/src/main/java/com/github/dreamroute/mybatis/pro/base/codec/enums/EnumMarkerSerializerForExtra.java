@@ -33,7 +33,7 @@ public class EnumMarkerSerializerForExtra extends JsonSerializer<Enum> {
             String currentName = gen.getOutputContext().getCurrentName();
             gen.writeObjectField(currentName + "Desc", v.getDesc());
         } else {
-            gen.writeObject(value);
+            gen.writeObject(value.toString());
         }
     }
 }
