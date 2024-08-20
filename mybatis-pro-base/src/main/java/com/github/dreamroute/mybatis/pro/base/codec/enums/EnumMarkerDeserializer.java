@@ -18,7 +18,7 @@ public class EnumMarkerDeserializer extends JsonDeserializer<Enum<? extends Enum
     public Enum<? extends EnumMarker> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.currentName();
         if (StrUtil.contains(name, "_")) {
-            name = underscoreToPascalCase(name);
+            name = underscoreToCamelCase(name);
         }
         Object obj = p.getCurrentValue();
         Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
@@ -64,17 +64,4 @@ public class EnumMarkerDeserializer extends JsonDeserializer<Enum<? extends Enum
         return result.toString();
     }
 
-    /**
-     * 将下划线命名转换为首字母大写的驼峰命名
-     *
-     * @param str 下划线命名的字符串
-     * @return 首字母大写的驼峰命名字符串
-     */
-    public static String underscoreToPascalCase(String str) {
-        String camelCase = underscoreToCamelCase(str);
-        if (camelCase != null && !camelCase.isEmpty()) {
-            return camelCase.substring(0, 1).toUpperCase() + camelCase.substring(1);
-        }
-        return camelCase;
-    }
 }

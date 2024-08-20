@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
@@ -21,6 +22,9 @@ public class DateDeserializer extends JsonDeserializer<Date> {
     @Override
     public Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String name = p.currentName();
+        if (StrUtil.contains(name, "_")) {
+            name = EnumMarkerDeserializer.underscoreToCamelCase(name);
+        }
         Object obj = p.getCurrentValue();
         Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
         if (Date.class.isAssignableFrom(propertyType)) {

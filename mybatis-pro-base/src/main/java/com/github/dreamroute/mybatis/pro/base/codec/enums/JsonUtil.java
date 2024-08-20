@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer;
 
@@ -58,6 +59,7 @@ public class JsonUtil {
         module.addSerializer(Date.class, ds);
         module.addDeserializer(Date.class, dd);
         MAPPER.registerModule(module);
+        MAPPER.registerModule(new JavaTimeModule());
 
         SimpleModule moduleForWeb = new SimpleModule();
         moduleForWeb.addSerializer(EnumMarker.class, new EnumMarkerSerializerForWeb());
@@ -66,6 +68,7 @@ public class JsonUtil {
         moduleForWeb.addSerializer(Date.class, ds);
         moduleForWeb.addDeserializer(Date.class, dd);
         MAPPER_FOR_WEB.registerModule(moduleForWeb);
+        MAPPER_FOR_WEB.registerModule(new JavaTimeModule());
     }
 
     /**
