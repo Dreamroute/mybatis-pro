@@ -1,5 +1,6 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.Demo;
 import com.github.dreamroute.mybatis.pro.sample.springboot.domain.Gender;
 import lombok.Data;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -46,6 +49,12 @@ public class DemoController {
         return deserializeEnumDTO;
     }
 
+    @PostMapping("/demo/deserializeDateTest")
+    DeserializeDateDTO deserializeDateTest(@RequestBody DeserializeDateDTO req) {
+        System.err.println(req);
+        return req;
+    }
+
     @Data
     public static class DemoDTO implements Serializable {
         private List<Demo> demos;
@@ -59,6 +68,15 @@ public class DemoController {
         private List<Sub> subs;
         private Date birthday;
         private String[] roles;
+    }
+
+    @Data
+    public static class DeserializeDateDTO implements Serializable {
+        private Date date;
+        private LocalDate localDate;
+        private LocalDateTime localDateTime;
+        @JsonProperty("user_name")
+        private String userName;
     }
 
     @Data

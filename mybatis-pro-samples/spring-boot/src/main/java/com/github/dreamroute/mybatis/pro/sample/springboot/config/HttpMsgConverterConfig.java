@@ -1,9 +1,14 @@
 package com.github.dreamroute.mybatis.pro.sample.springboot.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.LocalDateDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.LocalDateSerializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.LocalDateTimeDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.date.LocalDateTimeSerializer;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializerForCollection;
 import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerSerializerForExtra;
@@ -12,6 +17,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +46,14 @@ public class HttpMsgConverterConfig implements WebMvcConfigurer {
         simpleModule.addSerializer(Date.class, new DateSerializer());
         simpleModule.addDeserializer(Date.class, new DateDeserializer());
 
+        simpleModule.addSerializer(LocalDate.class, new LocalDateSerializer());
+        simpleModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
+
+        simpleModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
+        simpleModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer());
+
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.registerModule(simpleModule);
 
         // 自定义Converter
