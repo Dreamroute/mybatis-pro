@@ -44,9 +44,8 @@ public class EnumMarkerSerializerForExtraCollection extends JsonSerializer<Colle
                     throw new IllegalArgumentException("返回值不允许是枚举类型Enumarker的集合类型, 因为无法增加Desc字段");
                 });
             }
-            System.err.println(value);
         } else {
-            gen.writeObject(value.toString());
+            gen.writeObject(value);
         }
     }
 }
