@@ -2,11 +2,11 @@ package com.github.dreamroute.mybatis.pro.base.codec.date;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.PropertyAliasCache;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
@@ -20,15 +20,11 @@ import java.time.LocalDateTime;
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
     @Override
     public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String name = p.currentName();
-        if (StrUtil.contains(name, "_")) {
-            name = EnumMarkerDeserializer.underscoreToCamelCase(name);
-        }
-        Object obj = p.getCurrentValue();
-        Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
+        String name = PropertyAliasCache.getFieldAliasMap(p);
+        Class<?> propertyType = BeanUtils.findPropertyType(name, p.getCurrentValue().getClass());
         if (LocalDateTime.class.isAssignableFrom(propertyType)) {
             String dateStr = p.getValueAsString();
-            if (StrUtil.isNotBlank(dateStr)) {
+            if (CharSequenceUtil.isNotBlank(dateStr)) {
                 try {
                     return LocalDateTimeUtil.parse(dateStr, DatePattern.NORM_DATETIME_FORMATTER);
                 } catch (Exception e) {

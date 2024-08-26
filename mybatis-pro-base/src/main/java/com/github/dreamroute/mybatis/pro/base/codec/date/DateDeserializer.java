@@ -1,11 +1,11 @@
 package com.github.dreamroute.mybatis.pro.base.codec.date;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.github.dreamroute.mybatis.pro.base.codec.enums.EnumMarkerDeserializer;
+import com.github.dreamroute.mybatis.pro.base.codec.PropertyAliasCache;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
@@ -21,15 +21,11 @@ import static com.github.dreamroute.mybatis.pro.base.codec.date.DateSerializer.F
 public class DateDeserializer extends JsonDeserializer<Date> {
     @Override
     public Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String name = p.currentName();
-        if (StrUtil.contains(name, "_")) {
-            name = EnumMarkerDeserializer.underscoreToCamelCase(name);
-        }
-        Object obj = p.getCurrentValue();
-        Class<?> propertyType = BeanUtils.findPropertyType(name, obj.getClass());
+        String name = PropertyAliasCache.getFieldAliasMap(p);
+        Class<?> propertyType = BeanUtils.findPropertyType(name, p.getCurrentValue().getClass());
         if (Date.class.isAssignableFrom(propertyType)) {
             String dateStr = p.getValueAsString();
-            if (StrUtil.isNotBlank(dateStr)) {
+            if (CharSequenceUtil.isNotBlank(dateStr)) {
                 try {
                     return DateUtil.parse(dateStr, FORMAT);
                 } catch (Exception e) {

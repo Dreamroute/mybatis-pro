@@ -39,7 +39,7 @@
 
     <properties>
 
-        <revision>1.7.14</revision>
+        <revision>1.7.15</revision>
 
         <!-- 默认仓库地址 -->
         <repository.nexus.url>https://maven.aliyun.com/repository/public</repository.nexus.url>
