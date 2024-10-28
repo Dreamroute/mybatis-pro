@@ -62,6 +62,14 @@ class InsertTest {
         assertEquals(size, ids.size());
     }
 
+    @Test
+    void insertWithIdTest() {
+        User user = new User();
+        user.setId(1000L);
+        user.setName("w.dehai");
+        userMapper.insert(user);
+    }
+
 }
 
 

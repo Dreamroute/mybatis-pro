@@ -13,7 +13,6 @@ import javax.validation.Valid;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -62,7 +61,7 @@ public class DemoController {
 
     @Data
     public static class DeserializeEnumDTO implements Serializable {
-        private Collection<Gender> genders;
+//        private Collection<Gender> genders;
         private List<String> names;
         private Gender gender;
         private List<Sub> subs;

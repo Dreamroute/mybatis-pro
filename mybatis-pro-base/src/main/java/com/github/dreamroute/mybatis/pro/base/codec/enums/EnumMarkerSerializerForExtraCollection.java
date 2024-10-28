@@ -41,9 +41,10 @@ public class EnumMarkerSerializerForExtraCollection extends JsonSerializer<Colle
         } else if (value instanceof Collection) {
             if (CollUtil.isNotEmpty(value)) {
                 value.stream().findAny().filter(e -> e instanceof EnumMarker).ifPresent(e -> {
-                    throw new IllegalArgumentException("返回值不允许是枚举类型Enumarker的集合类型, 因为无法增加Desc字段");
+                    throw new IllegalArgumentException("返回值不允许是枚举类型EnumMarker的集合类型, 因为无法推断Desc字段");
                 });
             }
+            gen.writeObject(value);
         } else {
             gen.writeObject(value);
         }

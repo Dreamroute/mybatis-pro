@@ -1,6 +1,7 @@
 package com.github.dreamroute.mybatis.pro.base.codec.enums;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -60,6 +61,7 @@ public class JsonUtil {
         module.addDeserializer(Date.class, dd);
         MAPPER.registerModule(module);
         MAPPER.registerModule(new JavaTimeModule());
+        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule moduleForWeb = new SimpleModule();
         moduleForWeb.addSerializer(EnumMarker.class, new EnumMarkerSerializerForWeb());
@@ -69,6 +71,7 @@ public class JsonUtil {
         moduleForWeb.addDeserializer(Date.class, dd);
         MAPPER_FOR_WEB.registerModule(moduleForWeb);
         MAPPER_FOR_WEB.registerModule(new JavaTimeModule());
+        MAPPER_FOR_WEB.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     /**
